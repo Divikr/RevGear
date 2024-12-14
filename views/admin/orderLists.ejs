@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevGear - Customer Details</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/customer.css">
+   <style>
+   
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-dark: #1a1d24;
+            --card-background: #2c3342;
+            --text-color: #e0e6ed;
+            --border-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            background-color: var(--background-dark);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .content-title {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #2c3e50;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .table thead {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .table th, .table td {
+            padding: 15px;
+            text-align: center;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tr {
+            background-color: var(--card-background);
+            transition: all 0.3s ease;
+        }
+
+        .table tr:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .bg-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .bg-danger {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .bg-primary {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+        }
+
+        .bg-warning {
+            background-color: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+        }
+
+        .view-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .pagination .page-link {
+            background-color: var(--card-background);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            margin: 0 5px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .page-link:hover,
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .product-detail {
+            display: flex;
+            align-items: center;
+        }
+
+        .product-detail img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+        #order-search{
+            width:50%;
+        }
+    </style>
+  
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar" id="sidebar">
+           
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+            </div>
+           
+
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item ">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item active">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupons" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/sales" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>RevGear</h1>
+                <a href="/admin/dashboard" id="adminlogout">Back</a>
+            </div>
+
+<br>
+<section class="content-main">
+    <div class="content-header mb-4">
+        <div>
+            <h2 class="content-title card-title">Order List</h2>
+           
+        </div>
+    </div>
+
+    <div class="card ">
+        <header class="card-header">
+            <div class="row gx-3">
+                <div class="col-lg-4 col-md-6 me-auto">
+                    <input type="text" placeholder="Search orders..." class="form-control" id="order-search">
+                </div>
+                </div><br>
+                <button  id="searchButton" class="btn btn-primary mt-2">Search</button>
+            
+        </header>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Sl.no</th>
+                            <th>ID</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Total Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (orders.length > 0) { %>
+                            <% orders.forEach((orderItem,index) => { %>
+                                <tr>
+                                    <td><%= index+1 %></td>
+                                    <td><%= orderItem._id %></td>
+                                    <td>
+                                        <span class="badge bg-<%= 
+                                            orderItem.orderStatus === 'Delivered' ? 'success' : 
+                                            orderItem.orderStatus === 'Cancelled' ? 'danger' : 
+                                            orderItem.orderStatus === 'Shipped' ? 'primary' : 
+                                            'warning' 
+                                        %>">
+                                            <%= orderItem.orderStatus %>
+                                        </span>
+                                    </td>
+                                    <td><%= new Date(orderItem.orderDate).toLocaleDateString() %></td>
+                                    <td><%= orderItem.userId.name %></td>
+                                    <td>₹<%= orderItem.totalAmount %></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm view-btn" data-id="<%= orderItem._id %>">
+                                            View Details
+                                        </button>                 
+                                          
+                                    </td>
+                                </tr>
+                                <% orderItem.items.forEach(item => { %>
+                                    <tr class="bg-light">
+                                        
+                                    </tr>
+                                <% }); %>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    No orders found.
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <% if (totalPages > 1) { %>
+        <div class="pagination mt-4">
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+                        </li>
+                    <% } %>
+
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+
+                    <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+    <% } %>
+</section>
+
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('order-search');
+    const searchButton = document.querySelector('.btn-primary');
+
+    searchButton.addEventListener('click', () => {
+        const searchTerm = searchInput.value;
+        window.location.href = `/admin/orders?search=${encodeURIComponent(searchTerm)}`;
+    });
+
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const searchTerm = searchInput.value;
+            window.location.href = `/admin/orders?search=${encodeURIComponent(searchTerm)}`;
+        }
+    });
+
+    document.querySelectorAll('.view-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const orderId = button.getAttribute('data-id');
+            window.location.href = `/admin/viewOrderLists/${orderId}`;
+        });
+    });
+});
+      
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+   
+                navItems.forEach((item, index) => {
+                    item.style.transitionDelay = `${index * 50}ms`;
+                });
+            });
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+
+            const adminAvatar = document.querySelector('.admin-avatar');
+            setInterval(() => {
+                adminAvatar.style.animation = 'pulse 1.5s infinite';
+                setTimeout(() => {
+                    adminAvatar.style.animation = 'none';
+                }, 1500);
+            }, 5000);
+        });
+
+
+
+        
+        
+    </script>
+</body>
+</html>

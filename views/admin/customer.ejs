@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevGear - Customer Details</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/customer.css">
+   
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar" id="sidebar">
+           
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+            </div>
+           
+
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item active">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupons" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/sales" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>RevGear</h1>
+                <a href="/admin/dashboard" id="adminlogout">Back</a>
+            </div>
+
+<br>
+          <div class="search-bar">
+            <input type="text" placeholder="Search customers..." value="<%= search %>">
+            <button class="search-button">Search</button>
+        </div>
+        <br>
+
+          <table>
+              <thead>
+                  <tr>
+                    <th>Sl.No</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Status</th>
+                      <th class="action-btn">Action</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <% if (data && data.length > 0) { %>
+                      <% for (let i=0; i<data.length; i++) { %>
+                          <tr>
+                            <td><%= i+1 %></td>
+                              <td><%= data[i].name %></td>
+                              <td><%= data[i].email %></td>
+                              <td><%= data[i].phone %></td>
+                              <td>
+
+                                <a href="/admin/toggleCustomerBlock?id=<%=data[i]._id%>&page=<%= currentPages %>&search=<%= search %>" class="status-badge <%= data[i].isBlocked ? 'status-blocked' : 'status-active' %>"><%= data[i].isBlocked ? 'Blocked' : 'Active' %></a>
+
+                              
+                                </td>
+
+
+                              <td class="action-buttons">
+                                  <button class="btn btn-view">View</button>
+                                  <% if (!data[i].isBlocked) { %>
+                                      <a href="/admin/toggleCustomerBlock?id=<%=data[i]._id%>" class="btn btn-block">Block</a>
+                                  <% } else { %>
+                                      <a href="/admin/toggleCustomerBlock?id=<%=data[i]._id%>" class="btn btn-unblock">Unblock</a>
+                                  <% } %>
+                              </td>
+                          </tr>
+                      <% } %>
+                  <% } else { %>
+                      <tr>
+                          <td colspan="5" style="text-align: center; color: var(--text-secondary);">No customers found</td>
+                      </tr>
+                  <% } %>
+              </tbody>
+          </table>
+
+          <% if (totalPages > 1) { %>
+            <div class="pagination">
+                <% if (currentPages > 1) { %>
+                    <a href="/admin/customer?page=<%= currentPages - 1 %><%= search ? '&search=' + search : '' %>" class="btn">Previous</a>
+                <% } %>
+
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <a href="/admin/customer?page=<%= i %><%= search ? '&search=' + search : '' %>" 
+                       class="btn <%= currentPages === i ? 'active' : '' %>">
+                        <%= i %>
+                    </a>
+                <% } %>
+
+                <% if (currentPages < totalPages) { %>
+                    <a href="/admin/customer?page=<%= currentPages + 1 %><%= search ? '&search=' + search : '' %>" class="btn">Next</a>
+                <% } %>
+            </div>
+          <% } %>
+      </div>
+  </div>
+
+
+    <script>
+       document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.querySelector('.search-bar input');
+            const searchButton = document.querySelector('.search-button');
+
+            searchButton.addEventListener('click', () => {
+                const searchTerm = searchInput.value;
+                window.location.href = `/admin/customer?search=${encodeURIComponent(searchTerm)}`;
+            });
+
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const searchTerm = searchInput.value;
+                    window.location.href = `/admin/customer?search=${encodeURIComponent(searchTerm)}`;
+                }
+            });
+        });
+      
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+   
+                navItems.forEach((item, index) => {
+                    item.style.transitionDelay = `${index * 50}ms`;
+                });
+            });
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+
+            const adminAvatar = document.querySelector('.admin-avatar');
+            setInterval(() => {
+                adminAvatar.style.animation = 'pulse 1.5s infinite';
+                setTimeout(() => {
+                    adminAvatar.style.animation = 'none';
+                }, 1500);
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

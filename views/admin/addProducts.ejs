@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RevGear - Add Product</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/addProduct.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <style>
+    .cropped-image {
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      object-fit: cover;
+    }
+
+    .delete-button {
+      display: block;
+      margin-top: 5px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    .image-wrapper {
+      display: inline-block;
+      text-align: center;
+      margin: 10px;
+    }
+
+    .size-btn.selected {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .size-input-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .size-input-group {
+      display: none;
+      align-items: center;
+    }
+
+    .size-input-group.active {
+      display: flex;
+    }
+
+    .size-input-group label {
+      margin-right: 10px;
+    }
+
+    .size-input-group input {
+      width: 100px;
+    }
+  </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="sidebar" id="sidebar">
+         
+
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+               
+            </div>
+
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item active">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item ">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item ">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupons" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/sales" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>RevGear</h1>
+                <a href="/admin/dashboard" id="adminlogout">Back</a>
+            </div>
+      <br>
+      <div class="add-product-container">
+        <div class="product-info-container">
+
+          <div class="form-group image-upload">
+            <label for="product-images">Product Images (Max 4)</label>
+            <div class="image-upload-container">
+              <div class="image-upload-item" id="add-image-button">
+                <i class="fas fa-plus"></i>
+                <span>Add Image</span>
+              </div>
+              <input type="file" id="image-input" name="productImage" accept="image/*" style="display: none;">
+            </div>
+            <div id="image-preview-container" class="image-preview-container"></div>
+          </div>
+
+       
+          <div id="cropper-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+              <h2>Crop Image</h2>
+              <div id="cropper-container">
+                <img id="cropper-image" alt="To be cropped" />
+              </div>
+              <button id="crop-button">Crop</button>
+              <button id="cancel-crop-button">Cancel</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="product-name">Product Name</label>
+            <input type="text" id="product-name" placeholder="Type product name here..." required>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Product Description</label>
+            <input type="text" id="description" placeholder="Type product description here..." required>
+          </div>
+
+
+          <div class="form-group">
+            <label for="product-category">Category</label>
+            <select id="product-category" required>
+              <option value="" disabled selected>Select a category</option>
+              <% categories.forEach((category) => { %>
+              <option value="<%= category.name %>"><%= category.name %></option>
+              <% }) %>
+            </select>
+          </div>
+
+
+          <div class="form-group">
+            <label for="stock">Total Stock</label>
+            <input type="number" id="stock" placeholder="Total stock will be calculated automatically">
+          </div>
+
+          <div class="form-group">
+            <label for="product-price">Price</label>
+            <input type="number" id="product-price" placeholder="Enter price here..." required min="0" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="product-offer">Offer (%)</label>
+            <input type="number" id="product-offer" placeholder="Enter offer percentage here..." min="0" max="100" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="product-sale-price">Sale Price</label>
+            <input type="number" id="product-sale-price" placeholder="Sale price will be calculated..." min="0" step="0.01" readonly>
+          </div>
+          <button class="save-product">Save Product</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      
+      const maxImages = 4;
+      const imageInput = document.getElementById('image-input');
+      const imagePreviewContainer = document.getElementById('image-preview-container');
+      const addImageButton = document.getElementById('add-image-button');
+      const cropperModal = document.getElementById('cropper-modal');
+      const cropperImage = document.getElementById('cropper-image');
+      const cropButton = document.getElementById('crop-button');
+      const cancelCropButton = document.getElementById('cancel-crop-button');
+
+      let cropper;
+
+      addImageButton.addEventListener('click', () => {
+        if (imagePreviewContainer.childElementCount < maxImages) {
+          imageInput.click();
+        } else {
+          alert('Maximum of 4 images allowed.');
+        }
+      });
+
+      imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            cropperImage.src = event.target.result;
+            openCropperModal();
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      function openCropperModal() {
+        cropperModal.style.display = 'block';
+        cropper = new Cropper(cropperImage, {
+          aspectRatio: 1,
+          viewMode: 1,
+        });
+      }
+  
+      function closeCropperModal() {
+        cropperModal.style.display = 'none';
+        cropper.destroy();
+        cropper = null;
+      }
+
+      cropButton.addEventListener('click', () => {
+        const croppedCanvas = cropper.getCroppedCanvas();
+        const croppedImage = document.createElement('img');
+        const deleteButton = document.createElement('button');
+
+        croppedImage.src = croppedCanvas.toDataURL('image/png');
+        croppedImage.classList.add('cropped-image');
+
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('delete-button');
+        deleteButton.addEventListener('click', () => {
+          croppedImage.parentElement.remove();
+        });
+
+        const imageWrapper = document.createElement('div');
+        imageWrapper.classList.add('image-wrapper');
+        imageWrapper.appendChild(croppedImage);
+        imageWrapper.appendChild(deleteButton);
+
+        imagePreviewContainer.appendChild(imageWrapper);
+
+        closeCropperModal();
+      });
+
+      cancelCropButton.addEventListener('click', closeCropperModal);
+
+      document.querySelector('.save-product').addEventListener('click', async function() {
+        const requiredFields = [
+          'product-name', 'product-category',
+          'stock', 'product-price',
+        ];
+
+        const formData = new FormData();
+
+        formData.append('productName', document.getElementById('product-name').value);
+        formData.append('description', document.getElementById('description').value);
+        formData.append('category', document.getElementById('product-category').value);
+        formData.append('regularPrice', document.getElementById('product-price').value);
+        formData.append('salePrice', document.getElementById('product-sale-price').value || '');
+        formData.append('productOffer', document.getElementById('product-offer').value || '');
+        formData.append('quantity', document.getElementById('stock').value || '');
+
+
+        const imageWrappers = document.querySelectorAll('.image-wrapper img');
+        for (let [index, img] of imageWrappers.entries()) {
+          const response = await fetch(img.src);
+          const blob = await response.blob();
+          formData.append('productImage', blob, `product-image-${index}.png`);
+        }
+
+        try {
+          const response = await fetch('/admin/addproduct', {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            alert("Product saved successfully!");
+            window.location.href = '/admin/product';
+          } else {
+            console.error('Product save failed', result);
+            alert(result.error || 'Failed to save product');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('An error occurred while saving the product');
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const navItems = document.querySelectorAll('.nav-item');
+
+         
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                
+                navItems.forEach((item, index) => {
+                    item.style.transitionDelay = `${index * 50}ms`;
+                });
+            });
+
+         
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+
+      
+            const adminAvatar = document.querySelector('.admin-avatar');
+            setInterval(() => {
+                adminAvatar.style.animation = 'pulse 1.5s infinite';
+                setTimeout(() => {
+                    adminAvatar.style.animation = 'none';
+                }, 1500);
+            }, 5000);
+        });
+    </script>
+
+
+<script>
+  const priceInput = document.getElementById('product-price');
+  const offerInput = document.getElementById('product-offer');
+  const salePriceInput = document.getElementById('product-sale-price');
+
+  
+  function calculateSalePrice() {
+    const price = parseFloat(priceInput.value) || 0;
+    const offer = parseFloat(offerInput.value) || 0;
+
+
+    if (offer < 0 || offer > 100) {
+      alert("Offer percentage should be between 0 and 100.");
+      return;
+    }
+
+    const salePrice = price - (price * (offer / 100));
+    salePriceInput.value = salePrice.toFixed(2); 
+  }
+
+
+  priceInput.addEventListener('input', calculateSalePrice);
+  offerInput.addEventListener('input', calculateSalePrice);
+</script>
+</body>
+
+</html>

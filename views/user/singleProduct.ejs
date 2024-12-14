@@ -1,0 +1,357 @@
+<%- include("../partials/header.ejs")  %>
+
+<main class="container mx-auto px-4 py-8">
+  <div class="grid md:grid-cols-2 gap-8">
+    <div class="space-y-4">
+      <div class="bg-white p-4 rounded-lg shadow main-image zoom-container">
+        <img src="<%= product.productImage[0] %>" alt="Product" class="w-full" id="mainImage">
+      </div>
+      <div class="flex space-x-4 overflow-x-auto p-2">
+        <% product.productImage.forEach((image, index) => { %>
+          <img src="<%= image %>" alt="Thumbnail <%= index + 1 %>" 
+               class="thumbnail w-20 h-20 object-cover rounded-lg cursor-pointer opacity-70 hover:opacity-100 <%= index === 0 ? 'border-2 border-red-600 opacity-100' : '' %>">
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <h1 class="text-3xl font-bold"><%= product.productName %></h1>
+      <div>
+        <p><%= product.description %>
+          
+        </p>
+      <br>
+      <div class="flex items-center space-x-2">
+        <div class="text-yellow-400">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="far fa-star"></i>
+        </div>
+        <span class="text-gray-600">(150 Reviews)</span>
+      </div>
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center">
+          <span class="text-2xl font-bold text-red-600">₹<%= Math.round(product.salePrice) %></span>
+          <span class="text-sm text-gray-500 line-through ml-2">₹<%= product.regularPrice %></span>
+        </div>
+        
+      </div>
+      <div>
+        <% if (product.quantity > 0) { %>
+        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded"><%= product.productOffer %> % OFF</span>
+        <% } else { %>
+        <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded out-of-stock-indicator">Out of Stock</span>
+        <% } %>
+      </div>
+   
+    </div>
+      <div>
+        <h3 class="font-semibold mb-2">Quantity</h3>
+        <div class="flex items-center space-x-4">
+          <button id="decreaseQuantity" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">-</button>
+          <span id="quantity" class="font-semibold">1</span>
+          <button id="increaseQuantity" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">+</button>
+        </div>
+      </div>
+    
+
+      <div class="flex space-x-4">
+        <button   onclick="addToCart('<%= product._id %>')" id="addToCart" class="flex-grow bg-red-600 text-white py-3 rounded-full hover:bg-red-700 transition-colors">
+          Add to Cart
+        </button>
+        <button 
+        onclick="addToWishlists('<%= product._id %>', this)" 
+        id="addToWishlist" 
+        class="w-16 bg-gray-100 text-gray-700 py-3 rounded-full hover:bg-gray-200 transition-colors flex items-center justify-center"
+    >
+        <i class="fas fa-heart"></i>
+    </button>
+      </div>
+
+      <div class="space-y-4 border-t pt-4">
+        <div>
+          <h3 class="font-semibold">Free Delivery</h3>
+          <p class="text-gray-600">Enter your postal code for delivery availability</p>
+        </div>
+        <div>
+          <h3 class="font-semibold">Return Policy</h3>
+          <p class="text-gray-600">Free 30-day delivery returns. Details</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="related-products container mx-auto px-4 py-8">
+  <h2 class="text-2xl font-bold mb-6">Related Items</h2>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <% relatedProducts.forEach(product => { %>
+  
+    <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 animate-fade-in relative flex flex-col">
+  
+      <div class="relative overflow-hidden group h-64">
+        <div class="image-slider flex transition-transform duration-500 ease-in-out h-full">
+          <% product.productImage.forEach(image => { %>
+          <img src="<%= image %>" alt="<%= product.name %>" class="w-full h-full object-cover flex-shrink-0">
+          <% }) %>
+        </div>
+      </div>
+      
+      <a href="/product/<%= product._id %>" class="block flex-grow">
+        <!-- Product Info -->
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2"><%= product.productName %></h3>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+              <span class="text-2xl font-bold text-red-600">₹<%= Math.round(product.salePrice) %></span>
+              <span class="text-sm text-gray-500 line-through ml-2">₹<%= product.regularPrice %></span>
+            </div>
+            <% if (product.quantity > 0) { %>
+            <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded"><%= product.productOffer %> % OFF</span>
+            <% } else { %>
+            <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded out-of-stock-indicator">Out of Stock</span>
+            <% } %>
+          </div>
+
+          <!-- Rating Stars -->
+          <div class="flex items-center mb-4">
+            <div class="flex text-yellow-400">
+              <% for (let i = 1; i <= 5; i++) { %>
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+              </svg>
+              <% } %>
+            </div>
+            <span class="text-gray-600 ml-2">(4.5)</span>
+          </div>
+        </div>
+      </a>
+     
+      <!-- Wishlist Button -->
+      <div class="px-6 pb-6 mt-auto">
+        <button onclick="addToWishlist('<%= product._id %>', this)" data-product-id="<%= product._id %>" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 wishlist-btn <%= product.quantity === 0 ? 'opacity-50 cursor-not-allowed' : '' %>" <%= product.quantity === 0 ? 'disabled' : '' %>>
+          <span class="wishlist-text flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            Add to Wishlist
+          </span>
+        </button>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+</div>
+
+   <%- include("../partials/footer.ejs")  %>
+
+   <style>
+    .main-image {
+      position: relative;
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+  
+    .main-image img {
+      transition: transform 0.3s ease;
+    }
+  </style>
+    <script>
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const mainImage = document.getElementById('mainImage');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    const decreaseBtn = document.getElementById('decreaseQuantity');
+    const increaseBtn = document.getElementById('increaseQuantity');
+    const quantitySpan = document.getElementById('quantity');
+
+    function initZoom() {
+        let isZoomed = false;
+        let zoomLevel = 2;  
+
+        mainImage.addEventListener('click', function(e) {
+            if (!isZoomed) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const xPercent = (x / rect.width) * 100;
+                const yPercent = (y / rect.height) * 100;
+
+                this.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+                this.style.transform = `scale(${zoomLevel})`;
+                this.style.cursor = 'zoom-out';
+            } else {
+                this.style.transform = 'scale(1)';
+                this.style.cursor = 'zoom-in';
+            }
+            isZoomed = !isZoomed;
+        });
+
+        mainImage.addEventListener('mouseleave', function() {
+            if (isZoomed) {
+                this.style.transform = 'scale(1)';
+                this.style.cursor = 'zoom-in';
+                isZoomed = false;
+            }
+        });
+    }
+
+    thumbnails.forEach(thumb => {
+        thumb.addEventListener('click', function() {
+            thumbnails.forEach(t => {
+                t.classList.remove('border-2', 'border-red-600', 'opacity-100');
+                t.classList.add('opacity-70');
+            });
+
+            this.classList.add('border-2', 'border-red-600', 'opacity-100');
+            mainImage.src = this.src;
+
+            mainImage.style.transform = 'scale(1)';
+            mainImage.style.cursor = 'zoom-in';
+        });
+    });
+
+    let quantity = 1;
+    decreaseBtn.addEventListener('click', () => {
+        if (quantity > 1) {
+            quantity--;
+            quantitySpan.textContent = quantity;
+        }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+        quantity++;
+        quantitySpan.textContent = quantity;
+    });
+
+    initZoom();
+});
+      
+
+
+
+    function addToCart(productId) {
+
+    const quantity = parseInt(document.getElementById('quantity').textContent, 10);
+
+   
+    const data = {
+        productId: productId,
+        quantity: quantity,
+        
+    };
+
+    
+    fetch('/addToCart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(data) 
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(error => {
+                throw new Error(error.message || 'Failed to add to cart');
+            });
+        }
+        return response.json(); 
+    })
+    .then(responseData => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Added to Cart!',
+            text: responseData.message || 'Product added successfully',
+            showCancelButton: true,
+            confirmButtonText: 'Go to Cart',
+            cancelButtonText: 'Continue Shopping'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/cart';
+            } else {
+                location.reload();
+            }
+        });
+    })
+    .catch(error => {
+        if (error.message === 'User not authenticated') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Not Logged In',
+                text: 'Please log in to add items to your cart',
+                showConfirmButton: true,
+                confirmButtonText: 'Log In',
+                showCancelButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/login';
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: error.message || 'Something went wrong!'
+            });
+        }
+    });
+}
+
+  async function addToWishlists(productId, button) {
+    try {
+       
+        button.classList.add('opacity-50', 'cursor-not-allowed');
+
+        const response = await fetch('/wishlist/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId }),
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message); 
+        }
+
+        const data = await response.json();
+        console.log(data.message);
+      
+        button.classList.remove('bg-gray-100', 'hover:bg-gray-200'); 
+        button.classList.add('bg-green-500', 'hover:bg-green-600', 'text-white'); 
+
+       
+        Swal.fire({
+            icon: 'success',
+            title: 'Added to Wishlist!',
+            text: 'The item has been added to your wishlist.',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    } catch (error) {
+        console.error('Error:', error.message);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: error.message || 'Failed to add to wishlist. Please try again.',
+        });
+
+       
+        button.classList.remove('opacity-50', 'cursor-not-allowed');
+        button.classList.add('bg-gray-100', 'hover:bg-gray-200'); 
+    } finally {
+       
+        button.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+}
+    </script>
+</body>
+
+</html>

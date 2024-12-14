@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RevGear - Customer Details</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/product.css">
+  <style>
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    .product-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background-color: rgb(0, 0, 0);
+    }
+
+    .product-table thead {
+      background: linear-gradient(to right, #3b82f6, #8b5cf6);
+      color: white;
+    }
+
+    .product-table th {
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .product-table tr {
+      transition: background-color 0.3s ease;
+    }
+
+    .product-table tr:hover {
+      background-color: rgba(59, 130, 246, 0.05);
+    }
+
+    .product-image img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+    }
+
+    .product-image img:hover {
+      transform: scale(1.1);
+    }
+
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-badge.active {
+      background-color: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+    }
+
+    .status-badge.inactive {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+    }
+
+    .action-buttons .button-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .action-btn.edit {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .action-btn.view {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .action-btn.block {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .action-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="sidebar" id="sidebar">
+          
+
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+            </div>
+
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item active">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item ">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupons" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/sales" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>RevGear</h1>
+                <a href="/admin/dashboard" id="adminlogout">Back</a>
+            </div>
+      
+      
+
+      <div class="container">
+        <div class="search-bar">
+          <input type="text" id="searchBar" placeholder="Search product" >
+          <button id="searchButton">Search</button>
+      </div>
+        <div class="add-product-button">
+          <button class="btn-primary "><a href="/admin/addproduct">Add Product</a></button>
+        </div>
+        <br>
+
+        <div class="table-container">
+          <table class="product-table">
+            <thead>
+              <tr>
+              
+              <th>Sl.No</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Stock</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Offer</th>
+                <th>Sale Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% products.forEach((product,index) => { %>
+              <tr class="product-row">
+               <td><%= index+1 %></td>
+                <td class="product-image">
+                  <% if (product.productImage && product.productImage.length > 0) { %>
+                  <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" />
+                  <% } else { %>
+                  <img src="/images/placeholder.jpg" alt="No image" />
+                  <% } %>
+                </td>
+                <td><%= product.productName %></td>
+                <td><%= product.category %></td>
+                <td><%= product.quantity %></td>
+                <td><%= product.description %></td>
+                <td>₹<%= product.regularPrice %></td>
+                <td><%= product.productOffer %>%</td>
+                <td>₹<%= product.salePrice %></td>
+                <td>
+                  <span class="status-badge <%= product.isBlocked ? 'inactive' : 'active' %>">
+                    <%= product.isBlocked ? 'Blocked' : 'Active' %>
+                  </span>
+                </td>
+                <td class="action-buttons">
+                  <div class="button-group">
+                    <a href="/admin/editProduct/<%= product._id %>" class="action-btn edit" title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="/admin/blockProduct/<%= product._id %>" class="action-btn block" title="Block">
+                      <i class="fas fa-ban"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        
+
+          
+        </div>
+
+           <% if (totalPages > 1) { %>
+            <div class="pagination">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %><%= search ? '&search=' + search : '' %>" class="btn">Previous</a>
+                <% } %>
+
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                  <a href="?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
+                     class="btn <%= currentPage === i ? 'active' : '' %>">
+                    <%= i %>
+                  </a>
+                <% } %>
+                
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %><%= search ? '&search=' + search : '' %>" class="btn">Next</a>
+                <% } %>
+            </div>
+          <% } %>
+        
+      </div>
+      <script>
+        const actionButtons = document.querySelectorAll('.action-button');
+        actionButtons.forEach(button => {
+          button.addEventListener('click', handleActionButtonClick);
+        });
+
+        function handleActionButtonClick(event) {
+          const action = event.target.dataset.action;
+          const productId = event.target.dataset.productId;
+   
+          console.log(`Performing ${action} action for product with ID ${productId}`);
+        }
+
+        const addProductButton = document.querySelector('.btn-primary');
+        addProductButton.addEventListener('click', () => {
+        
+          console.log('Add product button clicked');
+        });
+    
+
+      
+        document.addEventListener('DOMContentLoaded', () => {
+          const table = document.querySelector('.product-table');
+
+          table.addEventListener('mouseover', (e) => {
+            const row = e.target.closest('tr');
+            if (row && row.classList.contains('product-row')) {
+              row.classList.add('hover');
+            }
+          });
+
+          table.addEventListener('mouseout', (e) => {
+            const row = e.target.closest('tr');
+            if (row && row.classList.contains('product-row')) {
+              row.classList.remove('hover');
+            }
+          });
+
+
+          const actionButtons = table.querySelectorAll('.action-btn');
+          actionButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+              button.classList.add('clicked');
+              setTimeout(() => {
+                button.classList.remove('clicked');
+              }, 200);
+            });
+          });
+
+   
+        
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('searchBar'); 
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      const searchTerm = searchInput.value.toLowerCase(); 
+      const rows = document.querySelectorAll('.product-table tbody tr');
+
+      rows.forEach(row => {
+        const productName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+        const category = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+
+   
+        if (productName.includes(searchTerm) || category.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none'; 
+        }
+      });
+    });
+  }
+});
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const navItems = document.querySelectorAll('.nav-item');
+
+  
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                
+              
+                navItems.forEach((item, index) => {
+                    item.style.transitionDelay = `${index * 50}ms`;
+                });
+            });
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+
+
+            const adminAvatar = document.querySelector('.admin-avatar');
+            setInterval(() => {
+                adminAvatar.style.animation = 'pulse 1.5s infinite';
+                setTimeout(() => {
+                    adminAvatar.style.animation = 'none';
+                }, 1500);
+            }, 5000);
+        });
+      </script>
+</body>
+
+</html>

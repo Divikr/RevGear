@@ -1,0 +1,140 @@
+<%- include("../partials/header.ejs")  %>
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --success-color: #10b981;
+        --text-dark: #1f2937;
+        --text-light: #6b7280;
+    }
+    .progress-step.completed {
+        background-color: var(--success-color);
+        color: white;
+        border-color: var(--success-color);
+    }
+    .progress-step.active {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    @media (max-width: 640px) {
+        .order-details {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<body class="bg-gray-50 text-gray-900 antialiased">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+
+        <section class="order-progress bg-white shadow-md rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-6">Order Progress</h2>
+            <div class="flex items-center justify-between progress-container">
+                <div class="flex-1 flex items-center order-progress-step">
+                    <div class="progress-step <%= order.orderStatus === 'Ordered' ? 'completed' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
+                        1
+                    </div>
+                    <div class="flex-1 h-1.5 <%= ['Shipped', 'Out For Delivery', 'Delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300' %> mx-2"></div>
+                </div>
+                <div class="flex-1 flex items-center order-progress-step">
+                    <div class="progress-step <%= ['Shipped', 'Out For Delivery', 'Delivered'].includes(order.orderStatus) ? 'completed' : order.orderStatus === 'Ordered' ? 'active' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
+                        2
+                    </div>
+                    <div class="flex-1 h-1.5 <%= ['Out For Delivery', 'Delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300' %> mx-2"></div>
+                </div>
+                <div class="order-progress-step">
+                    <div class="progress-step <%= order.orderStatus === 'Delivered' ? 'completed' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
+                        3
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-between text-sm mt-4">
+                <span class="text-green-500 font-medium">Order Placed</span>
+                <span class="text-blue-500 font-medium">Shipped</span>
+                <span class="text-gray-400 font-medium">Delivered</span>
+            </div>
+        </section>
+
+        <div class="order-details grid md:grid-cols-2 gap-8">
+            <section class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-700 mb-6">Order Items</h2>
+                <div class="space-y-6">
+                    <% order.items.forEach(item => { %>
+                        <div class="flex items-center space-x-4 product-item">
+                            <img src="<%= item.productId.productImage[0] %>" alt="Product" class="h-24 w-24 rounded-lg object-cover">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800"><%= item.productId.name %></h3>
+                                <p class="text-gray-500 text-sm">Quantity: <%= item.quantity %></p>
+                                <p class="text-blue-600 font-medium">$<%= item.price.toFixed(2) %></p>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </section>
+
+            <div class="space-y-8">
+                <section class="bg-white shadow-md rounded-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-6">Order Summary</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span class="text-gray-800 font-medium">$<%= order.totalAmount.toFixed(2) %></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Shipping</span>
+                            <span class="text-gray-800 font-medium">$<%= order.shippingCost || '5.00' %></span>
+                        </div>
+                        <hr class="border-gray-200">
+                        <div class="flex justify-between items-center font-bold">
+                            <span class="text-gray-900">Total</span>
+                            <span class="text-blue-600 text-xl">$<%= (order.totalAmount + (order.shippingCost || 5)).toFixed(2) %></span>
+                        </div>
+                    </div>
+                    <button class="mt-6 w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                        Cancel Order
+                    </button>
+                </section>
+
+                <section class="bg-white shadow-md rounded-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-6">Shipping Details</h2>
+                    <address class="not-italic text-gray-600">
+                        <p class="font-semibold"><%= order.deliveryAddress.name %></p>
+                        <p><%= order.deliveryAddress.streetAddress %></p>
+                        <p><%= order.deliveryAddress.city %></p>
+                        <p class="mt-2">Phone: <a href="tel:+<%= order.deliveryAddress.phone %>" class="text-blue-600">+<%= order.deliveryAddress.phone %></a></p>
+                    </address>
+                </section>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+<%- include("../partials/footer")  %>
+<script>
+  
+    gsap.registerPlugin(ScrollTrigger);
+
+  
+    const progressSteps = gsap.utils.toArray('.order-progress-step');
+    gsap.from(progressSteps, {
+        duration: 1,
+        opacity: 0,
+        scale: 0.5,
+        ease: "back",
+        stagger: 0.3
+    });
+
+
+    const productItems = gsap.utils.toArray('.product-item');
+    gsap.from(productItems, {
+        scrollTrigger: {
+            trigger: ".order-details",
+            start: "top 80%"
+        },
+        duration: 1,
+        opacity: 0,
+        y: 30,
+        stagger: 0.3
+    });
+</script>

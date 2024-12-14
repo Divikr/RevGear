@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevGear - Categories</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/category.css">
+  
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar" id="sidebar">
+         
+
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+               
+            </div>
+
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item ">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item active">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupons" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/sales" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>RevGear</h1>
+                <a href="/admin/dashboard" id="adminlogout">Back</a>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <div class="search-bar">
+                    <input type="text" id="searchBar" placeholder="Search Categories" >
+                    <button id="searchButton">Search</button>
+                    
+                </div>
+                <br>
+                <a href="/admin/addcategory" class="add-category">+ Add Category</a>
+            </div>
+<br>
+<br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sl.No</th>
+                            <th>Image</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Offer</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="categoryTable">
+                    <% if (cat && cat.length > 0) { %>
+                        <% for (let i = 0; i < cat.length; i++) { %>
+                            <tr class="category-row">
+                                <td><%= i+1  %></td>
+                                <td class="product-image">
+                                    <% if (cat[i].Image && cat[i].Image.length > 0) { %>
+                                        <img src="<%= cat[i].Image[0] %>" alt="<%= cat[i].name %>" class="category-image" />
+                                    <% } else { %>
+                                        <img src="/images/placeholder.jpg" alt="No image" class="category-image" />
+                                    <% } %>
+                                </td>
+                                <td><%= cat[i].name %></td>
+                                <td><%= cat[i].description %></td>
+                                <td><%= cat[i].categoryOffer %></td>
+                                <td>
+                                    <span class="status-badge <%= cat[i].isListed ? 'status-active' : 'status-blocked' %>">
+                                        <%= cat[i].isListed ? 'Active' : 'Blocked' %>
+                                    </span>
+                                </td>
+                                <td class="action-buttons">
+                                    <a href="/admin/editcategory/<%= cat[i]._id %>" class="btn btn-view">Edit</a>
+                                    <% if (!cat[i].isListed) { %>
+                                        <a href="/admin/listToggle?id=<%= cat[i]._id %>" class="btn btn-unblock">Unblock</a>
+                                    <% } else { %>
+                                        <a href="/admin/listToggle?id=<%= cat[i]._id %>" class="btn btn-block">Block</a>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% } %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--text-secondary);">No categories found</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+
+            <% if (totalPages > 1) { %>
+                <div class="pagination">
+                    <% if (currentPages > 1) { %>
+                        <a href="?page=<%= currentPages - 1 %>&search=<%= search %>" class="btn">Previous</a>
+                    <% } %>
+
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <a href="?page=<%= i %>&search=<%= search %>" 
+                           class="btn <%= currentPages === i ? 'active' : '' %>">
+                            <%= i %>
+                        </a>
+                    <% } %>
+
+                    <% if (currentPages < totalPages) { %>
+                        <a href="?page=<%= currentPages + 1 %>&search=<%= search %>" class="btn">Next</a>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+
+        const searchBar = document.getElementById('searchBar');
+        const searchButton = document.getElementById('searchButton');
+        const categoryRows = document.querySelectorAll('.category-row');
+ 
+        function filterCategories() {
+    const searchTerm = searchBar.value.toLowerCase();
+
+    categoryRows.forEach(row => {
+        const name = row.querySelector('td:nth-child(3)').textContent.toLowerCase(); 
+
+        if (name.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+        searchButton.addEventListener('click', filterCategories);
+
+        searchBar.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                filterCategories();
+            }
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+         
+                navItems.forEach((item, index) => {
+                    item.style.transitionDelay = `${index * 50}ms`;
+                });
+            });
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+
+            const adminAvatar = document.querySelector('.admin-avatar');
+            setInterval(() => {
+                adminAvatar.style.animation = 'pulse 1.5s infinite';
+                setTimeout(() => {
+                    adminAvatar.style.animation = 'none';
+                }, 1500);
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
+

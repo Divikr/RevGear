@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+
+<%- include("../partials/header.ejs")  %>
+
+<div class="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
+    <div class="bg-gradient-to-br from-white to-blue-50 shadow-2xl rounded-xl overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 p-6">
+            <!-- Sidebar with Enhanced Animations -->
+            <div class="col-span-1 bg-white border border-blue-100 p-4 rounded-xl shadow-lg transition-all duration-500 hover:shadow-2xl">
+                <ul class="space-y-4">
+                    <li class="sidebar-item">
+                        <a href="/profile" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                            <i class="fas fa-user text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Profile</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="/addressbook" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                            <i class="fas fa-map-marker-alt text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Address</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                            <i class="fas fa-credit-card text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Payment</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                            <i class="fas fa-wallet text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Wallet</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                            <i class="fas fa-box text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Order</span>
+                        </a>
+                    </li>
+                  
+                    <li class="sidebar-item">
+                        <a href="#" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-red-50 hover:shadow-md">
+                            <i class="fas fa-sign-out-alt text-red-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-red-600 group-hover:font-semibold transition-all">Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="col-span-3">
+                <section class="bg-white shadow-2xl rounded-xl overflow-hidden w-full transform transition-all hover:scale-102 hover:shadow-3xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto border-collapse border border-gray-200">
+                            <thead class="bg-gradient-to-r from-blue-500 to-blue-700 text-white">
+                                <tr>
+                                    <th class="px-4 py-3 text-left border border-gray-300">Order ID</th>
+                                    <th class="px-4 py-3 text-left border border-gray-300">Status</th>
+                                    <th class="px-4 py-3 text-left border border-gray-300">Address</th>
+                                    <th class="px-4 py-3 text-right border border-gray-300">Total</th>
+                                    <th class="px-4 py-3 text-center border border-gray-300">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-700">
+                                <% orders.forEach(order => { %>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                          <td><%= order._id %></td>
+                                          <td><%= order.orderStatus %></td>
+                                          <td><%= order.deliveryAddress.city %></td>
+                                          <td><%= (order.totalAmount + (order.shippingCost || 5)).toFixed(2) %></td>
+                                          <td>
+                                    <td class="px-4 py-3 text-center border border-gray-300">
+                                       <a class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors" href="/myorder/<%= order._id  %>">View</a>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex justify-between items-center py-4 px-4">
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">Previous</button>
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">Next</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include("../partials/footer.ejs") %>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="/js/header.js"></script>
+
+<script>
+    const viewButtons = document.querySelectorAll('.bg-blue-500');
+    viewButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            console.log('View button clicked');
+        });
+    });
+</script>
+</body>
+</html>

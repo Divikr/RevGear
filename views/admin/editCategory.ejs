@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Category</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/addCategory.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar" id="sidebar">
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+            </div>
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item ">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item active">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupons" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/sales" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>Edit Category</h1>
+                <a href="/admin/dashboard" id="adminlogout">Back</a>
+            </div>
+
+            <div class="add-category">
+                <div class="category-info">
+                    <div class="form-group image-upload">
+                        <label for="product-images">Category Image</label>
+                        <div class="image-upload-container">
+                          
+                            <input type="file" id="image-input" name="Image" accept="image/*" style="display: none;">
+                            <div id="add-image-button">
+                                <i class="fas fa-plus"></i>
+                                <span>Add Image</span>
+                            </div>
+                            
+                        </div>
+                        <div id="image-preview-container" class="image-preview-container">
+                            <% cat.Image.forEach((image) => { %>
+                                <div class="image-wrapper">
+                                    <img src="<%= image %>" alt="Existing Image" class="existing-image">
+                                    <button class="delete-button" onclick="deleteExistingImage('<%= image %>')">Remove</button>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category-name">Category Name</label>
+                        <input 
+                            type="text" 
+                            id="category-name" 
+                            placeholder="Type category name here..." 
+                            value="<%= cat.name %>" 
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category-description">Description</label>
+                        <textarea id="category-description" placeholder="Type category description here..."><%= cat.description %></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category-offer">Offer</label>
+                        <input 
+                            type="text" 
+                            id="category-offer" 
+                            placeholder="Type category offer here..." 
+                            value="<%= cat.categoryOffer %>" 
+                        >
+                    </div>
+                </div>
+                <button class="save-category" id="update" onclick="updateCategory()">Update Category</button>
+            </div>
+
+        
+        </div>
+    </div>
+
+    <script>
+        let uploadedImage = null;
+
+        document.getElementById('add-image-button').addEventListener('click', () => {
+            document.getElementById('image-input').click();
+        });
+
+        document.getElementById('image-input').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imagePreviewContainer = document.getElementById('image-preview-container');
+                    imagePreviewContainer.innerHTML = '';
+
+                    const imageWrapper = document.createElement('div');
+                    imageWrapper.classList.add('image-wrapper');
+
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('cropped-image');
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Remove';
+                    deleteButton.classList.add('delete-button');
+                    deleteButton.addEventListener('click', () => {
+                        imagePreviewContainer.innerHTML = '';
+                        uploadedImage = null;
+                    });
+
+                    imageWrapper.appendChild(img);
+                    imageWrapper.appendChild(deleteButton);
+                    imagePreviewContainer.appendChild(imageWrapper);
+
+                    uploadedImage = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function deleteExistingImage(imageUrl) {
+          
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            imagePreviewContainer.innerHTML = '';
+        }
+
+        function updateCategory() {
+            const categoryName = document.getElementById('category-name').value;
+            const categoryDescription = document.getElementById('category-description').value;
+            const categoryOffer = document.getElementById('category-offer').value;
+            const categoryId = '<%= cat._id %>';
+
+            const formData = new FormData();
+            formData.append('name', categoryName);
+            formData.append('description', categoryDescription);
+            formData.append('categoryOffer', categoryOffer);
+
+            const imageInput = document.getElementById('image-input');
+if (imageInput.files.length > 0) {
+    formData.append('Image', imageInput.files[0]); 
+}
+
+            fetch(`/admin/editcategory/${categoryId}`, {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success)  if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Category Updated Successfully!',
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: `Error updating category: ${data.message}`,
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

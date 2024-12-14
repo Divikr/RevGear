@@ -1,0 +1,169 @@
+<%- include("../partials/header.ejs") %>
+
+<div class="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
+  <div class="bg-gradient-to-br from-white to-blue-50 shadow-2xl rounded-xl overflow-hidden">
+    <div class="grid grid-cols-4 gap-6 p-6">
+    
+      <div class="col-span-1 bg-white border border-blue-100 p-4 rounded-xl shadow-lg transition-all duration-500 hover:shadow-2xl">
+        <ul class="space-y-4">
+          <li class="sidebar-item">
+            <a href="/profile" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+              <i class="fas fa-user text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Profile</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="/addressbook" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+              <i class="fas fa-map-marker-alt text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Address</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+              <i class="fas fa-credit-card text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Payment</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+              <i class="fas fa-wallet text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Wallet</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+              <i class="fas fa-box text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Order</span>
+            </a>
+          </li>
+         
+          <li class="sidebar-item">
+            <a href="/logout" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-red-50 hover:shadow-md">
+              <i class="fas fa-sign-out-alt text-red-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-red-600 group-hover:font-semibold transition-all">Logout</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-span-3">
+        <h1 class="text-3xl font-bold mb-6 text-gray-800 animate-fade-in">Address Book</h1>
+        <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-blue-100">
+          <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-semibold text-gray-700">Saved Addresses</h3>
+              <a href="/addaddress" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-md hover:shadow-lg">
+                Add Address
+              </a>
+            </div>
+
+         
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <% if (recentAddress.length > 0) { %>
+                <% recentAddress.forEach((address) => { %>
+                  <div 
+                    id="recentAddress-<%= address.id %>" 
+                    class="address-card bg-white border border-gray-200 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                  >
+                    <div class="flex justify-between items-start mb-4">
+                      <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2"><%= address.name %></h4>
+                        <p class="text-gray-600 text-sm mb-1"><%= address.addressType %></p>
+                      </div>
+                      <div class="flex space-x-2">
+                        <a href="/editAddress?id=<%= address._id %>" class="text-blue-500 hover:text-blue-700 transition-colors">
+                          <i class="fas fa-edit"></i>
+                        </a>
+                        <button 
+                          onclick="deleteAddress('<%= address._id %>')" 
+                          class="text-red-500 hover:text-red-700 transition-colors"
+                        >
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="text-gray-600">
+                      <p><strong>Phone:</strong> <%= address.phone %></p>
+                      <p><strong>Address:</strong> <%= address.street %>, <%= address.apartment %></p>
+                      <p><%= address.city %>, <%= address.postalCode %></p>
+                      <% if (address.landmark) { %>
+                        <p><strong>Landmark:</strong> <%= address.landmark %></p>
+                      <% } %>
+                    </div>
+                  </div>
+                <% }) %>
+              <% } else { %>
+                <p id="noAddressMessage" class="text-center text-gray-500 col-span-2">
+                  No addresses found. Add a new address.
+                </p>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("../partials/footer.ejs") %>
+
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="/js/header.js"></script>
+<script>
+async function deleteAddress(addressId) {
+   
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#DB4444',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+        try {
+          
+            const response = await fetch(`/deleteAddress/${addressId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                Swal.fire(
+                    'Deleted!',
+                    'Your address has been deleted.',
+                    'success'
+                );
+
+             
+                const addressElement = document.getElementById(`recentAddress-${addressId}`);
+                if (addressElement) {
+                    addressElement.remove();
+                }
+            } else {
+                const errorData = await response.json();
+                Swal.fire(
+                    `Error!,
+                    Failed to delete address: ${errorData.error || "Unknown error"},
+                    error`
+                );
+            }
+        } catch (error) {
+            console.error("Error deleting address:", error);
+            Swal.fire(
+                'Error!',
+                'An error occurred. Please try again.',
+                'error'
+            );
+        }
+    }
+}
+</script>
+</body>
+</html>

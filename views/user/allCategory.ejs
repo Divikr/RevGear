@@ -1,0 +1,35 @@
+
+<%- include("../partials/header.ejs")  %>
+
+
+
+
+
+  <section class="container mx-auto py-16 px-4">
+    <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Featured Categories</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <% categories.forEach((featured) => { %>
+      <div class="bg-white rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:scale-105">
+        <div class="h-48 overflow-hidden">
+          <img src="<%= featured.Image %>" alt="<%= featured.name %>" class="w-full h-full object-cover">
+        </div>
+        <div class="p-4 text-center">
+          <h3 class="font-semibold text-xl mb-2"><%= featured.name %></h3>
+          <p class="text-gray-600 text-sm mb-4"><%= featured.description %></p>
+          <a href="/products/<%= featured.name %>" class="inline-block bg-black text-white px-4 py-2 rounded-full hover:bg-red-600 transition-colors">
+            Explore
+          </a>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </section>
+
+ 
+
+  <%- include("../partials/footer.ejs") %>
+<script src="/js/header.js"></script>
+ 
+</body>
+
+</html>

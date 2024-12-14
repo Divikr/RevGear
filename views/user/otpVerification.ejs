@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevGear - OTP Verification</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        input[type="text"]::-webkit-inner-spin-button, 
+        input[type="text"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Header -->
+    <header class="bg-black text-white py-4">
+        <div class="container mx-auto px-4">
+            <nav class="flex justify-between items-center">
+                <div class="text-2xl font-bold">REVGEAR</div>
+                <div class="flex items-center space-x-6">
+                    <a href="index.html" class="hover:text-red-500 transition-colors">Home</a>
+                    <a href="login.html" class="hover:text-red-500 transition-colors">Log In</a>
+                    <a href="signup.html" class="hover:text-red-500 transition-colors">Sign Up</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <div class="flex items-center justify-center">
+            <!-- Larger Column -->
+             
+            <div class="w-full max-w-2xl">
+                <div class="bg-white p-12 rounded-lg border border-gray-200 shadow-lg">
+                    <h2 class="text-3xl font-bold mb-8 text-center">OTP Verification</h2>
+                    <p class="text-lg text-gray-600 mb-8 text-center">
+                        Enter the 6-digit OTP sent to your registered email address.
+                    </p>
+                    <form class="space-y-8" method="post" action="/otpPost" >
+                        <!-- OTP Input -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" >Enter OTP</label>
+                            <input type="text" maxlength="6" class="w-full px-4 py-3 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Enter your OTP" required name="otp">
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="flex justify-center">
+                            <button type="submit" class="bg-red-600 text-white py-3 px-8 rounded-md text-lg hover:bg-red-700 transition-colors">
+                                Verify OTP
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Timer -->
+                    <div class="text-center mt-4 text-sm text-gray-600">
+                        <span id="timer">01:00</span> remaining
+                    </div>
+
+                    <!-- Resend OTP -->
+                     <form action="/resendotp" method="post">
+                    <p class="mt-8 text-center text-sm text-gray-600">
+                        Didn't receive the OTP? 
+                        <button id="resendButton" type="submit" class="text-gray-400 cursor-not-allowed" disabled>
+                            Resend
+                        </button>
+                    </p>
+                </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-4 gap-8">
+                <div>
+                    <h3 class="font-bold mb-4">Quick User</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="login.html" class="hover:text-white">Log In</a></li>
+                        <li><a href="signup.html" class="hover:text-white">Register</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-4">Support</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-4">Account</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white">My Account</a></li>
+                        <li><a href="#" class="hover:text-white">Orders</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-4">Quick Link</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+      
+ 
+    var timer = document.getElementById("timer");
+    var resendButton = document.getElementById("resendButton");
+    var timeLeft = 60; 
+
+    var interval = setInterval(function() {
+        var minutes = Math.floor(timeLeft / 60);
+        var seconds = timeLeft % 60;
+        if (seconds < 10) seconds = "0" + seconds;
+        timer.innerHTML = minutes + ":" + seconds;
+
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+
+           
+            resendButton.removeAttribute("disabled");
+            resendButton.classList.remove("text-gray-400", "cursor-not-allowed");
+            resendButton.classList.add("text-red-600", "cursor-pointer");
+        }
+        timeLeft--;
+    }, 1000);
+
+    const form = document.querySelector("form[action='/otpPost']");
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault(); 
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch('/otpPost', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'OTP Verified',
+                    text: result.message,
+                }).then(() => {
+                    // Redirect to login page after showing success alert
+                    window.location.href = "/login";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message,
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong. Please try again.',
+            });
+        }
+    });
+    </script>
+</body>
+</html>

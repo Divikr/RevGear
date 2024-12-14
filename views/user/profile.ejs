@@ -1,0 +1,107 @@
+<%- include("../partials/header.ejs") %>
+
+<div class="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
+  <div class="bg-gradient-to-br from-white to-blue-50 shadow-2xl rounded-xl overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 p-6">
+   
+      <div class="col-span-1 bg-white border border-blue-100 p-6 rounded-xl shadow-lg">
+        <ul class="space-y-6">
+          <li>
+            <a href="#" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+              <i class="fas fa-user text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Profile</span>
+            </a>
+          </li>
+          <li>
+            <a href="/addressbook" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+              <i class="fas fa-map-marker-alt text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Address</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+              <i class="fas fa-credit-card text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Payment</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+              <i class="fas fa-wallet text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Wallet</span>
+            </a>
+          </li>
+          <li>
+            <a href="/orderlist" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+              <i class="fas fa-box text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Order</span>
+            </a>
+          </li>
+        
+          <li>
+            <a href="/logout" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-red-50 hover:shadow-md">
+              <i class="fas fa-sign-out-alt text-red-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-gray-700 group-hover:text-red-600 group-hover:font-semibold">Logout</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-span-3 bg-white shadow-lg rounded-xl border border-blue-100 p-8">
+        <h1 class="text-2xl font-bold mb-8 text-gray-800">Manage My Account</h1>
+        <form id="profileForm" class="space-y-6" action="/edit-profile" method="POST">
+       
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="name" class="block font-medium text-gray-700 mb-2">Name</label>
+              <input type="text" id="name" name="name" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.name %>" required>
+            </div>
+            <div>
+              <label for="email" class="block font-medium text-gray-700 mb-2">Email</label>
+              <input type="email" id="email" name="email" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.email %>" required>
+            </div>
+          </div>
+        
+  
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="phone" class="block font-medium text-gray-700 mb-2">Phone Number</label>
+              <input type="tel" id="phone" name="phone" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.phone %>" required>
+            </div>
+          </div>
+        
+          
+          <div class="flex justify-end">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg text-base transition-all transform hover:scale-105">
+              Save Changes
+            </button>
+          </div>
+        </form>
+        
+        <br>
+        
+        <div class="bg-blue-50 p-4 rounded-xl shadow-md border border-blue-200 transition-all duration-300 hover:shadow-xl transform hover:scale-102 w-1/2">
+          <h3 class="text-lg font-semibold mb-4 text-gray-800">Account Security</h3>
+          <div class="space-y-2">
+            <p>Password</p>
+            <p>Last changed: 2 months ago</p>
+           <a href="/changePassword" class="text-blue-600 hover:underline font-medium mt-2">Change Password</a> 
+          </div>
+        </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("../partials/footer.ejs") %>
+
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="/js/header.js"></script>
+<script>
+  
+</script>
+</body>
+</html>

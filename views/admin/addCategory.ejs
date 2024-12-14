@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevGear - Customer Details</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/addCategory.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<style>
+ .cropped-image {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+    object-fit: cover;
+  }
+
+  .delete-button {
+    display: block;
+    margin-top: 5px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .image-wrapper {
+    display: inline-block;
+    text-align: center;
+    margin: 10px;
+  }
+  </style>
+
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar" id="sidebar">
+           
+
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+               
+            </div>
+
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item ">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item active">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupons" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/sales" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>RevGear</h1>
+                <a href="/admin/dashboard" id="adminlogout">Back</a>
+            </div>
+            
+            <div class="add-category">
+                <div class="category-info">
+                    <div class="form-group image-upload">
+                        <label for="product-images">Category Images (Max 1)</label>
+                        <div class="image-upload-container">
+                          <div class="image-upload-item" id="add-image-button">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Image</span>
+                          </div>
+                          <input type="file" id="image-input" name="Image" accept="image/*" style="display: none;">
+                        </div>
+                        <div id="image-preview-container" class="image-preview-container"></div>
+                      </div>
+            
+                      <!-- Cropper Modal (remains the same as previous version) -->
+                      <div id="cropper-modal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                          <h2>Crop Image</h2>
+                          <div id="cropper-container">
+                            <img id="cropper-image" alt="To be cropped" />
+                          </div>
+                          <button id="crop-button">Crop</button>
+                          <button id="cancel-crop-button">Cancel</button>
+                        </div>
+                      </div>
+            
+                  <div class="form-group">
+                    <label for="category-name">Category Name</label>
+                    <input type="text" id="category-name" placeholder="Type category name here...">
+                  </div>
+                  <div class="form-group">
+                    <label for="category-description">Description</label>
+                    <textarea id="category-description" placeholder="Type category description here..."></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label for="category-offer">Offer</label>
+                    <input type="text" id="category-offer" placeholder="Type category offer here...">
+                  </div>
+                </div>
+                <button class="save-category" onclick="openModal()">Save Category</button>
+
+                <div id="modal" class="modal">
+                  <div class="modal-content">
+                      <h2>Category saved successfully!</h2>
+                      <button onclick="closeModal()">Close</button>
+                  </div>
+              </div>
+              </div>
+              </div>
+              <script>
+         
+                function openModal() {
+                    document.getElementById('modal').style.display = 'flex';
+                }
+        
+                function closeModal() {
+                    document.getElementById('modal').style.display = 'none';
+                    
+                }
+                document.querySelector('.save-category').addEventListener('click', async function (event) {
+  const categoryName = document.getElementById('category-name').value;
+  const categoryDescription = document.getElementById('category-description').value;
+  const categoryOffer = document.getElementById('category-offer').value;
+  const imagePreviewContainer = document.getElementById('image-preview-container');
+
+
+  const formData = new FormData();
+  formData.append('name', categoryName);
+  formData.append('description', categoryDescription);
+  formData.append('categoryOffer', categoryOffer);
+
+
+  const imageElement = imagePreviewContainer.querySelector('.cropped-image');
+  if (imageElement) {
+
+    const response = await fetch(imageElement.src);
+    const blob = await response.blob();
+    formData.append('Image', blob, 'category-image.png');
+  }
+
+  try {
+    const response = await fetch('/admin/addcategory', {
+      method: 'POST',
+      body: formData, 
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      openModal();
+    
+      document.getElementById('category-name').value = '';
+      document.getElementById('category-description').value = '';
+      document.getElementById('category-offer').value = '';
+      imagePreviewContainer.innerHTML = '';
+    } else {
+      alert(data.message || 'Error saving category');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error saving category');
+  }
+});
+
+  document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const navItems = document.querySelectorAll('.nav-item');
+
+   
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                
+               
+                navItems.forEach((item, index) => {
+                    item.style.transitionDelay = `${index * 50}ms`;
+                });
+            });
+
+         
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+
+            const adminAvatar = document.querySelector('.admin-avatar');
+            setInterval(() => {
+                adminAvatar.style.animation = 'pulse 1.5s infinite';
+                setTimeout(() => {
+                    adminAvatar.style.animation = 'none';
+                }, 1500);
+            }, 5000);
+        });
+
+
+ document.addEventListener('DOMContentLoaded', () => {
+            const maxImages = 1;
+            const imageInput = document.getElementById('image-input');
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            const addImageButton = document.getElementById('add-image-button');
+            const cropperModal = document.getElementById('cropper-modal');
+            const cropperImage = document.getElementById('cropper-image');
+            const cropButton = document.getElementById('crop-button');
+            const cancelCropButton = document.getElementById('cancel-crop-button');
+
+            let cropper;
+            let uploadedImage = null;
+
+            addImageButton.addEventListener('click', () => {
+                if (imagePreviewContainer.childElementCount < maxImages) {
+                    imageInput.click();
+                } else {
+                    alert('Only one image is allowed for the category.');
+                }
+            });
+
+            imageInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Please upload a valid image file (JPEG, PNG, GIF, or WebP).');
+                        return;
+                    }
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Image size should be less than 5MB.');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        cropperImage.src = event.target.result;
+                        openCropperModal();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            function openCropperModal() {
+                cropperModal.style.display = 'flex';
+                if (cropper) {
+                    cropper.destroy();
+                }
+                cropper = new Cropper(cropperImage, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    minCropBoxWidth: 100,
+                    minCropBoxHeight: 100
+                });
+            }
+
+            function closeCropperModal() {
+                cropperModal.style.display = 'none';
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+            }
+
+            cropButton.addEventListener('click', () => {
+                const croppedCanvas = cropper.getCroppedCanvas({
+                    width: 300,
+                    height: 300
+                });
+
+                imagePreviewContainer.innerHTML = '';
+
+                const imageWrapper = document.createElement('div');
+                imageWrapper.classList.add('image-wrapper');
+
+                const croppedImage = document.createElement('img');
+                croppedImage.src = croppedCanvas.toDataURL('image/png');
+                croppedImage.classList.add('cropped-image');
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Remove';
+                deleteButton.classList.add('delete-button');
+                deleteButton.addEventListener('click', () => {
+                    imagePreviewContainer.innerHTML = '';
+                    uploadedImage = null;
+                    imageInput.value = '';
+                });
+
+                imageWrapper.appendChild(croppedImage);
+                imageWrapper.appendChild(deleteButton);
+                imagePreviewContainer.appendChild(imageWrapper);
+
+                uploadedImage = croppedCanvas.toDataURL('image/png');
+
+                closeCropperModal();
+            });
+
+            cancelCropButton.addEventListener('click', closeCropperModal);
+        });
+        
+            </script>
+            </body>
+            </html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RevGear Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/admin/dashboard.css">
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar" id="sidebar">
+           
+
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+              
+            </div>
+
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item ">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupons" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/sales" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>RevGear</h1>
+                <a href="/admin/adminlogout" id="adminlogout">Log Out</a>
+            </div>
+
+            <div class="price-cards">
+                <div class="price-card">
+                    <h3>$12.34</h3>
+                    <p>+4.5%</p>
+                </div>
+                <div class="price-card">
+                    <h3>$17.34</h3>
+                    <p>+2.8%</p>
+                </div>
+                <div class="price-card">
+                    <h3>$12.34</h3>
+                    <p style="color: #f44336;">-1.4%</p>
+                </div>
+                <div class="price-card">
+                    <h3>$23.45</h3>
+                    <p>+3.2%</p>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">Transaction History</h3>
+                    <div class="donut-container">
+                        <canvas id="donutChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Bar Chart</h3>
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Revenue</h3>
+                    <p style="font-size: 1.5rem;">$32,123</p>
+                    <p style="color: #66bb6a">+4.2%</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Sales</h3>
+                    <p style="font-size: 1.5rem;">$45,850</p>
+                    <p style="color: #66bb6a">+2.8%</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Purchase</h3>
+                    <p style="font-size: 1.5rem;">$2,039</p>
+                    <p style="color: #f44336">-1.2%</p>
+                </div>
+            </div>
+
+            <div class="orders-table">
+                <h2>Order Status</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#001</td>
+                            <td>John Doe</td>
+                            <td>Website</td>
+                            <td>$4,000</td>
+                            <td><span class="status pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>#002</td>
+                            <td>Jane Smith</td>
+                            <td>Mobile App</td>
+                            <td>$5,000</td>
+                            <td><span class="status approved">Approved</span></td>
+                        </tr>
+                        <tr>
+                            <td>#003</td>
+                            <td>Bob Wilson</td>
+                            <td>Design</td>
+                            <td>$2,500</td>
+                            <td><span class="status rejected">Rejected</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const donutCtx = document.getElementById('donutChart').getContext('2d');
+        new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Online Payment', 'Cash on Delivery'],
+                datasets: [{
+                    data: [4000, 3000],
+                    backgroundColor: ['#66bb6a', '#ffd700'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#fff',
+                            padding: 10,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Bar Chart
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['2017', '2018', '2019', '2020', '2021', '2022'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [15, 20, 8, 10, 12, 8],
+                    backgroundColor: '#66bb6a',
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#2a2f3a'
+                        },
+                        ticks: {
+                            color: '#fff'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#fff'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+  
+                navItems.forEach((item, index) => {
+                    item.style.transitionDelay = `${index * 50}ms`;
+                });
+            });
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+
+            const adminAvatar = document.querySelector('.admin-avatar');
+            setInterval(() => {
+                adminAvatar.style.animation = 'pulse 1.5s infinite';
+                setTimeout(() => {
+                    adminAvatar.style.animation = 'none';
+                }, 1500);
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

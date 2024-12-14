@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/admin/adminlogin.css">
+</head>
+<body>
+   
+        <div class="logo">
+            <h1>RevGear</h1>
+        </div>
+        
+        <div class="login-container">
+            <div class="login-header">
+                <h2>Admin Login</h2>
+            </div>
+            
+            <form method="post" action="/admin/login">
+                <div class="input-group">
+                    <input type="text" placeholder="email" name="email" required>
+                </div>
+                
+                <div class="input-group">
+                    <input type="password" placeholder="Password" name="password" required>
+                </div>
+                
+                <button type="submit" class="login-btn">Log In</button>
+                
+               
+            </form>
+        </div>
+   
+</body>
+</html>
