@@ -1,5 +1,20 @@
 <%- include("../partials/header.ejs")  %>
 <br>
+
+ <nav class="text-sm ml-6 font-medium text-gray-700 mb-6 ">
+    <ol class="list-reset flex">
+      <li>
+        <a href="/home" class="text-blue-600 hover:text-blue-700">Home</a>
+      </li>
+      <li class="mx-2">/</li>
+      <li>
+        <a href="/product" class="text-blue-600 hover:text-blue-700">Shop</a>
+      </li>
+      <li class="mx-2">/</li>
+      
+      <li class="text-gray-400">Whislist</li>
+    </ol>
+  </nav>
 <div class="text-center mb-8">
     <h1 class="font-playfair text-3xl mb-2 text-[#1a1a1a]">Your Wishlist</h1>
 </div>
@@ -46,11 +61,7 @@
 
                    
 
-                    <div class="flex items-center space-x-4">
-                        <button id="decreaseQuantity" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">-</button>
-                        <span id="quantity" class="font-semibold">1</span>
-                        <button id="increaseQuantity" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">+</button>
-                    </div>
+                
                       <br>
 
                     <div class="flex justify-between items-center mt-auto">
@@ -222,7 +233,7 @@ function addToCart(productId) {
         });
     })
     .catch(error => {
-        if (error.message === 'User not authenticated') {
+        if (error.message === 'Please Log In') {
             Swal.fire({
                 icon: 'warning',
                 title: 'Not Logged In',
@@ -246,22 +257,7 @@ function addToCart(productId) {
 }
 
 
-const decreaseQuantityBtn = document.getElementById('decreaseQuantity');
-const increaseQuantityBtn = document.getElementById('increaseQuantity');
-const quantityDisplay = document.getElementById('quantity');
 
-
-decreaseQuantityBtn.addEventListener('click', () => {
-    let currentQuantity = parseInt(quantityDisplay.textContent, 10);
-    if (currentQuantity > 1) { 
-        quantityDisplay.textContent = currentQuantity - 1;
-    }
-});
-
-increaseQuantityBtn.addEventListener('click', () => {
-    let currentQuantity = parseInt(quantityDisplay.textContent, 10);
-    quantityDisplay.textContent = currentQuantity + 1;
-});
 
 
 document.addEventListener('DOMContentLoaded', () => {

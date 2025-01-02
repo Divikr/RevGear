@@ -120,37 +120,53 @@
         });
 
         document.getElementById('image-input').addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const imagePreviewContainer = document.getElementById('image-preview-container');
-                    imagePreviewContainer.innerHTML = '';
+    const file = event.target.files[0];
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+    const allowedFileTypes = ['image/jpeg', 'image/png' ,'image/webp'];
+    imagePreviewContainer.innerHTML = '';
 
-                    const imageWrapper = document.createElement('div');
-                    imageWrapper.classList.add('image-wrapper');
+    if (file) {
+      
+        if (!allowedFileTypes.includes(file.type)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid File Type',
+                text: 'Please upload a valid image (JPEG, PNG , Webp).',
+            });
+            event.target.value = ''; 
+            return;
+        }
 
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.classList.add('cropped-image');
+        
+      
 
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'Remove';
-                    deleteButton.classList.add('delete-button');
-                    deleteButton.addEventListener('click', () => {
-                        imagePreviewContainer.innerHTML = '';
-                        uploadedImage = null;
-                    });
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageWrapper = document.createElement('div');
+            imageWrapper.classList.add('image-wrapper');
 
-                    imageWrapper.appendChild(img);
-                    imageWrapper.appendChild(deleteButton);
-                    imagePreviewContainer.appendChild(imageWrapper);
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.classList.add('cropped-image');
 
-                    uploadedImage = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Remove';
+            deleteButton.classList.add('delete-button');
+            deleteButton.addEventListener('click', () => {
+                imagePreviewContainer.innerHTML = '';
+                uploadedImage = null;
+                document.getElementById('image-input').value = ''; 
+            });
+
+            imageWrapper.appendChild(img);
+            imageWrapper.appendChild(deleteButton);
+            imagePreviewContainer.appendChild(imageWrapper);
+
+            uploadedImage = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
 
         function deleteExistingImage(imageUrl) {
           

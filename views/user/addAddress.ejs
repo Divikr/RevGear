@@ -1,5 +1,27 @@
 <%- include("../partials/header.ejs") %>
 
+
+<br>
+
+ <nav class="text-sm ml-6 font-medium text-gray-700 mb-6 ">
+  <ol class="list-reset flex">
+    <li>
+      <a href="/home" class="text-blue-600 hover:text-blue-700">Home</a>
+    </li>
+    <li class="mx-2">/</li>
+    <li>
+      <a href="/profile" class="text-blue-600 hover:text-blue-700">Profile</a>
+    </li>
+    <li class="mx-2">/</li>
+    <li>
+      <a href="/addressbook" class="text-blue-600 hover:text-blue-700">Address</a>
+    </li>
+    <li class="mx-2">/</li>
+    <li class="text-gray-400">Add Address</li>
+  </ol>
+</nav>
+
+
 <div class="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
   <div class="bg-gradient-to-br from-white to-blue-50 shadow-2xl rounded-xl overflow-hidden">
     <div class="grid grid-cols-4 gap-6 p-6">
@@ -31,7 +53,7 @@
             </a>
           </li>
           <li class="sidebar-item">
-            <a href="#" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+            <a href="/orderlist" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
               <i class="fas fa-box text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
               <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Order</span>
             </a>
@@ -46,7 +68,7 @@
         </ul>
       </div>
 
-      <!-- Main Content -->
+    
       <div class="col-span-3">
         <h1 class="text-3xl font-bold mb-6 text-gray-800 animate-fade-in">Add New Address</h1>
         <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-blue-100">
@@ -81,22 +103,22 @@
                 </div>
               </div>
 
-              <!-- Address Input Fields -->
+            
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label for="name" class="block font-medium text-gray-700 mb-2">Full Name</label>
-                  <input type="text" id="name" name="name" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" required>
+                  <input type="text" id="name" name="name" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" >
                   <div id="nameError" class="text-red-500 text-sm mt-1 hidden">Please enter your name.</div>
                 </div>
                 <div>
                   <label for="phone" class="block font-medium text-gray-700 mb-2">Phone Number</label>
-                  <input type="tel" id="phone" name="phone" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" required>
+                  <input type="tel" id="phone" name="phone" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" >
                   <div id="phoneError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid phone number.</div>
                 </div>
                 
                 <div class="col-span-2">
                   <label for="street" class="block font-medium text-gray-700 mb-2">Street Address</label>
-                  <input type="text" id="street" name="street" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" required>
+                  <input type="text" id="street" name="street" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" >
                 </div>
                 
                 <div>
@@ -111,16 +133,16 @@
                 
                 <div>
                   <label for="city" class="block font-medium text-gray-700 mb-2">City</label>
-                  <input type="text" id="city" name="city" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" required>
+                  <input type="text" id="city" name="city" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" >
                 </div>
                 
                 <div>
                   <label for="postalCode" class="block font-medium text-gray-700 mb-2">Pin Code</label>
-                  <input type="text" id="postalCode" name="postalCode" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" required>
+                  <input type="text" id="postalCode" name="postalCode" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" >
                 </div>
               </div>
 
-              <!-- Save Button -->
+           
               <div class="mt-6 text-right">
                 <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-6 rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-md hover:shadow-lg">
                   Save Address
@@ -141,32 +163,95 @@
 <script src="/js/header.js"></script>
 <script>
   const form = document.getElementById('addressForm');
-  const nameError = document.getElementById('nameError');
-  const phoneError = document.getElementById('phoneError');
+const nameError = document.getElementById('nameError');
+const phoneError = document.getElementById('phoneError');
+const streetError = document.getElementById('streetError');
+const cityError = document.getElementById('cityError');
+const postalCodeError = document.getElementById('postalCodeError');
 
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // Prevent form submission
 
-    let isValid = true;
+  let isValid = true;
 
-    if (form.name.value.trim() === '') {
-      nameError.classList.remove('hidden');
-      isValid = false;
-    } else {
-      nameError.classList.add('hidden');
+// Name validation
+
+if (!form.name.value.match(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)) {
+  nameError.textContent = 'Please enter a valid full name ';
+  nameError.classList.remove('hidden');
+  isValid = false;
+} else {
+  nameError.classList.add('hidden');
+}
+
+  // Phone number validation
+  if (!form.phone.value.match(/^\+?\d{10}$/)) {
+    phoneError.textContent = 'Please enter a valid phone number (10 digits).';
+    phoneError.classList.remove('hidden');
+    isValid = false;
+  } else {
+    phoneError.classList.add('hidden');
+  }
+
+  // Street address validation
+  if (form.street.value.trim() === '') {
+    if (!streetError) {
+      const errorDiv = document.createElement('div');
+      errorDiv.id = 'streetError';
+      errorDiv.textContent = 'Please enter your street address.';
+      errorDiv.classList.add('text-red-500', 'text-sm', 'mt-1');
+      form.street.insertAdjacentElement('afterend', errorDiv);
     }
+    isValid = false;
+  } else {
+    const errorDiv = document.getElementById('streetError');
+    if (errorDiv) errorDiv.remove();
+  }
 
-    if (!form.phone.value.match(/^\+?\d{10,15}$/)) {
-      phoneError.classList.remove('hidden');
-      isValid = false;
-    } else {
-      phoneError.classList.add('hidden');
+  // City validation
+  if (form.city.value.trim() === '') {
+    if (!cityError) {
+      const errorDiv = document.createElement('div');
+      errorDiv.id = 'cityError';
+      errorDiv.textContent = 'Please enter your city.';
+      errorDiv.classList.add('text-red-500', 'text-sm', 'mt-1');
+      form.city.insertAdjacentElement('afterend', errorDiv);
     }
+    isValid = false;
+  } else {
+    const errorDiv = document.getElementById('cityError');
+    if (errorDiv) errorDiv.remove();
+  }
 
-    if (isValid) {
-      form.submit();
+  // Postal code validation
+  if (!form.postalCode.value.match(/^\d{5,6}$/)) {
+    if (!postalCodeError) {
+      const errorDiv = document.createElement('div');
+      errorDiv.id = 'postalCodeError';
+      errorDiv.textContent = 'Please enter a valid pin code';
+      errorDiv.classList.add('text-red-500', 'text-sm', 'mt-1');
+      form.postalCode.insertAdjacentElement('afterend', errorDiv);
     }
-  });
+    isValid = false;
+  } else {
+    const errorDiv = document.getElementById('postalCodeError');
+    if (errorDiv) errorDiv.remove();
+  }
+
+  
+  if (isValid)  { Swal.fire({
+        title: 'Success!',
+        text: 'Your address has been saved successfully.',
+        icon: 'success',
+        confirmButtonText: 'Okay',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit();
+        }
+      });
+    }} );
+
+
 </script>
 </body>
 </html>

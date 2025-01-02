@@ -172,31 +172,31 @@
 
 
         .custom-select {
-    background-color: #f8f9fa; /* Light grey background */
-    border: 2px solid #007bff; /* Blue border */
-    border-radius: 10px; /* Rounded corners */
-    padding: 10px; /* Add padding for a better look */
-    font-size: 16px; /* Adjust font size */
-    color: #212529; /* Dark text color */
-    appearance: none; /* Remove native arrow in some browsers */
+    background-color: #f8f9fa;
+    border: 2px solid #007bff; 
+    border-radius: 10px;
+    padding: 10px; 
+    font-size: 16px; 
+    color: #212529;
+    appearance: none; 
     cursor: pointer;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    transition: all 0.3s ease; /* Smooth transitions */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease; 
 }
 
 .custom-select:hover {
-    background-color: #e2e6ea; /* Slightly darker background on hover */
-    border-color: #0056b3; /* Darker blue border on hover */
+    background-color: #e2e6ea; 
+    border-color: #0056b3; 
 }
 
 .custom-select:focus {
     outline: none;
-    border-color: #0056b3; /* Highlight border on focus */
-    box-shadow: 0px 0px 10px rgba(0, 91, 187, 0.5); /* Glow effect */
+    border-color: #0056b3; 
+    box-shadow: 0px 0px 10px rgba(0, 91, 187, 0.5); 
 }
 
 .custom-select option {
-    padding: 10px; /* Padding for options */
+    padding: 10px; 
 }
 
 
@@ -277,8 +277,9 @@
                     <select id="orderStatusSelect" class="form-select custom-select">
                         <option value="Ordered">Ordered</option>
                         <option value="Shipped">Shipped</option>
+                        <option value="Out For Delivery">Out For Delivery</option>
                         <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
+                    
                     </select>
                 </div>
             </div>
@@ -321,9 +322,16 @@
                                 <strong>Total Amount:</strong> 
                                 <span class="text-success">₹<%= orderDetails.totalAmount.toFixed(2) %></span><br>
                                 <strong>Order Status:</strong> 
-                                <span class="status-badge"><%= orderDetails.orderStatus %></span>
+                                <span class="status-badge"><%= orderDetails.orderStatus %></span><br>
+                                <% if (orderDetails.orderStatus === 'Cancelled') { %>
+                                    <strong>Reason:</strong>
+                                    <span><%= orderDetails.cancellationReason %></span><br>
+                                    <strong>Reason Description:</strong>
+                                    <span><%= orderDetails.cancellationComment  %></span>
+                                <% } %>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>
@@ -410,21 +418,21 @@
         });
 
         document.getElementById('saveStatusBtn').addEventListener('click', function () {
-    console.log('Button clicked'); // Debugging step
+    console.log('Button clicked'); 
     const orderId = '<%= orderDetails._id %>';
     const status = document.getElementById('orderStatusSelect').value;
 
     axios.patch('/admin/changeStatus', { orderId, status })
         .then(response => {
-            console.log('Response received:', response); // Debugging step
+            console.log('Response received:', response); 
             Swal.fire({
                 icon: 'success',
                 title: 'Order Status Updated',
                 text: 'The order status has been successfully updated.',
                 confirmButtonText: 'OK'
             }).then(() => {
-                console.log('Swal confirmed, reloading'); // Debugging step
-                location.reload(true); // Force reload from server
+                console.log('Swal confirmed, reloading'); 
+                location.reload(true);
             });
         })
         .catch(error => {
@@ -434,7 +442,7 @@
                 text: 'There was an error updating the order status.',
                 confirmButtonText: 'OK'
             });
-            console.error('Error occurred:', error); // Debugging step
+            console.error('Error occurred:', error); 
         });
 });
 

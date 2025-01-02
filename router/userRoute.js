@@ -3,6 +3,7 @@ const route = express()
 const userController = require("../controller/user/userController")
 const productController = require("../controller/user/productController")
 const profileController = require("../controller/user/profile")
+const paymentController = require("../controller/user/payment")
 const passport = require("../config/passport");
 const auth = require("../middleware/userAuth")
 
@@ -32,21 +33,39 @@ route.get('/auth/google/callback', passport.authenticate('google', { failureRedi
 route.get("/login", userController.loadlogin)
 route.post("/login", userController.login)
 
+
+route.get("/forgetPassword",userController.getForget)
+route.post("/forgetPassword",userController.postForget)
+
+route.get("/otpforget", userController.otpforget)
+route.post('/otpforget',userController.verifyPasswordOtp)
+
+route.get('/setPassword',userController.setPassword)
+route.post("/resendOtp", userController.resendotp)
+route.post("/setPassword",userController.setNewPassword)
+
+
+
 route.get("/home", userController.home)
 route.get("/logout", userController.logout)
 
-route.get("/product", userController.product);
+
+
+//product manegment
+
+route.get("/product", userController.getAllProducts);
+
 route.get('/product/:id', productController.singleproduct)
 
 route.get('/categories', userController.category);
 
-route.get("/products",productController.getAllProducts)
+route.get("/products",userController.getAllProducts)
 
 
 
 route.get('/search', userController.searchProducts);
 
-
+route.get('/products/:name', productController.getProductByCategory)
 
 
 
@@ -90,7 +109,7 @@ route.post('/wishlist/add', productController.addToWishlist);
 route.get('/wishlist',productController.getwishlist);
 
 
-route.get('/products/:name', productController.getProductByCategory)
+
 
 //order manegment
 
@@ -100,6 +119,18 @@ route.get('/orderconfirm/:id',productController.orderconfirm);
 route.get('/myorder/:id', productController.orderdetails)
 
 route.get('/orderlist',productController.orderlist);
+
+route.post('/orders/cancel/:id',productController.cancelOrder);
+
+
+//payment
+
+route.post('/create-razorpay-order',paymentController.createRazorpayOrder);
+
+
+
+
+
 
 
 module.exports = route

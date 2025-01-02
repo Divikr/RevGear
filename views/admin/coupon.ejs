@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Category</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/addCategory.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+
+<body class="bg-gray-900">
+    <div class="flex min-h-screen">
+        
+        <div class="sidebar">
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+            </div>
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupons" class="nav-item active">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/sales" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+
+        
+        <div class="flex-1 p-4">
+            <div class="w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    
+                    <div class="lg:col-span-3">
+                        <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
+                            <h2 class="text-2xl font-bold mb-6 text-white">Add/Edit Coupon</h2>
+                            
+                            <form id="couponForm" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                  
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Code</label>
+                                        <input type="text" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+            
+                                   
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Discount Type</label>
+                                        <select class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
+                                            <option>Percentage</option>
+                                            <option>Fixed Amount</option>
+                                        </select>
+                                    </div>
+            
+                                   
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Discount Value</label>
+                                        <input type="number" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+            
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Min Purchase Amount</label>
+                                        <input type="number" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+            
+                                
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Valid From</label>
+                                        <input type="datetime-local" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+            
+                              
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Valid Until</label>
+                                        <input type="datetime-local" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+            
+                                   
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Max Uses</label>
+                                        <input type="number" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+            
+                                    
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="isActive" class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                                        <label for="isActive" class="ml-2 text-sm font-medium text-gray-300">Is Active</label>
+                                    </div>
+                                </div>
+            
+                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                                    Save Coupon
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                 
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

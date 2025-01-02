@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="/admin/addProduct.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <style>
     .cropped-image {
       width: 100px;
@@ -203,7 +205,11 @@
         if (imagePreviewContainer.childElementCount < maxImages) {
           imageInput.click();
         } else {
-          alert('Maximum of 4 images allowed.');
+          Swal.fire({
+      icon: 'warning',
+      title: 'Limit Reached',
+      text: 'You can upload a maximum of 4 images only.',
+    });
         }
       });
 
@@ -260,49 +266,88 @@
       cancelCropButton.addEventListener('click', closeCropperModal);
 
       document.querySelector('.save-product').addEventListener('click', async function() {
-        const requiredFields = [
-          'product-name', 'product-category',
-          'stock', 'product-price',
-        ];
-
-        const formData = new FormData();
-
-        formData.append('productName', document.getElementById('product-name').value);
-        formData.append('description', document.getElementById('description').value);
-        formData.append('category', document.getElementById('product-category').value);
-        formData.append('regularPrice', document.getElementById('product-price').value);
-        formData.append('salePrice', document.getElementById('product-sale-price').value || '');
-        formData.append('productOffer', document.getElementById('product-offer').value || '');
-        formData.append('quantity', document.getElementById('stock').value || '');
-
-
-        const imageWrappers = document.querySelectorAll('.image-wrapper img');
-        for (let [index, img] of imageWrappers.entries()) {
-          const response = await fetch(img.src);
-          const blob = await response.blob();
-          formData.append('productImage', blob, `product-image-${index}.png`);
-        }
-
-        try {
-          const response = await fetch('/admin/addproduct', {
-            method: 'POST',
-            body: formData
-          });
-
-          const result = await response.json();
-
-          if (response.ok) {
-            alert("Product saved successfully!");
-            window.location.href = '/admin/product';
-          } else {
-            console.error('Product save failed', result);
-            alert(result.error || 'Failed to save product');
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          alert('An error occurred while saving the product');
-        }
+          
+            const productName = document.getElementById('product-name').value;
+            const description = document.getElementById('description').value;
+            const category = document.getElementById('product-category').value;
+            const stock = document.getElementById('stock').value;
+            const price = document.getElementById('product-price').value;
+            const offer = document.getElementById('product-offer').value;
+            
+            if (!productName || !description || !category || !stock || !price) {
+              Swal.fire({
+        icon: 'error',
+        title: '',
+        text: 'Please fill all the  fields.',
       });
+      return;
+            }
+
+            if (offer < 0 || offer > 100) {
+              Swal.fire({
+        icon: 'error',
+        title: 'Invalid Offer',
+        text: 'Offer percentage should be between 0 and 100.',
+      });
+      return;
+            }
+
+            const formData = new FormData();
+            formData.append('productName', productName);
+            formData.append('description', description);
+            formData.append('category', category);
+            formData.append('regularPrice', price);
+            formData.append('salePrice', document.getElementById('product-sale-price').value || '');
+            formData.append('productOffer', offer || '');
+            formData.append('quantity', stock);
+
+            const imageWrappers = document.querySelectorAll('.image-wrapper img');
+            if (imageWrappers.length === 0) {
+              Swal.fire({
+        icon: 'error',
+        title: 'No Images Uploaded',
+        text: 'Please add at least one image.',
+      });
+      return;
+            }
+
+            for (let [index, img] of imageWrappers.entries()) {
+                const response = await fetch(img.src);
+                const blob = await response.blob();
+                formData.append('productImage', blob, `product-image-${index}.png`);
+            }
+
+            try {
+                const response = await fetch('/admin/addproduct', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Product Saved',
+          text: 'Product saved successfully!',
+        }).then(() => {
+          window.location.href = '/admin/product';
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Save Failed',
+          text: result.error || 'Failed to save product',
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred while saving the product',
+      });
+    }
+  });
 
       document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.getElementById('sidebar');
@@ -349,10 +394,7 @@
     const offer = parseFloat(offerInput.value) || 0;
 
 
-    if (offer < 0 || offer > 100) {
-      alert("Offer percentage should be between 0 and 100.");
-      return;
-    }
+   
 
     const salePrice = price - (price * (offer / 100));
     salePriceInput.value = salePrice.toFixed(2); 

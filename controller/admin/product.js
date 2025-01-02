@@ -4,6 +4,9 @@ const Product = require("../../model/product")
 const Category = require('../../model/category');
 const upload = multer({ dest: 'public/uploads/products/' });
 
+
+//get product
+
 const getProduct = async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -38,6 +41,8 @@ const getProduct = async (req, res) => {
 };
 
 
+//get addproduct
+
 const addproduct = async (req, res) => {
   try {
     const categories = await Category.find({});
@@ -48,7 +53,7 @@ const addproduct = async (req, res) => {
 }
 
 
-
+//post addproduct
 
 const addProduct = async (req, res) => {
 
@@ -60,7 +65,7 @@ const addProduct = async (req, res) => {
     const productImages = req.files ? req.files.map((file) => file.path.replace("public", "")) : [];
 
 
-    console.log(productImages)
+ 
 
 
     const newProduct = new Product({
@@ -74,7 +79,7 @@ const addProduct = async (req, res) => {
       description: req.body.description,
       status: req.body.status || "Available",
     });
-    console.log(newProduct)
+    
     const savedProduct = await newProduct.save();
 
     res.status(201).json({
@@ -82,13 +87,15 @@ const addProduct = async (req, res) => {
       product: savedProduct,
     });
 
-    console.log(savedProduct)
+   
   } catch (error) {
     console.error("Error adding product:", error);
     res.status(500).json({ error: "Failed to add product" });
   }
 };
 
+
+//get edit product
 
 const editProduct = async (req, res) => {
   try {
@@ -105,6 +112,8 @@ const editProduct = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+
 
 const updateProduct = async (req, res) => {
   console.log("iam hereeeeeee");
@@ -171,6 +180,9 @@ const updateProduct = async (req, res) => {
     res.status(500).json({ error: 'Update failed', details: error.message });
   }
 };
+
+
+//block product
 
 const blockProduct = async (req, res) => {
   try {

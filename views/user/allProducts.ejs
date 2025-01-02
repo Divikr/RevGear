@@ -2,29 +2,44 @@
 
 
   <section class="container mx-auto py-12 px-4">
+
+ 
+  <nav class="text-sm font-medium text-gray-700 mb-6 ">
+    <ol class="list-reset flex">
+      <li>
+        <a href="/home" class="text-blue-600 hover:text-blue-700">Home</a>
+      </li>
+      <li class="mx-2">/</li>
+      <li class="text-gray-400">Shop</li>
+    </ol>
+  </nav>
+  <br>
+
+
+
     <div class="flex flex-col md:flex-row">
     
-      
-      
       <div class="w-full md:w-4/4">
        
-        <div class="flex justify-between items-center mb-6">
-          <p class="text-gray-600"></p>
-          <br>
-           <select id="sort-select" class="sort-select" onchange="handleSort(event)">
-            <option value="a-z">Sort BY</option>
-                <option value="a-z">A-Z</option>
-                <option value="z-a">Z-A</option>
-                <option value="low-to-high">Price: Low to High</option>
-                <option value="high-to-low">Price: High to Low</option>
-            </select>
-        </div>
-
+        <div class="sorting mb-4">
+          <form method="GET" action="">
+              <label for="sort" class="mr-2">Sort by:</label>
+              <select name="sort" id="sort" onchange="this.form.submit()">
+                  <option value="" <%= !sort ? 'selected' : '' %>>Default</option>
+                  <option value="a-z" <%= sort === 'a-z' ? 'selected' : '' %>>A-Z</option>
+                  <option value="z-a" <%= sort === 'z-a' ? 'selected' : '' %>>Z-A</option>
+                  <option value="low-to-high" <%= sort === 'low-to-high' ? 'selected' : '' %>>Price: Low to High</option>
+                  <option value="high-to-low" <%= sort === 'high-to-low' ? 'selected' : '' %>>Price: High to Low</option>
+              </select>
+          </form>
+      </div>
+<br>
+<br>
     
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <% products.forEach(product => { %>
       
-          <!-- Product Card -->
+    
           <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 animate-fade-in">
            
             <div class="relative overflow-hidden group h-64">
@@ -37,7 +52,7 @@
             </div>
             <a href="/product/<%= product._id %>" class="block">
 
-              <!-- Product Info -->
+       
               <div class="p-6">
                 <h3 class="text-xl font-bold text-gray-900 mb-2"><%= product.productName %></h3>
                 <h2 class="text-sm font-bold text-gray-400 mb-5"><%= product.description %></h2>
@@ -52,7 +67,7 @@
                   <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded out-of-stock-indicator">Out of Stock</span>
                   <% } %>
                 </div>
-                <!-- Rating Stars -->
+           
                 <div class="flex items-center mb-4">
                   <div class="flex text-yellow-400">
                     <% for (let i = 1; i <= 5; i++) { %>
@@ -66,7 +81,7 @@
               </div>
             </a>
         
-            <!-- Add to Cart Button -->
+       
             <div class="px-6 pb-6">
               <button onclick="addToCart('<%= product._id %>', this)" 
                 data-product-id="<%= product._id %>" 
@@ -79,7 +94,6 @@
               </button>
             </div>
       
-            <!-- Like Button -->
             <button onclick="addToWishlist('<%= product._id %>', this)" 
               data-product-id="<%= product._id %>"  class="like-button absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-red-50 transition-colors duration-300" data-liked="false" >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -90,11 +104,29 @@
       
           <% }) %>
         </div>
+<br>
+<br>
+        <div class="pagination flex justify-center mt-6">
+          <ul class="flex space-x-2">
+              <% for (let i = 1; i <= totalPages; i++) { %>
+                  <li>
+                      <a href="?page=<%= i %>&limit=<%= limit %>&sort=<%= sort %>"
+                         class="px-4 py-2 <%= i === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' %> rounded">
+                          <%= i %>
+                      </a>
+                  </li>
+              <% } %>
+          </ul>
+      </div>
         
         
       </div>
     </div>
+   
+  </div>
+  
   </section>
+  
 
 <%- include("../partials/footer.ejs") %>
 <script src="/js/header.js"></script>
@@ -206,11 +238,11 @@ async function addToCart(productId, button) {
   }
 }
 
-function handleSort(event) {
-        const sortValue = event.target.value;
-        // Redirect or fetch sorted data
-        window.location.href =` /products?sort=${sortValue}`;
-    }
+
+
+
+
+    
 </script>
 </body>
 

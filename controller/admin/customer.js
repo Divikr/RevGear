@@ -1,6 +1,6 @@
 const User = require("../../model/users");
 
-
+//get page
 
 const getCustomer = (req,res) => {
     try {
@@ -9,6 +9,8 @@ const getCustomer = (req,res) => {
         console.log(error.message)
     }
 }
+
+//customer info
 
 const customerInfo = async (req, res) => {
   try {
@@ -60,6 +62,9 @@ const customerInfo = async (req, res) => {
       });
   }
 };
+
+
+//toggle button
 
 const toggleCustomerBlock = async (req, res) => {
   try {

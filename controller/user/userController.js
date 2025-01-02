@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const sendotp = require("../../utils/otpNodemailer");
 const Products = require('../../model/product');
 const Category = require("../../model/category");
+const { name } = require("ejs");
 
 const homePage = async (req, res) => {
     try {
@@ -131,7 +132,6 @@ const loadlogin = async (req, res) => {
         res.status(500).send("Server error");
     }
 };
-
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -140,8 +140,12 @@ const login = async (req, res) => {
             return res.status(400).render("user/login", { error: "All fields are required." });
         }
 
-        const user = await User.findOne({ email });
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).render("user/login", { error: "Invalid email format." });
+        }
 
+        const user = await User.findOne({ email });
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).render("user/login", { error: "Invalid email or password" });
         }
@@ -149,10 +153,192 @@ const login = async (req, res) => {
         req.session.user = user; 
         res.redirect("/home");
     } catch (error) {
-        console.error("Login error:", error);
+        console.error(`Login error for email ${req.body.email}:`, error.message);
         res.status(500).render("user/login", { error: "Internal Server Error" });
     }
 };
+
+
+
+const getForget= async  (req,res)=>{
+    try {
+        res.render("user/forgetPassword")
+
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
+
+const postForget = async (req, res) => {
+    try {
+      const { email } = req.body;
+  
+      const existingUser = await User.findOne({ email });
+      if (!existingUser) {
+        return res.render("user/forgetPassword", {
+          error: "No account found with this email address.",
+          success: null,
+        });
+      }
+  
+      const { name } = existingUser;
+  
+      const otpData = generateotp();
+      console.log(`Generated OTP for email ${email}: ${otpData.code}`);
+  
+
+      req.session.forgotPasswordOtp = {
+        code: otpData.code,
+        timestamp: otpData.timestamp,
+        email,
+      };
+
+      await sendotp(email, name, otpData.code);
+
+      res.redirect("/otpforget");
+    } catch (error) {
+      console.error("Error during forgot password process:", error);
+      res.render("user/forgetPassword", {
+        error: "An unexpected error occurred. Please try again.",
+        success: null,
+      });
+    }
+  };
+  
+
+const otpforget = async (req, res) => {
+    try {
+        res.render("user/otpforget");
+    } catch (error) {
+        console.error("Error rendering OTP page:", error);
+        res.status(500).send("Server error");
+    }
+};
+
+const generateotp = () => {
+    const otpCode = Math.floor(100000 + Math.random() * 900000); 
+    const timestamp = new Date().getTime();
+    return { code: otpCode, timestamp };
+  };
+
+
+  const resendotp = async (req, res) => {
+    try {
+    
+        console.log("Session Data: ", req.session);
+
+       
+
+        const newOtp = generateOTP();
+
+        req.session.otp = newOtp;
+
+        const { email, name } = existingUser;
+        console.log("User Data: ", { email, name });
+        sendotp(email, name, newOtp);
+        res.redirect("/otpforget");
+    } catch (error) {
+        console.error("Error in resending OTP:", error.message);
+        res.status(500).send("An error occurred while resending the OTP.");
+    }
+};
+
+
+
+const verifyPasswordOtp = (req, res) => {
+    try {
+        console.log("Request Body:", req.body);
+        console.log("Session Data:", req.session.forgotPasswordOtp);
+
+        const { otp } = req.body;
+        const otpData = req.session.forgotPasswordOtp;
+
+        if (!otpData) {
+            return res.status(400).json({
+                success: false,
+                message: "OTP session expired. Please request a new OTP.",
+                expired: true
+            });
+        }
+        if (String(otp) !== String(otpData.code)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid OTP. Please try again."
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "OTP verified successfully."
+        });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "An error occurred during OTP verification."
+        });
+    }
+};
+
+
+
+const setPassword = async (req, res) => {
+    try {
+        res.render("user/setPassword");
+    } catch (error) {
+        console.error("Error rendering OTP page:", error);
+        res.status(500).send("Server error");
+    }
+};
+
+
+
+
+
+const setNewPassword = async (req, res) => {
+    try {
+        const { newpass, confirmpass } = req.body;
+        const { email } = req.session.forgotPasswordOtp;
+
+
+        if (newpass !== confirmpass) {
+            return res.status(400).json({
+                success: false,
+                message: "Passwords do not match.",
+            });
+        }
+        const user = await User.findOne({email});
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found.",
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newpass, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        req.session.forgotPasswordOtp = null;
+
+        return res.status(200).json({
+            success: true,
+            message: "Your password has been changed successfully!",
+        });
+    } catch (error) {
+        console.error("Error in setNewPassword:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while setting the new password.",
+        });
+    }
+};
+
+
+
+
+
 
 const home = async (req, res) => {
     try {
@@ -182,16 +368,50 @@ const logout = async (req, res) => {
     }
 }
 
-const product = async (req, res) => {
+const getAllProducts = async (req, res) => {
     try {
-        const products = await Products.find({ isBlocked: false });
-        const categories = await Category.find({});
-        res.render("user/allProducts", { products, categories });
+        const { page = 1, limit = 5, sort } = req.query;
+
+  
+        let sortCriteria = {};
+        switch (sort) {
+            case 'a-z':
+                sortCriteria = { productName: 1 };
+                break;
+            case 'z-a':
+                sortCriteria = { productName: -1 };
+                break;
+            case 'low-to-high':
+                sortCriteria = { salePrice: 1 };
+                break;
+            case 'high-to-low':
+                sortCriteria = { salePrice: -1 };
+                break;
+            default:
+                sortCriteria = {};
+        }
+
+        const products = await Products.find({ isBlocked: false })
+            .sort(sortCriteria)
+            .skip((page - 1) * 8)
+            .limit(8);
+
+        const totalProducts = await Products.countDocuments({ isBlocked: false });
+        const totalPages = Math.ceil(totalProducts / 8);
+
+        res.render('user/allProducts', {
+            products,
+            currentPage: parseInt(page),
+            totalPages,
+            limit: 8,
+            sort,
+        });
     } catch (error) {
-        console.error("Error rendering home page:", error);
-        res.status(500).send("Server error");
+        console.error('Error fetching products with sorting and pagination:', error);
+        res.status(500).send('Internal Server Error');
     }
 };
+
 
 const category = async (req, res) => {
     try {
@@ -240,6 +460,9 @@ const searchProducts = async (req, res) => {
     }
 };
 
+
+
+
 module.exports = {
     homePage,
     loadsignup,
@@ -250,8 +473,16 @@ module.exports = {
     home,
     otpPost,
     resendOtp,
-    product,
+    getAllProducts,
     logout,
     category,
-    searchProducts
+    searchProducts,
+    getForget,
+    postForget,
+    otpforget,
+    generateotp,
+    verifyPasswordOtp,
+    setPassword,
+    resendotp,
+    setNewPassword
 };

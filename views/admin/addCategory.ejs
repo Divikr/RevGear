@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/admin/addCategory.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
  .cropped-image {
     width: 100px;
@@ -127,11 +129,7 @@
                 </div>
                 <button class="save-category" onclick="openModal()">Save Category</button>
 
-                <div id="modal" class="modal">
-                  <div class="modal-content">
-                      <h2>Category saved successfully!</h2>
-                      <button onclick="closeModal()">Close</button>
-                  </div>
+               
               </div>
               </div>
               </div>
@@ -145,50 +143,78 @@
                     document.getElementById('modal').style.display = 'none';
                     
                 }
-                document.querySelector('.save-category').addEventListener('click', async function (event) {
-  const categoryName = document.getElementById('category-name').value;
-  const categoryDescription = document.getElementById('category-description').value;
-  const categoryOffer = document.getElementById('category-offer').value;
-  const imagePreviewContainer = document.getElementById('image-preview-container');
+                  document.querySelector('.save-category').addEventListener('click', async function (event) {
+        event.preventDefault();
 
+        const categoryName = document.getElementById('category-name').value.trim();
+        const categoryDescription = document.getElementById('category-description').value.trim();
+        const categoryOffer = document.getElementById('category-offer').value.trim();
+        const imagePreviewContainer = document.getElementById('image-preview-container');
 
-  const formData = new FormData();
-  formData.append('name', categoryName);
-  formData.append('description', categoryDescription);
-  formData.append('categoryOffer', categoryOffer);
+        // Validation
+        if (!categoryName) {
+            Swal.fire('Validation Error', 'Category Name is required.', 'error');
+            return;
+        } else if (categoryName.length < 3 || categoryName.length > 50) {
+            Swal.fire('Validation Error', 'Category Name must be between 3 and 50 characters.', 'error');
+            return;
+        }
 
+        if (!categoryDescription) {
+            Swal.fire('Validation Error', 'Category Description is required.', 'error');
+            return;
+        } else if (categoryDescription.length < 10 || categoryDescription.length > 200) {
+            Swal.fire('Validation Error', 'Category Description must be between 10 and 200 characters.', 'error');
+            return;
+        }
 
-  const imageElement = imagePreviewContainer.querySelector('.cropped-image');
-  if (imageElement) {
+        if (!categoryOffer) {
+            Swal.fire('Validation Error', 'Category Offer is required.', 'error');
+            return;
+        } else if (isNaN(categoryOffer) || categoryOffer < 0 || categoryOffer > 100) {
+            Swal.fire('Validation Error', 'Category Offer must be a number between 0 and 100.', 'error');
+            return;
+        }
 
-    const response = await fetch(imageElement.src);
-    const blob = await response.blob();
-    formData.append('Image', blob, 'category-image.png');
-  }
+        if (!imagePreviewContainer.querySelector('.cropped-image')) {
+            Swal.fire('Validation Error', 'Category Image is required.', 'error');
+            return;
+        }
 
-  try {
-    const response = await fetch('/admin/addcategory', {
-      method: 'POST',
-      body: formData, 
+        // Prepare FormData
+        const formData = new FormData();
+        formData.append('name', categoryName);
+        formData.append('description', categoryDescription);
+        formData.append('offer', categoryOffer);
+
+        const imageElement = imagePreviewContainer.querySelector('.cropped-image');
+        if (imageElement) {
+            const response = await fetch(imageElement.src);
+            const blob = await response.blob();
+            formData.append('Image', blob, 'category-image.png');
+        }
+
+        try {
+            const response = await fetch('/admin/addcategory', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                Swal.fire('Success', 'Category saved successfully!', 'success');
+                document.getElementById('category-name').value = '';
+                document.getElementById('category-description').value = '';
+                document.getElementById('category-offer').value = '';
+                imagePreviewContainer.innerHTML = '';
+            } else {
+                Swal.fire('Error', data.message || 'Error saving category.', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire('Error', 'Failed to save category.', 'error');
+        }
     });
-    
-    const data = await response.json();
-    
-    if (data.success) {
-      openModal();
-    
-      document.getElementById('category-name').value = '';
-      document.getElementById('category-description').value = '';
-      document.getElementById('category-offer').value = '';
-      imagePreviewContainer.innerHTML = '';
-    } else {
-      alert(data.message || 'Error saving category');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error saving category');
-  }
-});
 
   document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.getElementById('sidebar');
@@ -247,9 +273,13 @@
             imageInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    const validTypes = ['image/jpeg', 'image/png',  'image/webp'];
                     if (!validTypes.includes(file.type)) {
-                        alert('Please upload a valid image file (JPEG, PNG, GIF, or WebP).');
+                        Swal.fire({
+                icon: 'error',
+                title: 'Invalid File Type',
+                text: 'Please upload a valid image (JPEG, PNG , Webp).',
+            });
                         return;
                     }
 

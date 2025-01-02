@@ -24,34 +24,62 @@
 
 <body class="bg-gray-50 text-gray-900 antialiased">
     <div class="container mx-auto px-4 py-8 max-w-4xl">
-
         <section class="order-progress bg-white shadow-md rounded-lg p-6 mb-8">
-            <h2 class="text-xl font-semibold text-gray-700 mb-6">Order Progress</h2>
-            <div class="flex items-center justify-between progress-container">
-                <div class="flex-1 flex items-center order-progress-step">
-                    <div class="progress-step <%= order.orderStatus === 'Ordered' ? 'completed' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
-                        1
-                    </div>
-                    <div class="flex-1 h-1.5 <%= ['Shipped', 'Out For Delivery', 'Delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300' %> mx-2"></div>
+            <section>
+                <h2 class="text-xl font-semibold text-gray-700 mb-6">Order Progress</h2>
+                <div class="flex items-center justify-between progress-container">
+                    <!-- Progress Steps -->
+                    <% if (order.orderStatus === 'Cancelled') { %>
+                        <div class="flex mb-4 items-center justify-center w-full py-6 bg-red-100 border border-red-500 rounded-lg shadow-md">
+                            <div class="flex items-center space-x-4">
+                                <!-- Cancel Icon -->
+                                <svg class="w-8 h-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                <!-- Message -->
+                                <span class="text-red-700 font-bold text-xl">Order Cancelled</span>
+                            </div>
+                        </div>
+                       
+                        
+                    <% } else { %>
+                        <div class="flex-1 flex items-center order-progress-step">
+                            <div class="progress-step <%= order.orderStatus === 'Ordered' ? 'completed' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
+                                1
+                            </div>
+                            <div class="flex-1 h-1.5 <%= ['Shipped', 'Out For Delivery', 'Delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300' %> mx-2"></div>
+                        </div>
+                        <div class="flex-1 flex items-center order-progress-step">
+                            <div class="progress-step <%= ['Shipped', 'Out For Delivery', 'Delivered'].includes(order.orderStatus) ? 'completed' : order.orderStatus === 'Ordered' ? 'active' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
+                                2
+                            </div>
+                            <div class="flex-1 h-1.5 <%= ['Out For Delivery', 'Delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300' %> mx-2"></div>
+                        </div>
+                        <div class="flex-1 flex items-center order-progress-step">
+                            <div class="progress-step <%= ['Out For Delivery', 'Delivered'].includes(order.orderStatus) ? 'completed' : order.orderStatus === 'Shipped' ? 'active' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
+                                3
+                            </div>
+                            <div class="flex-1 h-1.5 <%= order.orderStatus === 'Delivered' ? 'bg-green-500' : 'bg-gray-300' %> mx-2"></div>
+                        </div>
+                        <div class="order-progress-step">
+                            <div class="progress-step <%= order.orderStatus === 'Delivered' ? 'completed' : order.orderStatus === 'Out For Delivery' ? 'active' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
+                                4
+                            </div>
+                        </div>
+                    <% } %>
                 </div>
-                <div class="flex-1 flex items-center order-progress-step">
-                    <div class="progress-step <%= ['Shipped', 'Out For Delivery', 'Delivered'].includes(order.orderStatus) ? 'completed' : order.orderStatus === 'Ordered' ? 'active' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
-                        2
+                <% if (order.orderStatus !== 'Cancelled') { %>
+                    <div class="flex justify-between text-sm mt-4">
+                        <span class="text-green-500 font-medium">Order Placed</span>
+                        <span class="text-blue-500 font-medium">Shipped</span>
+                        <span class="text-yellow-500 font-medium">Out For Delivery</span>
+                        <span class="text-gray-400 font-medium">Delivered</span>
                     </div>
-                    <div class="flex-1 h-1.5 <%= ['Out For Delivery', 'Delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300' %> mx-2"></div>
-                </div>
-                <div class="order-progress-step">
-                    <div class="progress-step <%= order.orderStatus === 'Delivered' ? 'completed' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
-                        3
-                    </div>
-                </div>
-            </div>
-            <div class="flex justify-between text-sm mt-4">
-                <span class="text-green-500 font-medium">Order Placed</span>
-                <span class="text-blue-500 font-medium">Shipped</span>
-                <span class="text-gray-400 font-medium">Delivered</span>
-            </div>
-        </section>
+                <% } %>
+            </section>
+            
+
+        
 
         <div class="order-details grid md:grid-cols-2 gap-8">
             <section class="bg-white shadow-md rounded-lg p-6">
@@ -63,7 +91,7 @@
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-800"><%= item.productId.name %></h3>
                                 <p class="text-gray-500 text-sm">Quantity: <%= item.quantity %></p>
-                                <p class="text-blue-600 font-medium">$<%= item.price.toFixed(2) %></p>
+                                <p class="text-blue-600 font-medium">₹<%= item.price.toFixed(2) %></p>
                             </div>
                         </div>
                     <% }) %>
@@ -76,22 +104,124 @@
                     <div class="space-y-4">
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600">Subtotal</span>
-                            <span class="text-gray-800 font-medium">$<%= order.totalAmount.toFixed(2) %></span>
+                            <span class="text-gray-800 font-medium">₹<%= order.totalAmount.toFixed(2) %></span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600">Shipping</span>
-                            <span class="text-gray-800 font-medium">$<%= order.shippingCost || '5.00' %></span>
+                            <span class="text-gray-800 font-medium">₹<%= order.shippingCost || '100.00' %></span>
                         </div>
                         <hr class="border-gray-200">
                         <div class="flex justify-between items-center font-bold">
                             <span class="text-gray-900">Total</span>
-                            <span class="text-blue-600 text-xl">$<%= (order.totalAmount + (order.shippingCost || 5)).toFixed(2) %></span>
+                            <span class="text-blue-600 text-xl">₹<%= (order.totalAmount + (order.shippingCost || 100)).toFixed(2) %></span>
                         </div>
                     </div>
-                    <button class="mt-6 w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
-                        Cancel Order
-                    </button>
+                    <% if (!['Shipped', 'Out For Delivery', 'Delivered','Cancelled'].includes(order.orderStatus)) { %>
+                        <button  onclick="showCancelModal()" class="mt-6 w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+
+                            Cancel Order
+                        </button>
+                        
+                    <% } %>
+
+<!-- Cancel Order Modal -->
+<div id="cancelOrderModal" 
+class="fixed inset-0 z-50 hidden"
+aria-labelledby="modal-title" 
+role="dialog" 
+aria-modal="true">
+<div class="modal-backdrop absolute inset-0 bg-black bg-opacity-50">
+   <div class="flex min-h-screen items-center justify-center p-4">
+       <div class="modal-content bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-auto">
+           <div class="flex justify-between items-center mb-4">
+               <h2 id="modal-title" class="text-xl font-semibold text-gray-900">Cancel Order</h2>
+               <button onclick="hideCancelModal()" class="text-gray-400 hover:text-gray-500">
+                   <span class="sr-only">Close</span>
+                   <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                   </svg>
+               </button>
+           </div>
+
+           <form id="cancelOrderForm" onsubmit="handleCancelSubmit(event)">
+               <div class="space-y-4">
+                   <div>
+                       <label for="reason" class="block text-sm font-medium text-gray-700">Select Reason</label>
+                       <br>
+                       <select id="reason" 
+                               name="reason"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                               required>
+                               <option value="select option">select option</option>
+                           <option value="Got at Better Price">Got at Better Price</option>
+                           <option value="Wrong Item Ordered">Wrong Item Ordered</option>
+                           <option value="Shipping Time Too Long">Shipping Time Too Long</option>
+                           <option value="Other Reason">Other Reason</option>
+                       </select>
+                   </div>
+
+                   <br>
+                   <div>
+                       <label for="description" class="block text-sm font-medium text-gray-700">Reason</label>
+                       <textarea id="description"
+                                 name="description"
+                                 rows="4"
+                                 class="mt-1 block w-full rounded-md border-grey-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                ></textarea>
+                   </div>
+               </div>
+
+               <div class="mt-6 flex justify-end space-x-3">
+                   <button type="button"
+                           onclick="hideCancelModal()"
+                           class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                       Cancel
+                   </button>
+                   <button type="submit"
+                           class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                       Confirm Cancellation
+                   </button>
+               </div>
+           </form>
+       </div>
+   </div>
+</div>
+</div>
+
+
+<% if (order.orderStatus === 'Delivered') { %>
+    <button id="returnOrderButton" class="mt-6 w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        Return Order
+    </button>
+<% } %>
+
+
+
+<div id="returnOrderModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+        <h2 class="text-lg font-semibold mb-4">Return Order</h2>
+        <form id="returnOrderForm">
+            <div class="mb-4">
+                <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Return</label>
+                <select id="reason" name="reason" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="damaged">Damaged Item</option>
+                    <option value="wrongItem">Wrong Item Delivered</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea id="description" name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Provide more details"></textarea>
+            </div>
+            <div class="flex justify-end">
+                <button type="button" id="cancelButton" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-lg mr-2">Cancel</button>
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
                 </section>
+
 
                 <section class="bg-white shadow-md rounded-lg p-6">
                     <h2 class="text-xl font-semibold text-gray-700 mb-6">Shipping Details</h2>
@@ -99,7 +229,7 @@
                         <p class="font-semibold"><%= order.deliveryAddress.name %></p>
                         <p><%= order.deliveryAddress.streetAddress %></p>
                         <p><%= order.deliveryAddress.city %></p>
-                        <p class="mt-2">Phone: <a href="tel:+<%= order.deliveryAddress.phone %>" class="text-blue-600">+<%= order.deliveryAddress.phone %></a></p>
+                        <p class="mt-2">Phone: <a href="tel:+<%= order.deliveryAddress.phone %>" class="text-blue-600">+91 <%= order.deliveryAddress.phone %></a></p>
                     </address>
                 </section>
             </div>
@@ -137,4 +267,127 @@
         y: 30,
         stagger: 0.3
     });
+
+    function showCancelModal() {
+        const modal = document.getElementById('cancelOrderModal');
+        const modalContent = modal.querySelector('.modal-content');
+        modal.classList.remove('hidden');
+        setTimeout(() => modalContent.classList.add('show'), 10);
+    }
+
+    function hideCancelModal() {
+        const modal = document.getElementById('cancelOrderModal');
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.classList.remove('show');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+ 
+
+    async function handleCancelSubmit(event) {
+  event.preventDefault();
+
+  const reason = document.getElementById('reason').value;
+  const description = document.getElementById('description').value;
+  const orderId = "<%= order._id %>";
+
+  if (!reason ) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Please fill in all required fields'
+    });
+    return;
+  }
+
+  try {
+    const response = await fetch(`/orders/cancel/${orderId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        reason,
+        description
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to cancel order: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+
+    if (result.success) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Order cancelled successfully'
+      });
+      hideCancelModal();
+      window.location.reload();
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (error) {
+    console.error('Error cancelling order:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Failed',
+      text: error.message || 'Failed to cancel order. Please try again later.'
+    });
+  }
+}
+
+
+// Close modal when clicking outside
+document.getElementById('cancelOrderModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) {
+        hideCancelModal();
+    }
+});
+
+// Close modal on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        hideCancelModal();
+    }
+});
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+        const returnOrderButton = document.getElementById("returnOrderButton");
+        const returnOrderModal = document.getElementById("returnOrderModal");
+        const cancelButton = document.getElementById("cancelButton");
+
+        // Show modal
+        returnOrderButton.addEventListener("click", () => {
+            returnOrderModal.classList.remove("hidden");
+        });
+
+        // Hide modal
+        cancelButton.addEventListener("click", () => {
+            returnOrderModal.classList.add("hidden");
+        });
+
+        // Handle form submission
+        const form = document.getElementById("returnOrderForm");
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            const reason = document.getElementById("reason").value;
+            const description = document.getElementById("description").value;
+
+            console.log({ reason, description }); // Process return logic here
+
+            // Close the modal after submission
+            returnOrderModal.classList.add("hidden");
+        });
+    });
+
 </script>

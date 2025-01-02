@@ -38,25 +38,27 @@
         </div>
         
       </div>
+      <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded"><%= product.productOffer %> % OFF</span>
       <div>
         <% if (product.quantity > 0) { %>
-        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded"><%= product.productOffer %> % OFF</span>
-        <% } else { %>
-        <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded out-of-stock-indicator">Out of Stock</span>
-        <% } %>
-      </div>
-   
-    </div>
-      <div>
+        <div>
         <h3 class="font-semibold mb-2">Quantity</h3>
         <div class="flex items-center space-x-4">
           <button id="decreaseQuantity" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">-</button>
           <span id="quantity" class="font-semibold">1</span>
           <button id="increaseQuantity" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">+</button>
         </div>
+      </div>        <% } else { %>
+        <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded out-of-stock-indicator">Out of Stock</span>
+        <% } %>
       </div>
+   
+    </div>
+     
     
-
+<div>
+  <span> Stock available <%= product.quantity %></span>
+</div>
       <div class="flex space-x-4">
         <button   onclick="addToCart('<%= product._id %>')" id="addToCart" class="flex-grow bg-red-600 text-white py-3 rounded-full hover:bg-red-700 transition-colors">
           Add to Cart
@@ -101,7 +103,7 @@
       </div>
       
       <a href="/product/<%= product._id %>" class="block flex-grow">
-        <!-- Product Info -->
+     
         <div class="p-6">
           <h3 class="text-xl font-bold text-gray-900 mb-2"><%= product.productName %></h3>
           <div class="flex items-center justify-between mb-4">
@@ -116,7 +118,7 @@
             <% } %>
           </div>
 
-          <!-- Rating Stars -->
+         
           <div class="flex items-center mb-4">
             <div class="flex text-yellow-400">
               <% for (let i = 1; i <= 5; i++) { %>
@@ -130,7 +132,7 @@
         </div>
       </a>
      
-      <!-- Wishlist Button -->
+      
       <div class="px-6 pb-6 mt-auto">
         <button onclick="addToWishlist('<%= product._id %>', this)" data-product-id="<%= product._id %>" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 wishlist-btn <%= product.quantity === 0 ? 'opacity-50 cursor-not-allowed' : '' %>" <%= product.quantity === 0 ? 'disabled' : '' %>>
           <span class="wishlist-text flex items-center justify-center">
@@ -159,6 +161,8 @@
       transition: transform 0.3s ease;
     }
   </style>
+
+
     <script>
 
 
@@ -279,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     })
     .catch(error => {
-        if (error.message === 'User not authenticated') {
+        if (error.message === 'Please Log In') {
             Swal.fire({
                 icon: 'warning',
                 title: 'Not Logged In',

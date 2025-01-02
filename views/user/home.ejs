@@ -4,21 +4,21 @@
   <section class="relative">
     <div class="swiper-container h-[500px]">
       <div class="swiper-wrapper">
-        <!-- Slide 1 -->
+     
         <div class="swiper-slide relative">
           <img src="/Slider1.jpg" alt="Slide 1" class="w-full h-full object-cover brightness-50">
           <div class="absolute inset-0 flex items-center justify-center">
             <h1 class="text-4xl md:text-6xl font-bold text-white text-center"></h1>
           </div>
         </div>
-        <!-- Slide 2 -->
+       
         <div class="swiper-slide relative">
           <img src="/Slider2.jpg" alt="Slide 2" class="w-full h-full object-cover brightness-50">
           <div class="absolute inset-0 flex items-center justify-center">
             <h1 class="text-4xl md:text-6xl font-bold text-white text-center"></h1>
           </div>
         </div>
-        <!-- Slide 3 -->
+        
         <div class="swiper-slide relative">
           <img src="/Slider3.jpg" alt="Slide 3" class="w-full h-full object-cover brightness-50">
           <div class="absolute inset-0 flex items-center justify-center">
@@ -33,7 +33,6 @@
     </div>
   </section>
 
-  <!-- Category Icons -->
   <section class="container mx-auto py-12 px-4">
     <div class="grid grid-cols-4 gap-4 justify-items-center">
       <% categories.forEach((category) => { %>
@@ -64,19 +63,19 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <% products.forEach(product => { %>
   
-      <!-- Product Card -->
+    
       <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 animate-fade-in">
-        <!-- Image Slider -->
+       
         <div class="relative overflow-hidden group h-64">
           <div class="image-slider flex transition-transform duration-500 ease-in-out h-full">
             <% product.productImage.forEach(image => { %>
             <img src="<%= image %>" alt="Product" class="w-full h-full object-cover flex-shrink-0">
             <% }) %>
           </div>
-          <!-- Slider Navigation -->
         </div>
+
         <a href="/product/<%= product._id %>" class="block">
-          <!-- Product Info -->
+       
           <div class="p-6">
             <h3 class="text-xl font-bold text-gray-900 mb-2"><%= product.productName %></h3>
             <h2 class="text-sm font-bold text-gray-400 mb-5"><%= product.description %></h2>
@@ -91,7 +90,7 @@
               <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded out-of-stock-indicator">Out of Stock</span>
               <% } %>
             </div>
-            <!-- Rating Stars -->
+
             <div class="flex items-center mb-4">
               <div class="flex text-yellow-400">
                 <% for (let i = 1; i <= 5; i++) { %>
@@ -105,7 +104,7 @@
           </div>
         </a>
     
-        <!-- Add to Cart Button -->
+        
         <div class="px-6 pb-6">
           <button onclick="addToCart('<%= product._id %>', this)" 
             data-product-id="<%= product._id %>" 
@@ -118,7 +117,7 @@
           </button>
         </div>
   
-        <!-- Like Button -->
+       
         <button onclick="addToWishlist('<%= product._id %>', this)" 
           data-product-id="<%= product._id %>"  class="like-button absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-red-50 transition-colors duration-300" data-liked="false" >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -143,19 +142,17 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <% products.forEach(product => { %>
   
-      <!-- Product Card -->
+
       <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 animate-fade-in">
-        <!-- Image Slider -->
         <div class="relative overflow-hidden group h-64">
           <div class="image-slider flex transition-transform duration-500 ease-in-out h-full">
             <% product.productImage.forEach(image => { %>
             <img src="<%= image %>" alt="Product" class="w-full h-full object-cover flex-shrink-0">
             <% }) %>
           </div>
-          <!-- Slider Navigation -->
+        
         </div>
         <a href="/product/<%= product._id %>" class="block">
-          <!-- Product Info -->
           <div class="p-6">
             <h3 class="text-xl font-bold text-gray-900 mb-2"><%= product.productName %></h3>
             <h2 class="text-sm font-bold text-gray-400 mb-5"><%= product.description %></h2>
@@ -170,7 +167,8 @@
               <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded out-of-stock-indicator">Out of Stock</span>
               <% } %>
             </div>
-            <!-- Rating Stars -->
+           
+
             <div class="flex items-center mb-4">
               <div class="flex text-yellow-400">
                 <% for (let i = 1; i <= 5; i++) { %>
@@ -184,7 +182,7 @@
           </div>
         </a>
     
-        <!-- Add to Cart Button -->
+     
         <div class="px-6 pb-6">
           <button onclick="addToCart('<%= product._id %>', this)" 
             data-product-id="<%= product._id %>" 
@@ -197,7 +195,6 @@
           </button>
         </div>
   
-        <!-- Like Button -->
         <button onclick="addToWishlist('<%= product._id %>', this)" 
           data-product-id="<%= product._id %>"  class="like-button absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-red-50 transition-colors duration-300" data-liked="false" >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -316,7 +313,7 @@
 async function addToCart(productId, button) {
   try {
    
-    button.classList.add('opacity-50', 'cursor-not-allowed');
+    button.classList.add('opacity-100');
     button.querySelector('span').textContent = 'Adding...';
 
     const response = await fetch('/addToCart', {

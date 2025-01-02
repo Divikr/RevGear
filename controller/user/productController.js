@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 
 
+//get single prooduct
 
 const singleproduct = async (req, res) => {
     try {
@@ -67,12 +68,17 @@ const getwishlist = async (req, res, next) => {
 
 
 
+//get allproduct
+
 const getProductByCategory = async (req,res) => {
   try {
     const {name} = req.params;
     const categories = await Category.find({})
     const products = await Product.find({category: name});
+
+
     console.log(products)
+
     res.render('user/allProducts', {products, categories})
   } catch (error) {
     
@@ -164,7 +170,7 @@ const addToCart = async (req, res) => {
       const newQuantity = cartItem.quantity + validQuantity;
       if (newQuantity > product.quantity) {
         return res.status(400).json({
-          message: `Cannot add more than available stock. Available stock: ${product.quantity}`,
+          message: `Only ${product.quantity} items are available in stock.`,
         });
       }
 
@@ -173,7 +179,7 @@ const addToCart = async (req, res) => {
     } else {
       if (validQuantity > product.quantity) {
         return res.status(400).json({
-          message: `Cannot add more than available stock. Available stock: ${product.quantity}`,
+          message: `Only ${product.quantity} items are available in stock.`,
         });
       }
 
@@ -194,7 +200,7 @@ const addToCart = async (req, res) => {
   }
 };
 
-
+//update cart
 
 
 const updateCart = async (req, res) => {
@@ -218,7 +224,7 @@ const updateCart = async (req, res) => {
 
     if (validQuantity > product.quantity) {
       return res.status(400).json({
-        message: `Cannot update to more than available stock. Available stock: ${product.quantity}`,
+        message: `Only ${product.quantity} items are available in stock.`,
       });
     }
 
@@ -249,7 +255,7 @@ const updateCart = async (req, res) => {
   }
 };
 
-
+//get cart
 
 const getcart = async (req, res) => {
   try {
@@ -312,7 +318,7 @@ const getcart = async (req, res) => {
 };
 
 
-
+//remove from cart
 
 
 const removeFromCart = async (req, res) => {
@@ -342,6 +348,8 @@ const removeFromCart = async (req, res) => {
   }
 };
 
+
+//place order
 
 const placeOrder = async (req,res) => {
  try {
@@ -407,6 +415,12 @@ console.log("..........address..........",newOrder)
     res.status(500).json({ success: false, message: 'An error occurred while placing the order.' });
 }
 }
+
+
+
+
+
+
 
 const removeFromWishlist = async (req, res) => {
   try {
@@ -522,37 +536,58 @@ const orderlist = async (req, res) => {
   }
 };
 
-const getAllProducts = async (req, res) => {
+
+const cancelOrder = async (req, res) => {
   try {
-      const { sort } = req.query; 
+    // Extract order ID from request parameters
+    const { id } = req.params;
+    
+    // Extract reason and description from the request body
+    const { reason, description } = req.body;
+    
+    // Fetch the order with the given ID
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
 
-      let sortCriteria = {};
-      switch (sort) {
-          case 'a-z':
-              sortCriteria = { productName: 1 }; 
-              break;
-          case 'z-a':
-              sortCriteria = { productName: -1 }; 
-              break;
-          case 'low-to-high':
-              sortCriteria = { salePrice: 1 }; 
-              break;
-          case 'high-to-low':
-              sortCriteria = { salePrice: -1 }; 
-              break;
-          default:
-              sortCriteria = {}; 
-      }
+    // Check if the order is eligible for cancellation
+    if (!['Ordered'].includes(order.orderStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Order cannot be cancelled at this stage'
+      });
+    }
 
-      
-      const products = await Product.find({ isBlocked: false }).sort(sortCriteria);
+    // Update order status and cancellation details
+    order.orderStatus = 'Cancelled';
+    order.cancellationDetails = reason;
+    order.cancellationReason = reason;
+    order.cancellationComment = description;
+    order.cancelDate = new Date().toISOString();
 
-      res.render('user/allProducts', { products });
+    // Save the updated order
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Order cancelled successfully',
+      order
+    });
   } catch (error) {
-      console.error('Error fetching products:', error);
-      res.status(500).send('Internal Server Error');
+    console.error('Cancel order error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to cancel order',
+      error: error.message
+    });
   }
 };
+
+
 
 module.exports = {
     singleproduct,
@@ -568,6 +603,7 @@ module.exports = {
     placeOrder,
     orderlist,
     getProductByCategory,
-    getAllProducts,
-    removeFromCart
+    removeFromCart,
+    cancelOrder
+   
 }

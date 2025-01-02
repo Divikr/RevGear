@@ -9,6 +9,7 @@ const passport = require("./config/passport");
 const bodyParser = require('body-parser');
 const session = require('express-session')
 const nocache = require("nocache")
+const Razorpay = require('razorpay');
 db()
 
 app.use(express.static(path.join(__dirname, "public")))
@@ -22,13 +23,16 @@ app.use(session({
     cookie: { secure: false }
 }))
 
+
+
+
 app.use(nocache());
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Initialize Passport
+
 app.use(passport.initialize());
 app.use(passport.session());
 

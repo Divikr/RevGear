@@ -61,6 +61,13 @@ const orderSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    cancellationDetails:{
+        type:String,
+        enum:['select option','Got at Better Price','Wrong Item Ordered','Shipping Time Too Long','Other Reason'],
+        default:'select option',
+        description:String,
+       
+    },
     cancellationReason: {
         type: String,
         default: null

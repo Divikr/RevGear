@@ -4,6 +4,7 @@ const adminController = require("../controller/admin/adminController")
 const customerController = require("../controller/admin/customer")
 const categoryController = require("../controller/admin/category")
 const productController = require('../controller/admin/product')
+const couponController = require('../controller/admin/coupon')
 const auth = require("../middleware/adminAuth")
 const multer = require('multer')
 
@@ -57,6 +58,6 @@ router.get('/viewOrderLists/:orderId',auth.isAdminAuth, adminController.viewOrde
 router.patch("/changeStatus",adminController.changeStatus)
 
 
-
+router.get("/coupon",couponController.getCoupon)
 
 module.exports = router

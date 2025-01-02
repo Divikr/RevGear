@@ -1,5 +1,18 @@
 <%- include("../partials/header.ejs") %>
 
+<br>
+
+ <nav class="text-sm ml-6 font-medium text-gray-700 mb-6 ">
+  <ol class="list-reset flex">
+    <li>
+      <a href="/home" class="text-blue-600 hover:text-blue-700">Home</a>
+    </li>
+    <li class="mx-2">/</li>
+    <li class="text-gray-400">Profile</li>
+  </ol>
+</nav>
+
+
 <div class="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
   <div class="bg-gradient-to-br from-white to-blue-50 shadow-2xl rounded-xl overflow-hidden">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 p-6">
@@ -46,7 +59,6 @@
         </ul>
       </div>
 
-      <!-- Main Content -->
       <div class="col-span-3 bg-white shadow-lg rounded-xl border border-blue-100 p-8">
         <h1 class="text-2xl font-bold mb-8 text-gray-800">Manage My Account</h1>
         <form id="profileForm" class="space-y-6" action="/edit-profile" method="POST">
@@ -54,11 +66,11 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label for="name" class="block font-medium text-gray-700 mb-2">Name</label>
-              <input type="text" id="name" name="name" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.name %>" required>
+              <input type="text" id="name" name="name" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.name %>">
             </div>
             <div>
               <label for="email" class="block font-medium text-gray-700 mb-2">Email</label>
-              <input type="email" id="email" name="email" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.email %>" required>
+              <input type="email" id="email" name="email" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.email %>"  readonly>
             </div>
           </div>
         
@@ -66,7 +78,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label for="phone" class="block font-medium text-gray-700 mb-2">Phone Number</label>
-              <input type="tel" id="phone" name="phone" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.phone %>" required>
+              <input type="tel" id="phone" name="phone" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.phone %>" >
             </div>
           </div>
         
@@ -101,7 +113,61 @@
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="/js/header.js"></script>
 <script>
-  
+const form = document.getElementById('profileForm');
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const phoneInput = document.getElementById('phone');
+
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+
+ 
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
+  const phone = phoneInput.value.trim();
+
+  const nameRegex = /^[A-Za-z\s]{3,}$/; 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+  const phoneRegex = /^\d{10}$/;
+
+  let isValid = true;
+  let message = '';
+
+  if (!nameRegex.test(name)) {
+    isValid = false;
+    message += 'Enter Valid Name';
+  }
+
+  if (!emailRegex.test(email)) {
+    isValid = false;
+    message += 'Invalid Email: Please enter a valid email address.\n';
+  }
+
+  if (!phoneRegex.test(phone)) {
+    isValid = false;
+    message += 'Invalid Phone Number: Must be exactly 10 digits.\n';
+  }
+
+  if (isValid) {
+    Swal.fire({
+      title: 'Success!',
+      text: 'Your changes have been saved.',
+      icon: 'success',
+      confirmButtonText: 'Okay'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        form.submit();
+      }
+    });
+  } else {
+    Swal.fire({
+      title: 'Validation Error!',
+      text: message,
+      icon: 'error',
+      confirmButtonText: 'Retry'
+    });
+  }
+});
 </script>
 </body>
 </html>

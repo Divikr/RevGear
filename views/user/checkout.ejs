@@ -6,44 +6,32 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
     <div class="bg-white shadow-sm rounded-lg p-6">
-      <h3 class="text-lg font-medium mb-4">Order Summary</h3>
-      <% cart.forEach(item => { %>
-      <div class="flex items-center space-x-4 border-b pb-4 mb-4">
-        <img src="<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" class="h-20 w-20 object-cover rounded-md">
-        <div>
-          <h4 class="font-medium text-gray-900"><%= item.productId.productName %></h4>
-          <p class="text-sm text-gray-600">Quantity: <%= item.quantity %></p>
-          <p class="text-sm text-gray-900">Price: ₹<%= item.productId.salePrice.toFixed(2) %></p>
-          <p class="text-sm text-gray-900 font-semibold">Subtotal: ₹<%= (item.productId.salePrice * item.quantity).toFixed(2) %></p>
-        </div>
-      </div>
-      <% }) %>
-      <div class="flex justify-between items-center text-lg font-medium">
-        <span>Total:</span>
-        <span>₹<%= total.toFixed(2) %></span>
-      </div>
-    </div>
 
 
-    <div class="bg-white shadow-sm rounded-lg p-6">
       <h3 class="text-lg font-medium mb-4">Shipping Address</h3>
 
-    
       <label for="saved-addresses" class="block mb-2 text-sm text-gray-700">Select Saved Address</label>
-      <div class="space-y-4 mb-4" id="saved-addresses-container">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="saved-addresses-container">
         <% savedAddresses.forEach(address => { %>
-          <div class="flex items-center space-x-4 border p-4 rounded-md hover:bg-gray-100 cursor-pointer">
-            <input type="radio" name="savedaddress" value="<%= address._id %>" class="h-5 w-5">
+          <div class="flex items-start border p-4 rounded-md hover:bg-gray-100 cursor-pointer transition-shadow address-item" data-id="<%= address._id %>">
+            <input 
+              type="radio" 
+              name="savedaddress" 
+              value="<%= address._id %>" 
+              class="h-5 w-5 mr-4 address-radio" 
+              id="address-<%= address._id %>"
+            >
             <div>
               <p class="font-medium text-gray-900"><%= address.name %></p>
-              <p class="text-sm text-gray-600"><%= address.street %>, <%= address.apartment ? address.apartment + ', ' : '' %><%= address.city %>, <%= address.postalCode %></p>
+              <p class="text-sm text-gray-600">
+                <%= address.street %>, 
+                <%= address.apartment ? address.apartment + ', ' : '' %><%= address.city %>, <%= address.postalCode %>
+              </p>
               <p class="text-sm text-gray-600">Phone: <%= address.phone %></p>
             </div>
           </div>
         <% }) %>
       </div>
-
-
       <button id="add-new-address-btn" class="mt-4 w-full bg-blue-500 text-white py-3 rounded-md uppercase tracking-wide hover:bg-blue-600 transition-colors">Add New Address</button>
       <div id="new-address-form-checkout" class="mt-6 hidden">
         <h4 class="text-sm font-medium text-gray-700 mb-2">Enter New Address for Checkout</h4>
@@ -67,17 +55,60 @@
         </div>
       </div>
 
-      <h3 class="text-lg font-medium mb-4">Payment Options</h3>
-      <div class="space-y-2">
-        <label class="flex items-center">
-          <input type="radio" name="payment-method" value="cash" class="mr-2">
-          Cash on Delivery
-        </label>
-        <label class="flex items-center">
-          <input type="radio" name="payment-method" value="online-payment" class="mr-2">
-          Online Payment
-        </label>
+      <br>
+    <hr>
+    <br>
+
+      
+    </div>
+
+
+    <div class="bg-white shadow-sm rounded-lg p-6">
+      
+
+      <h3 class="text-lg font-medium mb-4">Order Summary</h3>
+      <% cart.forEach(item => { %>
+      <div class="flex items-center space-x-4 border-b pb-4 mb-4">
+        <img src="<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" class="h-20 w-20 object-cover rounded-md">
+        <div>
+          <h4 class="font-medium text-gray-900"><%= item.productId.productName %></h4>
+          <p class="text-sm text-gray-600">Quantity: <%= item.quantity %></p>
+          <p class="text-sm text-gray-900">Price: ₹<%= item.productId.salePrice.toFixed(2) %></p>
+          <p class="text-sm text-gray-900 font-semibold">Subtotal: ₹<%= (item.productId.salePrice * item.quantity).toFixed(2) %></p>
+        </div>
       </div>
+      <% }) %>
+      <div class="flex justify-between items-center text-lg font-medium">
+        <span>Total:</span>
+        <span>₹<%= total.toFixed(2) %></span>
+      </div>
+<br>
+<br>
+
+<div class="mb-6">
+  <label for="voucher-code" class="block text-sm font-medium text-gray-700">Have a Voucher?</label>
+  <div class="flex items-center space-x-2 mt-2">
+    <input type="text" id="voucher-code" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" placeholder="Enter your voucher code">
+    <button id="apply-voucher-btn" class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">Apply</button>
+  </div>
+</div>
+
+
+<h3 class="text-lg font-medium mb-4">Payment Options</h3>
+<div class="space-y-2">
+  <label class="payment-option flex items-center px-4 py-2 rounded-md border border-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-100">
+    <input type="radio" name="payment-method" value="cash" class="mr-2 hidden">
+    <i class="fas fa-money-bill-alt mr-2"></i> Cash on Delivery
+  </label>
+  <label class="payment-option flex items-center px-4 py-2 rounded-md border border-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-100">
+    <input type="radio" name="payment-method" value="razorpay" class="mr-2 hidden">
+    <i class="fas fa-credit-card mr-2"></i> Online Payment
+  </label>
+  <label class="payment-option flex items-center px-4 py-2 rounded-md border border-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-100">
+    <input type="radio" name="payment-method" value="wallet" class="mr-2 hidden">
+    <i class="fas fa-wallet mr-2"></i> Wallet Payment
+  </label>
+</div>
 
    
       <button id="place-order-btn" class="mt-6 w-full bg-black text-white py-3 rounded-md uppercase tracking-wide hover:bg-gray-800 transition-colors">Place Order</button>
@@ -95,21 +126,52 @@
 
   document.getElementById('submit-new-address-checkout').addEventListener('click', () => {
     const newAddress = {
-      addressType: document.querySelector('input[name="addressType"]:checked').value,
-      name: document.getElementById('new-address-name').value,
-      phone: document.getElementById('new-address-phone').value,
-      street: document.getElementById('new-address-street').value,
-      apartment: document.getElementById('new-address-apartment').value || '',
-      landmark: document.getElementById('new-address-landmark').value || '',
-      city: document.getElementById('new-address-city').value,
-      postalCode: document.getElementById('new-address-postalCode').value
+        addressType: document.querySelector('input[name="addressType"]:checked').value,
+        name: document.getElementById('new-address-name').value.trim(),
+        phone: document.getElementById('new-address-phone').value.trim(),
+        street: document.getElementById('new-address-street').value.trim(),
+        apartment: document.getElementById('new-address-apartment').value.trim() || '',
+        landmark: document.getElementById('new-address-landmark').value.trim() || '',
+        city: document.getElementById('new-address-city').value.trim(),
+        postalCode: document.getElementById('new-address-postalCode').value.trim()
     };
 
-  
+
     if (!newAddress.name || !newAddress.phone || !newAddress.street || !newAddress.city || !newAddress.postalCode) {
-      alert('Please fill in all required fields.');
-      return;
+        Swal.fire({
+            icon: 'error',
+            title: 'Missing Information',
+            text: 'Please fill in all required fields.',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Okay'
+        });
+        return;
     }
+
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(newAddress.phone)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Phone Number',
+            text: 'Please enter a valid 10-digit phone number.',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Okay'
+        });
+        return;
+    }
+
+    const postalCodeRegex = /^\d{5,6}$/;
+    if (!postalCodeRegex.test(newAddress.postalCode)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Postal Code',
+            text: 'Please enter a valid 5 or 6-digit postal code.',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Okay'
+        });
+        return;
+    }
+
 
   
     fetch('/add-address-checkout', {
@@ -157,10 +219,50 @@
 
 
 
+ const paymentOptions = document.querySelectorAll('.payment-option');
+
+paymentOptions.forEach(option => {
+  option.addEventListener('click', () => {
+  
+    paymentOptions.forEach(o => o.classList.remove('shadow-blue-500', 'shadow-md'));
+
+    option.classList.add('shadow-blue-500', 'shadow-md');
+
+    const selectedPaymentMethod = option.getAttribute('data-value');
+    console.log('Selected Payment Method:', selectedPaymentMethod);
+  });
+});
+
 </script>
 
 
 <script>
+
+
+
+ const addressItems = document.querySelectorAll('.address-item');
+  const addressRadios = document.querySelectorAll('.address-radio');
+
+  addressRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+  
+      addressItems.forEach(item => {
+        item.classList.remove('shadow-blue-500', 'shadow-md');
+      });
+
+      const selectedContainer = document.querySelector(`.address-item[data-id="${radio.value}"]`);
+      selectedContainer.classList.add('shadow-blue-500', 'shadow-md');
+    });
+  });
+
+
+  addressItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const radio = item.querySelector('.address-radio');
+      radio.checked = true;
+      radio.dispatchEvent(new Event('change')); 
+    });
+  });
 
    const savedAddresses = <%- JSON.stringify(savedAddresses || []) %>;
   
@@ -180,29 +282,69 @@
     }
 
     const orderDetails = {
-    savedaddress: selectedAddress,
-    paymentMethod,
-    cart: <%- JSON.stringify(cart || []) %>, 
-};
+        savedaddress: selectedAddress,
+        paymentMethod,
+        cart: <%- JSON.stringify(cart || []) %>, 
+    };
 
-    fetch('/place-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderDetails),
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-              
-                window.location.href = `/orderconfirm/${data.orderId}`;
-            } else {
-                alert(data.message || 'Failed to place order.');
-            }
+    if (paymentMethod === 'razorpay') {
+        
+        fetch('/create-razorpay-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderDetails),
         })
-        .catch(error => {
-            console.error('Error placing order:', error);
-            alert('An error occurred while placing the order.');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                   
+                    const options = {
+                        key: data.key,
+                        amount: data.amount,
+                        currency: data.currency,
+                        order_id: data.orderId,
+                        name: 'Your Store',
+                        description: 'Order Payment',
+                       
+                        theme: {
+                            color: '#3399cc',
+                        },
+                    };
+
+                    const razorpay = new Razorpay(options);
+                    razorpay.open();
+                } else {
+                    alert(data.message || 'Failed to create Razorpay order.');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating Razorpay order:', error);
+                alert('An error occurred while creating Razorpay order.');
+            });
+
+
+    } else if (paymentMethod === 'cash') {
+        
+        fetch('/place-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderDetails),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = `/orderconfirm/${data.orderId}`;
+                } else {
+                    alert(data.message || 'Failed to place order.');
+                }
+            })
+            .catch(error => {
+                console.error('Error placing order:', error);
+                alert('An error occurred while placing the order.');
+            });
+    } else {
+        alert('Unsupported payment method.');
+    }
 });
 </script>
 

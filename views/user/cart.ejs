@@ -1,6 +1,26 @@
 <%- include("../partials/header.ejs")  %>
 
-<h2 class="text-2xl sm:text-3xl font-light mb-6 sm:mb-8 uppercase tracking-wider">Shopping Bag</h2>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<br>
+
+  <nav class="text-sm ml-4 font-medium text-gray-700 mb-6 ">
+    <ol class="list-reset flex">
+      <li>
+        <a href="/home" class="text-blue-600 hover:text-blue-700">Home</a>
+      </li>
+      <li class="mx-2">/</li>
+      <li>
+        <a href="/product" class="text-blue-600 hover:text-blue-700">Shop</a>
+      </li>
+      <li class="mx-2">/</li>
+      
+      <li class="text-gray-400">Cart</li>
+    </ol>
+  </nav>
+  <br>
+
+<h2 class="text-2xl sm:text-3xl font-light ml-4 sm:mb-8 uppercase tracking-wider">Shopping Bag</h2>
 
             <% if (cart.length > 0) { %>
                 <div class="bg-white shadow-sm rounded-lg overflow-hidden mb-6 sm:mb-8"> 
@@ -34,7 +54,7 @@
                                     
                                         <td class="px-4 sm:px-6 py-3 sm:py-4">
                                             <div class="flex items-center space-x-2">
-                                                <!-- Decrement Button -->
+                                                
                                                 <button 
                                                     type="button" 
                                                     class="px-2 py-1 border border-gray-200 rounded-md focus:ring-2 focus:ring-black focus:border-transparent transition-all"
@@ -43,7 +63,7 @@
                                                     -
                                                 </button>
                                         
-                                                <!-- Quantity Input -->
+                                              
                                                 <input 
                                                     type="number" 
                                                     name="quantity" 
@@ -188,67 +208,74 @@
 
 
 <script>
-    async function validateAndUpdateQuantity(inputElement) {
-     const productId = inputElement.getAttribute('data-product-id');
-     const availableQuantity = parseInt(inputElement.getAttribute('data-available-quantity'));
-     let quantity = parseInt(inputElement.value);
+   async function validateAndUpdateQuantity(inputElement) {
+    const productId = inputElement.getAttribute('data-product-id');
+    const availableQuantity = parseInt(inputElement.getAttribute('data-available-quantity'));
+    let quantity = parseInt(inputElement.value);
+
+    console.log({ productId, availableQuantity, quantity });
+
+  
+    if (isNaN(quantity) || quantity < 1) {
+        quantity = 1;
+    }
+
+    inputElement.value = quantity;
+
+    try {
+        const response = await fetch('/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId, quantity }),
+        });
+
+        const data = await response.json();
+        console.log({ responseStatus: response.status, data });
+
+        if (response.ok) {
+         
+            if (quantity >= availableQuantity) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Stock Limit Reached',
+                    text: `Only ${availableQuantity} items are available in stock.`,
+                });
+                inputElement.value = availableQuantity; 
+            }
+
+            
+            const subtotalCell = inputElement.closest('tr').querySelector('.subtotal-cell');
+            if (subtotalCell) {
+                subtotalCell.textContent = `₹${(data.item.totalPrice).toFixed(2)}`;
+            }
+
+    
+            const totalElement = document.querySelector('.order-total');
+            if (totalElement) {
+                totalElement.textContent = `₹${(data.total).toFixed(2)}`;
+            }
+
+          
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000)
+        } else {
+            throw new Error(data.message || 'Failed to update cart');
+        }
+    } catch (error) {
+        console.error('Error updating quantity:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to update quantity',
+        });
+    }
+}
+
+
  
-     console.log({ productId, availableQuantity, quantity }); 
- 
-     if (isNaN(quantity) || quantity < 1) {
-         quantity = 1;
-     }
- 
-     if (quantity > availableQuantity) {
-         quantity = availableQuantity;
-         Swal.fire({
-             icon: 'warning',
-             title: 'Stock Limit Reached',
-             text: `Only ${availableQuantity} items available in stock.`,
-         });
-     }
- 
-     inputElement.value = quantity;
- 
-     try {
-         const response = await fetch('/update', {
-             method: 'POST',
-             headers: {
-                 'Content-Type': 'application/json',
-             },
-             body: JSON.stringify({ productId, quantity }),
-         });
- 
-         const data = await response.json();
- 
-         console.log({ responseStatus: response.status, data }); 
- 
-         if (response.ok) {
-             const subtotalCell = inputElement.closest('tr').querySelector('.subtotal-cell');
-             if (subtotalCell) {
-                 subtotalCell.textContent = `₹${(data.item.totalPrice).toFixed(2)}`;
-             }
- 
-             const totalElement = document.querySelector('.order-total');
-             if (totalElement) {
-                 totalElement.textContent = `₹${(data.total).toFixed(2)}`;
-             }
- 
-             setTimeout(() => {
-                 window.location.reload();
-             }, 3000);
-         } else {
-             throw new Error(data.message || 'Failed to update cart');
-         }
-     } catch (error) {
-         console.error('Error updating quantity:', error); 
-         Swal.fire({
-             icon: 'error',
-             title: 'Error',
-             text: error.message || 'Failed to update quantity',
-         });
-     }
- }
  
  function updateQuantity(button, change) {
      const input = button.parentElement.querySelector('input[name="quantity"]');

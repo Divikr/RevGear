@@ -3,6 +3,8 @@ const multer=require('multer')
 const path = require('path')
 
 
+//get category
+
 const getCategory = async (req, res) => {
   try {
     if (!req.session.admin) {
@@ -48,6 +50,7 @@ const getCategory = async (req, res) => {
       adminName,
       error: null,
     });
+
   } catch (error) {
     console.error("Error fetching category info:", error.message);
     res.render("category", {
@@ -61,6 +64,8 @@ const getCategory = async (req, res) => {
   }
 };
 
+//get addcategory
+
 const addCategory = (req, res) => {
   try {
     res.render('addCategory');
@@ -70,9 +75,13 @@ const addCategory = (req, res) => {
 };
 
 
+//post category
+
 
 const addCategorys = async (req, res) => {
   const { name, description, categoryOffer } = req.body;
+
+console.log(",{name,description,categoryOffer}............",{name,description,categoryOffer})
 
   try {
    
@@ -86,6 +95,8 @@ const addCategorys = async (req, res) => {
       categoryOffer,
       Image: Images 
     });
+
+console.log("newCategory.............",newCategory)
 
     await newCategory.save();
     res.json({ success: true, message: 'Category saved successfully!' });
@@ -104,7 +115,7 @@ const addCategorys = async (req, res) => {
   }
 };
 
-
+//toggle button
 
 const toggleCategoryStatus = async (req, res) => {
   const { id } = req.query; 
@@ -112,12 +123,14 @@ const toggleCategoryStatus = async (req, res) => {
   try {
 
     console.log(id)
+
       const category = await Category.findById(id);
 
       if (!category) {
           return res.status(404).json({ success: false, message: 'Category not found' });
       }
       category.isListed = !category.isListed;
+
       await category.save();
       res.redirect('/admin/category');
   } catch (error) {
@@ -126,7 +139,7 @@ const toggleCategoryStatus = async (req, res) => {
   }
 };
 
-
+//get editcategory
 
 const editCategory = async (req, res) => {
   try {
@@ -142,11 +155,14 @@ const editCategory = async (req, res) => {
     res.render('editCategory', {
       cat: category
     });
+
   } catch (error) {
     console.log(error.message);
     res.status(500).send('Server Error');
   }
 };
+
+//post editcategory
 
 const editsCategory = async (req, res) => {
   try {
@@ -186,6 +202,8 @@ const editsCategory = async (req, res) => {
   }
 };
 
+//get category products
+
 const getCategoriesForProduct = async (req, res) => {
   try {
       const categories = await Category.find({ isListed: true }, 'name _id');
@@ -207,3 +225,10 @@ module.exports = {
   editsCategory,
   getCategoriesForProduct
 };
+
+
+
+
+
+
+

@@ -3,12 +3,18 @@ const mongoose=require("mongoose")
 const Order=require("../../model/Order")
 const bcrypt=require("bcrypt")
 
+
+//get admin
+
 const adminloadlogin=(req,res)=>{
     if(req.session.admin){
         return res.redirect("/admin/dashboard")
     }
     res.render("adminlogin")
 }
+
+
+//post admin
 
 const adminlogin = async (req, res) => {
     try {
@@ -17,8 +23,12 @@ const adminlogin = async (req, res) => {
         console.log(req.body)
 
      
-        if (!email || !password) {
+        if (!email  ) {
             return res.status(400).render("adminlogin", { error: "All fields are required." });
+        }
+
+        if(!password){
+            return res.status(400).render("adminlogin", { error: "All fields are required." }); 
         }
 
 
@@ -28,10 +38,13 @@ const adminlogin = async (req, res) => {
         console.log(user)
 
       
-        if (!user || !user.isAdmin) {
-            return res.status(401).render("adminlogin", { error: "Unauthorized. Admin access only." });
+        if (!user  ) {
+            return res.status(401).render("adminlogin", { error: " Admin access only." });
         }
 
+        if(!user.isAdmin){
+            return res.status(401).render("adminlogin", { error: " Admin access only." }); 
+        }
        
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
@@ -50,7 +63,7 @@ const adminlogin = async (req, res) => {
     }
 };
 
-
+//get dashboard
 
 const dashboard = async (req, res) => {
     try {
@@ -62,6 +75,9 @@ const dashboard = async (req, res) => {
         res.status(500).send("Server error");
     }
 };
+
+
+//logout
 
 const adminlogout=async (req,res)=>{
     try {
@@ -78,7 +94,7 @@ const adminlogout=async (req,res)=>{
 } 
 
 
-
+//get orderlist
 
 const orderlists = async (req, res) => {
     try {
@@ -106,6 +122,9 @@ const orderlists = async (req, res) => {
     }
 };
 
+
+//get viewOrder
+
 const viewOrder = async (req, res) => {
     try {
         console.log("hello");
@@ -130,11 +149,15 @@ const viewOrder = async (req, res) => {
     }
 };
 
+//post vieworder
+
 const changeStatus=async(req,res)=>{
+
     const { orderId, status } = req.body;
-console.log({orderId,status})
+
     console.log("change sttus:",status)
     console.log("orderid:",orderId)
+    
     if (!orderId || !status) {
         return res.status(400).json({ error: 'Order ID and status are required' });
     }
@@ -167,7 +190,7 @@ module.exports={
     dashboard,
     adminlogout,
     orderlists,
-   viewOrder,
-   changeStatus
+    viewOrder,
+    changeStatus
    
 }

@@ -89,6 +89,10 @@ const addressBook = async (req, res) => {
     }
 };
 
+
+
+
+
 const addAddress = async (req, res) => {
     try {
         res.render("user/addAddress");
@@ -97,6 +101,10 @@ const addAddress = async (req, res) => {
         res.status(500).send("Server error");
     }
 };
+
+
+
+
 
 const addressverify = async (req, res) => {
     try {
@@ -132,6 +140,8 @@ const addressverify = async (req, res) => {
 };
 
 
+
+
  const addAddressFromCheckout = async (req, res) => {
     try {
       const userId = req.session.user; 
@@ -163,6 +173,10 @@ const addressverify = async (req, res) => {
     }
   };
 
+
+
+
+
 const loadAddressBook = async (req, res) => {
     try {
         const userId = req.session.user;
@@ -184,6 +198,9 @@ const loadAddressBook = async (req, res) => {
     }
 };
 
+
+
+
 const deleteAddress = async (req, res) => {
     const addressId = req.params.id;
    console.log("addressId====>",addressId)
@@ -202,6 +219,9 @@ const deleteAddress = async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
+
+
+
 
 const getEditAddress = async (req, res) => {
     try {
@@ -222,6 +242,8 @@ const getEditAddress = async (req, res) => {
     }
   }
 
+
+  
 
   const editAddress = async (req, res) => {
     try {
@@ -256,6 +278,10 @@ const getEditAddress = async (req, res) => {
         console.error('Error editing category:', error);
     }
 };
+
+
+
+
 
 const getpassword =  async (req, res) => {
     try {
