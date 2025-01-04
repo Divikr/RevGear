@@ -4,6 +4,7 @@ const userController = require("../controller/user/userController")
 const productController = require("../controller/user/productController")
 const profileController = require("../controller/user/profile")
 const paymentController = require("../controller/user/payment")
+const couponController = require("../controller/user/coupon")
 const passport = require("../config/passport");
 const auth = require("../middleware/userAuth")
 
@@ -128,8 +129,10 @@ route.post('/orders/cancel/:id',productController.cancelOrder);
 route.post('/create-razorpay-order',paymentController.createRazorpayOrder);
 
 
+//coupon manegment
 
 
+route.post('/apply',couponController.applyCoupon);
 
 
 

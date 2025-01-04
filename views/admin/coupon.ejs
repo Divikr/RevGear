@@ -55,80 +55,205 @@
             </ul>
         </div>
 
-        
-        <div class="flex-1 p-4">
-            <div class="w-full">
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    
-                    <div class="lg:col-span-3">
-                        <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
-                            <h2 class="text-2xl font-bold mb-6 text-white">Add/Edit Coupon</h2>
-                            
-                            <form id="couponForm" class="space-y-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                  
+        <div class="main-content">
+            <div class="max-w-7xl mx-auto">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold">RevGear</h1>
+                    <a href="/admin/dashboard" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                        Back
+                    </a>
+                </div>
+    
+                <!-- Coupon Form -->
+                <div class="bg-gray-800 rounded-xl shadow-xl p-8 mb-8">
+                    <h2 class="text-2xl font-bold mb-8 pb-4 border-b border-gray-700">Add/Edit Coupon</h2>
+                    <form id="couponForm" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Basic Details -->
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Code</label>
+                                <input type="text" name="code" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Discount Type</label>
+                                <select name="offerType" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input">
+                                    <option value="Percentage">Percentage</option>
+                                    <option value="Fixed Amount">Fixed Amount</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Discount Value</label>
+                                <input type="number" name="offerValue" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input" required>
+                            </div>
+                        </div>
+    
+                        <!-- Duration -->
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Valid From</label>
+                                <input type="datetime-local" name="createdOn" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Valid Until</label>
+                                <input type="datetime-local" name="expiredOn" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Min Purchase Amount</label>
+                                <input type="number" name="minimumPrice" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input" required>
+                            </div>
+                        </div>
+    
+                        <!-- Usage Limits -->
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Max Uses</label>
+                                <input type="number" name="usageLimit" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Usage Per User</label>
+                                <input type="number" name="usagePerUserLimit" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input">
+                            </div>
+                            <div class="flex items-center pt-4">
+                                <input type="checkbox" id="isActive" name="isActive" class="w-5 h-5 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                                <label for="isActive" class="ml-3 text-sm font-medium">Is Active</label>
+                            </div>
+                        </div>
+    
+                        <div class="col-span-3 flex justify-end pt-6">
+                            <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors">
+                                Save Coupon
+                            </button>
+                        </div>
+                    </form>
+                </div>
+    
+                <!-- Coupons Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <% coupons.forEach(coupon => { %>
+                        <div class="bg-gray-800 rounded-xl shadow-xl overflow-hidden">
+                            <div class="p-8">
+                                <div class="flex justify-between items-start mb-6">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-300 mb-2">Code</label>
-                                        <input type="text" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
+                                        <h3 class="text-2xl font-bold mb-2"><%= coupon.code %></h3>
+                                        <span class="inline-block px-4 py-1 text-sm rounded-full <%= coupon. isActive === 'isActive' ? 'bg-red-500' : 'bg-green-500' %> text-white">
+                                            <%= coupon. isActive %>
+                                        </span>
                                     </div>
-            
-                                   
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-300 mb-2">Discount Type</label>
-                                        <select class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
-                                            <option>Percentage</option>
-                                            <option>Fixed Amount</option>
-                                        </select>
-                                    </div>
-            
-                                   
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-300 mb-2">Discount Value</label>
-                                        <input type="number" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
-                                    </div>
-            
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-300 mb-2">Min Purchase Amount</label>
-                                        <input type="number" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
-                                    </div>
-            
-                                
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-300 mb-2">Valid From</label>
-                                        <input type="datetime-local" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
-                                    </div>
-            
-                              
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-300 mb-2">Valid Until</label>
-                                        <input type="datetime-local" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
-                                    </div>
-            
-                                   
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-300 mb-2">Max Uses</label>
-                                        <input type="number" class="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500">
-                                    </div>
-            
-                                    
-                                    <div class="flex items-center">
-                                        <input type="checkbox" id="isActive" class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
-                                        <label for="isActive" class="ml-2 text-sm font-medium text-gray-300">Is Active</label>
+                                    <div class="flex gap-4">
+                                        <button onclick="handleEditCoupon('<%= coupon.code %>')" class="text-blue-400 hover:text-blue-300 transition-colors">
+                                            <i class="fas fa-edit text-lg"></i>
+                                        </button>
+                                        <button onclick="handleDeleteCoupon('<%= coupon.code %>')" class="text-red-400 hover:text-red-300 transition-colors">
+                                            <i class="fas fa-trash-alt text-lg"></i>
+                                        </button>
                                     </div>
                                 </div>
-            
-                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800">
-                                    Save Coupon
-                                </button>
-                            </form>
+                                <div class="space-y-4">
+                                    <p class="flex justify-between text-lg">
+                                        <span class="text-gray-300">Discount:</span>
+                                        <span class="font-semibold"><%= coupon.offerValue %></span>
+                                    </p>
+                                    <p class="flex justify-between text-lg">
+                                        <span class="text-gray-300">Min Purchase:</span>
+                                        <span class="font-semibold"><%= coupon.minimumPrice %></span>
+                                    </p>
+                                    <p class="flex justify-between text-lg">
+                                        <span class="text-gray-300">Usage Limit:</span>
+                                        <span class="font-semibold"><%= coupon.usageLimit %></span>
+                                    </p>
+                                    <p class="flex justify-between text-lg">
+                                        <span class="text-gray-300">Created On:</span>
+                                        <span class="font-semibold"><%= new Date(coupon.createdOn).toLocaleDateString() %></span>
+                                    </p>
+                                    <p class="flex justify-between text-lg">
+                                        <span class="text-gray-300">Expires:</span>
+                                        <span class="font-semibold"><%= new Date(coupon.expiredOn).toLocaleDateString() %></span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-700 px-8 py-4">
+                                <div class="flex justify-between items-center text-gray-400">
+                                    
+                                    <span>Per User: <%= coupon.usagePerUserLimit %></span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                 
+                    <% }); %>
                 </div>
             </div>
         </div>
-    </div>
+    
+       
+
+    <script>
+   document.getElementById('couponForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            try {
+                Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData.entries());
+                data.isActive = formData.has('isActive');
+                console.log(data)
+
+                const response = await fetch('/admin/coupon', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) throw new Error('Failed to save coupon');
+                Swal.fire('Success', 'Coupon added successfully!', 'success').then(() => {
+                    window.location.href = '/admin/coupon';
+                });
+            } catch (err) {
+                Swal.fire('Error', err.message || 'Something went wrong', 'error');
+            }
+        });
+
+
+
+
+        function handleEditCoupon(couponCode) {
+            window.location.href = `/admin/coupon/edit/${couponCode}`;
+        }
+
+        function handleDeleteCoupon(couponCode) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Add your delete API call here
+                    fetch(`/admin/coupon/${couponCode}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to delete coupon');
+                        Swal.fire(
+                            'Deleted!',
+                            'Coupon has been deleted.',
+                            'success'
+                        ).then(() => {
+                            window.location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            'Error!',
+                            'Failed to delete coupon.',
+                            'error'
+                        );
+                    });
+                }
+            });
+        }
+    </script>
 </body>
 </html>

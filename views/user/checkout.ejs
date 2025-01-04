@@ -75,6 +75,9 @@
           <p class="text-sm text-gray-600">Quantity: <%= item.quantity %></p>
           <p class="text-sm text-gray-900">Price: ₹<%= item.productId.salePrice.toFixed(2) %></p>
           <p class="text-sm text-gray-900 font-semibold">Subtotal: ₹<%= (item.productId.salePrice * item.quantity).toFixed(2) %></p>
+          <p id="discount"></p>
+<p id="discountedTotal"></p>
+<p id="couponSuccessMessage" style="display: none;"></p>
         </div>
       </div>
       <% }) %>
@@ -89,7 +92,7 @@
   <label for="voucher-code" class="block text-sm font-medium text-gray-700">Have a Voucher?</label>
   <div class="flex items-center space-x-2 mt-2">
     <input type="text" id="voucher-code" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" placeholder="Enter your voucher code">
-    <button id="apply-voucher-btn" class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">Apply</button>
+    <button id="apply-button" class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">Apply</button>
   </div>
 </div>
 
@@ -346,5 +349,73 @@ paymentOptions.forEach(option => {
         alert('Unsupported payment method.');
     }
 });
+
+
+
+
+
+
+document.getElementById('apply-button').addEventListener('click', async () => {
+        const voucherCode = document.getElementById('voucher-code').value;
+
+        if (!voucherCode.trim()) {
+            alert('Please enter a voucher code.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/apply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ voucherCode }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Update discount and total in the DOM
+                document.getElementById('discount').textContent = `Discount: $${data.discount}`;
+                document.getElementById('discountedTotal').textContent = `Updated Total: $${data.discountedTotal}`;
+
+                // Show success message
+                const successMessage = document.getElementById('couponSuccessMessage');
+                successMessage.textContent = 'Coupon applied successfully!';
+                successMessage.style.color = 'green';
+                successMessage.style.display = 'block';
+
+                // SweetAlert for success
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Applied',
+                    text: `Discount: $${data.discount}. Updated Total: $${data.discountedTotal}`,
+                });
+            } else {
+                // SweetAlert for failure
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Coupon Failed',
+                    text: data.message || 'Failed to apply coupon.',
+                });
+            }
+        } catch (error) {
+            console.error('Error applying coupon:', error);
+
+            // SweetAlert for general error
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while applying the coupon.',
+            });
+        }
+    });
+
+
+
+
+
+
+
 </script>
 

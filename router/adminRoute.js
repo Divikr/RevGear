@@ -52,12 +52,15 @@ router.get('/editProduct/:id',auth.isAdminAuth, productController.editProduct)
 router.post('/editProduct/:id', upload.array("productImage", 4), productController.updateProduct)
 router.get('/blockProduct/:id',auth.isAdminAuth, productController.blockProduct)
 
+//order manegment
 
 router.get('/orderlists',auth.isAdminAuth, adminController.orderlists)
 router.get('/viewOrderLists/:orderId',auth.isAdminAuth, adminController.viewOrder)
 router.patch("/changeStatus",adminController.changeStatus)
 
+//coupon manegment
 
 router.get("/coupon",couponController.getCoupon)
+router.post('/coupon',couponController.addCoupon)
 
 module.exports = router
