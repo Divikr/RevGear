@@ -54,7 +54,8 @@ const couponSchema = mongoose.Schema({
     status:{
         type:Boolean,
         default:false,
-    }
+    },
+ 
 });
 
 const Coupon = mongoose.model('Coupon', couponSchema);

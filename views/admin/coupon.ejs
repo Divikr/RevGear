@@ -9,7 +9,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+  <style>
+    /* Hide scrollbar but allow scrolling */
+    body {
+        overflow: hidden;
+    }
+    .main-content {
+        overflow-y: auto;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+    }
+    .main-content::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+    .sidebar {
+        width: 250px;
+        min-width: 250px;
+    }
+</style>
 </head>
 
 <body class="bg-gray-900">
@@ -54,90 +71,104 @@
                 </a>
             </ul>
         </div>
+        </div>
 
-        <div class="main-content">
-            <div class="max-w-7xl mx-auto">
+         <!-- Main Content with improved alignment -->
+         <div class="main-content flex-1 p-8">
+            <div class="max-w-7xl mx-auto space-y-8">
                 <!-- Header -->
-                <div class="flex justify-between items-center mb-8">
-                    <h1 class="text-3xl font-bold">RevGear</h1>
-                    <a href="/admin/dashboard" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-3xl font-bold text-white">RevGear</h1>
+                    <a href="/admin/dashboard" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-white">
                         Back
                     </a>
                 </div>
     
                 <!-- Coupon Form -->
-                <div class="bg-gray-800 rounded-xl shadow-xl p-8 mb-8">
-                    <h2 class="text-2xl font-bold mb-8 pb-4 border-b border-gray-700">Add/Edit Coupon</h2>
-                    <form id="couponForm" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <!-- Basic Details -->
-                        <div class="space-y-6">
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Code</label>
-                                <input type="text" name="code" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Discount Type</label>
-                                <select name="offerType" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input">
-                                    <option value="Percentage">Percentage</option>
-                                    <option value="Fixed Amount">Fixed Amount</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Discount Value</label>
-                                <input type="number" name="offerValue" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input" required>
-                            </div>
-                        </div>
-    
-                        <!-- Duration -->
-                        <div class="space-y-6">
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Valid From</label>
-                                <input type="datetime-local" name="createdOn" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Valid Until</label>
-                                <input type="datetime-local" name="expiredOn" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Min Purchase Amount</label>
-                                <input type="number" name="minimumPrice" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input" required>
+                <div class="bg-gray-800 rounded-xl shadow-xl p-8">
+                    <h2 class="text-2xl font-bold mb-8 pb-4 border-b border-gray-700 text-white">Add/Edit Coupon</h2>
+                    <form id="couponForm" class="space-y-8">
+                        <!-- Basic Details Section -->
+                        <div>
+                          
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="form-group">
+                                    <label class="block text-sm font-medium mb-2 text-white">Code</label>
+                                    <input type="text" name="code" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-white" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="block text-sm font-medium mb-2 text-white">Discount Type</label>
+                                    <select name="offerType" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-white">
+                                        <option value="Percentage">Percentage</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="block text-sm font-medium mb-2 text-white">Discount Value</label>
+                                    <input type="number" name="offerValue" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-white" required>
+                                </div>
                             </div>
                         </div>
-    
-                        <!-- Usage Limits -->
-                        <div class="space-y-6">
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Max Uses</label>
-                                <input type="number" name="usageLimit" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Usage Per User</label>
-                                <input type="number" name="usagePerUserLimit" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors form-input">
-                            </div>
-                            <div class="flex items-center pt-4">
-                                <input type="checkbox" id="isActive" name="isActive" class="w-5 h-5 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
-                                <label for="isActive" class="ml-3 text-sm font-medium">Is Active</label>
+                
+                        <!-- Duration Section -->
+                        <div>
+                           
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="form-group">
+                                    <label class="block text-sm font-medium mb-2 text-white">Valid From</label>
+                                    <input type="date" 
+                                           name="createdOn" 
+                                           min="2025-01-10"
+                                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-white">
+                                </div>
+                                <div class="form-group">
+                                    <label class="block text-sm font-medium mb-2 text-white">Valid Until</label>
+                                    <input type="date" 
+                                           name="expiredOn" 
+                                           min="2025-01-11"
+                                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-white" 
+                                           required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="block text-sm font-medium mb-2 text-white">Min Purchase Amount</label>
+                                    <input type="number" name="minimumPrice" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-white" required>
+                                </div>
                             </div>
                         </div>
-    
-                        <div class="col-span-3 flex justify-end pt-6">
+                
+                        <!-- Usage Limits Section -->
+                        <div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="form-group">
+                                    <label class="block text-sm font-medium mb-2 text-white">Max Uses</label>
+                                    <input type="number" name="usageLimit" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-white">
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="isActive" name="isActive" class="w-5 h-5 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                                    <label for="isActive" class="ml-3 text-sm font-medium text-white">Is Active</label>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="flex justify-end pt-6 border-t border-gray-700">
                             <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors">
                                 Save Coupon
                             </button>
                         </div>
                     </form>
                 </div>
-    
+
+
                 <!-- Coupons Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-8">
                     <% coupons.forEach(coupon => { %>
                         <div class="bg-gray-800 rounded-xl shadow-xl overflow-hidden">
                             <div class="p-8">
                                 <div class="flex justify-between items-start mb-6">
                                     <div>
-                                        <h3 class="text-2xl font-bold mb-2"><%= coupon.code %></h3>
-                                        <span class="inline-block px-4 py-1 text-sm rounded-full <%= coupon. isActive === 'isActive' ? 'bg-red-500' : 'bg-green-500' %> text-white">
-                                            <%= coupon. isActive %>
+                                        <h3 class="text-2xl font-bold mb-2 text-white"><%= coupon.code %></h3>
+                                        <span class="inline-block px-4 py-1 text-sm rounded-full <%= coupon.status === 'true' ? 'bg-red-500' : 'bg-green-500' %> text-white">
+                                            <%= coupon.status %>
                                         </span>
                                     </div>
                                     <div class="flex gap-4">
@@ -149,10 +180,10 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="space-y-4">
+                                <div class="space-y-4 text-white">
                                     <p class="flex justify-between text-lg">
                                         <span class="text-gray-300">Discount:</span>
-                                        <span class="font-semibold"><%= coupon.offerValue %></span>
+                                        <span class="font-semibold"><%= coupon.offerValue %>%</span>
                                     </p>
                                     <p class="flex justify-between text-lg">
                                         <span class="text-gray-300">Min Purchase:</span>
@@ -174,7 +205,6 @@
                             </div>
                             <div class="bg-gray-700 px-8 py-4">
                                 <div class="flex justify-between items-center text-gray-400">
-                                    
                                     <span>Per User: <%= coupon.usagePerUserLimit %></span>
                                 </div>
                             </div>
@@ -183,11 +213,12 @@
                 </div>
             </div>
         </div>
+  
     
        
 
     <script>
-   document.getElementById('couponForm').addEventListener('submit', async function(e) {
+    document.getElementById('couponForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             try {
                 Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -211,9 +242,6 @@
                 Swal.fire('Error', err.message || 'Something went wrong', 'error');
             }
         });
-
-
-
 
         function handleEditCoupon(couponCode) {
             window.location.href = `/admin/coupon/edit/${couponCode}`;

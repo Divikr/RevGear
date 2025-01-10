@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const {Schema}=mongoose;
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -32,9 +33,12 @@ const userSchema = new mongoose.Schema({
     isAdmin:{
         type:Boolean,
         default:false
-    }
+    },
+    couponUsed:[{
+        type:Schema.Types.ObjectId,
+        ref:"Coupon"
+    }]
   
-
 });
 
 const User = mongoose.model('User', userSchema);

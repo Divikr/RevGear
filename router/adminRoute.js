@@ -5,6 +5,7 @@ const customerController = require("../controller/admin/customer")
 const categoryController = require("../controller/admin/category")
 const productController = require('../controller/admin/product')
 const couponController = require('../controller/admin/coupon')
+const salesController = require('../controller/admin/salesController')
 const auth = require("../middleware/adminAuth")
 const multer = require('multer')
 
@@ -65,5 +66,15 @@ router.post("/approve-return/:orderId", adminController.approveReturn)
 
 router.get("/coupon",couponController.getCoupon)
 router.post('/coupon',couponController.addCoupon)
+
+
+//report manegment
+
+router.get('/salesreport',salesController.loadSalesReport)
+router.get("/salesDaily",salesController.dailySalesReport)
+router.get('/salesWeekly',salesController.generateWeeklyReport)
+router.get('/salesMonthly',salesController.generateMonthlyReport)
+router.get('/salesYearly',salesController.generateYearlyReport)
+router.get('/customDateReport',salesController.generateCustomDateReport)
 
 module.exports = router

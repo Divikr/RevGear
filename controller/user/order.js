@@ -150,8 +150,9 @@ const orderlist = async (req, res) => {
   
   const placeOrder = async (req, res) => {
     try {
-        const { savedaddress, paymentMethod, cart, couponCode } = req.body; // Include couponCode in the request body
+        const { savedaddress, paymentMethod, cart, couponCode } = req.body;
         const userId = req.session.user;
+
         console.log("Received order details:", { savedaddress, paymentMethod, cart, couponCode });
 
         if (!savedaddress || !paymentMethod || !Array.isArray(cart) || cart.length === 0) {
@@ -159,6 +160,9 @@ const orderlist = async (req, res) => {
         }
 
         const address = await Address.findById({ _id: savedaddress });
+        if (!address) {
+            return res.status(404).json({ success: false, message: 'Address not found.' });
+        }
 
         let totalAmount = 0;
         const items = cart.map(item => {
@@ -176,19 +180,34 @@ const orderlist = async (req, res) => {
             };
         });
 
-        // If a coupon code is provided, check if it is valid
         let discount = 0;
         if (couponCode) {
             const coupon = await Coupon.findOne({ code: couponCode, isActive: true, status: true });
-            if (coupon && coupon.status === true) {
-                // Calculate the discount
-                if (coupon.offerType === 'Percentage') {
-                    discount = (coupon.offerValue / 100) * totalAmount;
-                } else if (coupon.offerType === 'flat') {
-                    discount = coupon.offerValue;
-                }
-                totalAmount = Math.max(totalAmount - discount, 0);
+            if (!coupon) {
+                return res.status(400).json({ success: false, message: 'Invalid or inactive coupon.' });
             }
+
+            // Check if the user has already used the coupon
+            const user = await User.findById(userId);
+            if (user.couponUsed.includes(coupon._id)) {
+                return res.status(400).json({ success: false, message: 'You have already used this coupon.' });
+            }
+
+            // Calculate the discount
+            if (coupon.offerType === 'Percentage') {
+                discount = (coupon.offerValue / 100) * totalAmount;
+            } else if (coupon.offerType === 'flat') {
+                discount = coupon.offerValue;
+            }
+            totalAmount = Math.max(totalAmount - discount, 0);
+
+            // Update coupon usage
+            coupon.couponUsed += 1;
+            await coupon.save();
+
+            // Update user's coupon usage
+            user.couponUsed.push(coupon._id);
+            await user.save();
         }
 
         console.log("Total amount after discount:", totalAmount);
@@ -199,8 +218,8 @@ const orderlist = async (req, res) => {
             items,
             totalAmount,
             paymentMethod,
-            couponApplied: couponCode ? Coupon._id : null, // Save the coupon ID to the order
-            offerApplied: discount // Save the discount applied
+            couponApplied: couponCode ? Coupon._id : null,
+            offerApplied: discount
         });
 
         console.log("Saving order:", newOrder);

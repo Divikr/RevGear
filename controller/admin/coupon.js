@@ -20,7 +20,7 @@ const addCoupon = async (req, res) => {
     try {
 
         console.log(".................................")
-        const { code, offerType, offerValue, minimumPrice, createdOn, expiredOn, usageLimit, usagePerUserLimit, isActive } = req.body;
+        const { code, offerType, offerValue, minimumPrice, createdOn, expiredOn, usageLimit, usagePerUserLimit, isActive, status } = req.body;
 
 
 
@@ -47,6 +47,7 @@ const addCoupon = async (req, res) => {
             usageLimit: usageLimit || null,
             usagePerUserLimit: usagePerUserLimit || 1,
             isActive: isActive ?? true,
+            status:true
             
            
         });

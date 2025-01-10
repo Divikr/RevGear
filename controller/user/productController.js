@@ -358,7 +358,7 @@ const removeFromCart = async (req, res) => {
 const removeFromWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
-    const userId = req.session.user?.id;
+    const userId = req.session.user;
 
     console.log(`Attempting to remove product ${productId} for user ${userId}`);
 

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Category</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/addCategory.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    /* Hide scrollbar but allow scrolling */
+   
+    /* Allow scrolling on the body */
+    body {
+        overflow: auto;
+    }
+    
+    .main-content {
+        overflow-y: auto;
+        max-height: 100vh; /* Ensures the content can scroll within the viewport */
+    }
+    
+    .main-content::-webkit-scrollbar {
+        display: block; /* Ensures the scrollbar is visible */
+    }
+    
+    .sidebar {
+        width: 250px;
+        min-width: 250px;
+    }
+</style>
+</head>
+
+<body class="bg-gray-900">
+    <div class="flex min-h-screen">
+        
+        <div class="sidebar">
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+            </div>
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupons" class="nav-item active">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/sales" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+        </div>
+
+        <div class="flex justify-end pr-4 pt-2">
+            <div class="relative">
+                <button class="btn btn-info bg-blue-600 text-white px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-blue-400 dropdown-toggle" type="button" id="salesReportDropdown">
+                    Sales Report
+                </button>
+                <ul class="absolute bg-gray-800 text-white shadow-md mt-2 rounded-md hidden" aria-labelledby="salesReportDropdown">
+                    <li><a class="block px-4 py-2 hover:bg-blue-700" href="/admin/salesDaily"><i class="fas fa-calendar-day mr-2"></i>Daily</a></li>
+                    <li><a class="block px-4 py-2 hover:bg-blue-700" href="/admin/salesWeekly"><i class="fas fa-calendar-week mr-2"></i>Weekly</a></li>
+                    <li><a class="block px-4 py-2 hover:bg-blue-700" href="/admin/salesMonthly"><i class="fas fa-calendar-alt mr-2"></i>Monthly</a></li>
+                    <li><a class="block px-4 py-2 hover:bg-blue-700" href="/admin/salesYearly"><i class="fas fa-calendar mr-2"></i>Yearly</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card-body mt-6">
+            <div class="overflow-x-auto">
+                <table id="myTable" class="table-auto border-collapse border border-gray-600 w-full text-white">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="border border-gray-600 px-4 py-2">ID</th>
+                            <th class="border border-gray-600 px-4 py-2">Time Line</th>
+                            <th class="border border-gray-600 px-4 py-2">Total Orders</th>
+                            <th class="border border-gray-600 px-4 py-2">Total Revenue</th>
+                            <th class="border border-gray-600 px-4 py-2">Total Coupon Discount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% report.forEach((order, index) => { %>
+                            <tr class="even:bg-gray-800">
+                                <td class="border border-gray-600 px-4 py-2"><%= index + 1 %></td>
+                                <td class="border border-gray-600 px-4 py-2"><%= order._id %></td>
+                                <td class="border border-gray-600 px-4 py-2"><%= order.totalOrders %></td>
+                                <td class="border border-gray-600 px-4 py-2">₹<%= order.totalAmount.toFixed(2) %></td>
+                                <td class="border border-gray-600 px-4 py-2"><%= totalCouponAmount %></td>
+                            </tr>
+                        <% }); %>
+                        <tr class="bg-gray-700">
+                            <td colspan="2" class="border border-gray-600 px-4 py-2 font-bold">Total:</td>
+                            <td class="border border-gray-600 px-4 py-2 font-bold"><%= totalOrders %></td>
+                            <td class="border border-gray-600 px-4 py-2 font-bold">₹<%= (totalAmount - totalCouponAmount).toFixed(2) %></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="text-center mt-6 mb-4">
+            <button id="download-pdf" class="bg-green-600 text-white px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-green-400 mr-2">
+                Download as PDF
+            </button>
+            <button id="download-excel" class="bg-green-600 text-white px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-green-400">
+                Download as Excel
+            </button>
+        </div>
+<script>
+        function downloadExcel() {
+        const table = document.getElementById('myTable');
+        const wb = XLSX.utils.table_to_book(table);
+        XLSX.writeFile(wb, 'sales_report.xlsx');
+    }
+
+    document.getElementById('download-pdf').addEventListener('click', function() {
+        const element = document.querySelector('.overflow-x-auto');
+        const opt = {
+            margin: 0.5,
+            filename: 'sales_report.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().from(element).set(opt).save();
+    });
+
+    document.getElementById('download-excel').addEventListener('click', function() {
+        downloadExcel();
+    });
+</script>
+</body>
+</html>

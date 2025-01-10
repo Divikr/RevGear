@@ -17,7 +17,7 @@ const applyCoupon = async (req, res, next) => {
         }
 
    
-        const coupon = await Coupon.findOne({ code: voucherCode, isActive: true  });
+        const coupon = await Coupon.findOne({ code: voucherCode, isActive: true ,status:true });
         if (!coupon) {
             return res.status(400).json({ message: 'Invalid or expired coupon code.' });
         }
@@ -69,9 +69,7 @@ const applyCoupon = async (req, res, next) => {
         await coupon.save();
 
      
-        user.couponUsed = user.couponUsed || []; 
-        user.couponUsed.push(coupon._id);
-        await user.save();
+    
 
         return res.status(200).json({
             message: 'Coupon applied successfully.',
@@ -88,7 +86,7 @@ const applyCoupon = async (req, res, next) => {
 
 const getCoupon=async (req, res) => {
     try {
-        const coupons = await Coupon.find({ isActive: true, isdelete: false });
+        const coupons = await Coupon.find({ isActive: true, isdelete: false ,status:true});
         res.status(200).json(coupons);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching coupons', error });
