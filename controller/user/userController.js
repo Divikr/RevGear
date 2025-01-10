@@ -424,7 +424,6 @@ const category = async (req, res) => {
 }
 
 
-
 const searchProducts = async (req, res) => {
     try {
         const { query } = req.query; 
@@ -432,13 +431,16 @@ const searchProducts = async (req, res) => {
             return res.status(400).send("Query parameter is required.");
         }
 
+        // Search for products with only the required fields
         const products = await Products.find({
             isBlocked: false,
             $or: [
-                { productName: { $regex: query, $options: 'i' } }, 
-                { description: { $regex: query, $options: 'i' } }  
+                { productName: { $regex: query, $options: 'i' } },
+                { description: { $regex: query, $options: 'i' } }
             ]
-        });
+        })
+        .select('productName productImage') // Select only the product name and image
+        .lean(); // Convert to plain JavaScript objects for rendering
 
         const categories = await Category.find({}); 
 

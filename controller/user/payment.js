@@ -2,6 +2,7 @@ const Cart = require("../../model/cart");
 const User = require("../../model/users");
 const Address = require('../../model/address');
 const Order = require('../../model/Order');
+const Wallet = require('../../model/wallet');
 const env = require("dotenv").config();
 const mongoose = require("mongoose"); 
 const Razorpay = require('razorpay');
@@ -16,7 +17,7 @@ const createRazorpayOrder = async (req, res) => {
     try {
         const { savedaddress, paymentMethod, cart } = req.body;
 
-        // Log received data for debugging
+      
         console.log("Received order details:", { savedaddress, paymentMethod, cart });
 
         if (!savedaddress || !paymentMethod || !Array.isArray(cart) || cart.length === 0) {
@@ -24,7 +25,7 @@ const createRazorpayOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid order details.' });
         }
 
-        // Calculate total amount
+       
         const totalAmount = cart.reduce((sum, item) => {
             if (!item.productId || !item.productId.salePrice || !item.quantity) {
                 throw new Error('Invalid cart item structure.');
@@ -39,9 +40,9 @@ const createRazorpayOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Total amount must be greater than 0.' });
         }
 
-        // Create Razorpay order
+       
         const options = {
-            amount: totalAmount * 100, // Amount in paisa
+            amount: totalAmount * 100, 
             currency: 'INR',
             receipt: `order_rcptid_${Math.floor(Math.random() * 1000000)}`,
         };
@@ -72,11 +73,48 @@ const createRazorpayOrder = async (req, res) => {
 
   
   
-  
+const getWallet =  async (req, res) => {
+    try {
+        const userId = req.session.user;
+        console.log("................", userId);
+
+        // Ensure the user is authenticated
+        const user = await User.findById(userId);
+        if (!userId) {
+            return res.status(401).send("User not authenticated");
+        }
+        console.log("-------->", user.name);
+        
+        // Check if wallet exists
+        let wallet = await Wallet.findOne({ userId: userId });
+
+        // If wallet doesn't exist, create a new one with a 0 balance
+        if (!wallet) {
+            wallet = new Wallet({
+                userId: userId,
+                balance: 0,
+                transactions: []
+            });
+            await wallet.save();
+        }
+
+        // Render the wallet page with the user's details and wallet information
+        res.render("user/wallet", { 
+            wallet, 
+            userName: user.name
+        });
+        
+    } catch (error) {
+        console.error("Error fetching wallet details:", error);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
  
   
 
   module.exports={
     createRazorpayOrder,
+    getWallet
     
   }

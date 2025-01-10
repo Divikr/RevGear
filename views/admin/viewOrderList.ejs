@@ -200,7 +200,21 @@
 }
 
 
+.btn-primary {
+    background-color: #4CAF50; /* Green color */
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
 
+.btn-primary:hover {
+    background-color: #45a049;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
 </style>
  
    
@@ -328,6 +342,21 @@
                                     <span><%= orderDetails.cancellationReason %></span><br>
                                     <strong>Reason Description:</strong>
                                     <span><%= orderDetails.cancellationComment  %></span>
+                                <% } %>
+
+                                <% if (orderDetails.orderStatus === 'Return Pending') { %>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>Return Reason:</strong>
+                                            <span><%= orderDetails.returnDetails.reason %></span><br>
+                                            <strong>Return Description:</strong>
+                                            <span><%= orderDetails.returnDetails.description %></span><br>
+                                        </div>
+                                        <form action="/admin/approve-return/<%= orderDetails._id %>" method="POST">
+                                            <button type="submit" class="btn btn-primary btn-lg ml-3">Approve Return</button>
+                                        </form>
+                                        
+                                    </div>
                                 <% } %>
                             </div>
                         </div>

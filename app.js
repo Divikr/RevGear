@@ -42,14 +42,12 @@ app.set("views", [path.join(__dirname, "views/user"), path.join(__dirname, "view
 app.use("/", userRoute)
 app.use("/admin", adminRoute)
 
+const searchRoutes = require('./router/searchRoute');
+app.use(searchRoutes);
+
 app.listen(4000, () => {
     console.log("server running");
 })
-
-
-
-
-
 
 module.exports = app
 

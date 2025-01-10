@@ -47,6 +47,7 @@ const addCoupon = async (req, res) => {
             usageLimit: usageLimit || null,
             usagePerUserLimit: usagePerUserLimit || 1,
             isActive: isActive ?? true,
+            
            
         });
 

@@ -351,73 +351,6 @@ const removeFromCart = async (req, res) => {
 
 //place order
 
-const placeOrder = async (req,res) => {
- try {
-    const { savedaddress, paymentMethod, cart } = req.body;
-    const userId = req.session.user;
-    console.log("...................",{savedaddress, paymentMethod, cart})
-
-    if (!savedaddress || !paymentMethod || !Array.isArray(cart) || cart.length === 0) {
-        return res.status(400).json({ success: false, message: 'Invalid order details.' });
-    }
-
-const address = await Address.findById({_id:savedaddress})
-
-    let totalAmount = 0;
-    const items = cart.map(item => {
-        if (!item.productId || !item.productId.salePrice || !item.quantity) {
-            throw new Error('Invalid item in cart.');
-        }
-
-        const itemTotal = item.productId.salePrice * item.quantity;
-        totalAmount += itemTotal;
-
-        return {
-            productId: item.productId._id,
-            quantity: item.quantity,
-            price: item.productId.salePrice
-        };
-    });
-
-
-
-    const newOrder = new Order({
-        userId,
-        deliveryAddress: address,
-        items,
-        totalAmount,
-        paymentMethod
-    });
-
-console.log("..........address..........",newOrder)
-
-    const savedOrder = await newOrder.save();
-
-    console.log("................",savedOrder)
-
-    for (const item of items) {
-        const updatedProduct = await Product.findOneAndUpdate(
-            { _id: item.productId },
-            { $inc: { quantity: -item.quantity } }, 
-            { new: true } 
-        );
-
-        if (updatedProduct && updatedProduct.quantity === 0) {
-            await Product.findByIdAndUpdate(item.productId, {
-                status: "Out of Stock",
-            });
-        }
-    }
-
-    res.status(201).json({ success: true, message: 'Order placed successfully!', orderId: savedOrder._id });
-} catch (error) {
-    console.error('Error placing order:', error);
-    res.status(500).json({ success: false, message: 'An error occurred while placing the order.' });
-}
-}
-
-
-
 
 
 
@@ -467,125 +400,17 @@ const removeFromWishlist = async (req, res) => {
 
 
 
-const getCheckout = async (req, res) => {
-  try {
-    const user = req.session.user; 
-    const userId = user._id; 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).send('Invalid User ID');
-    }
-
-
-    const cart = await Cart.findOne({ userId }).populate('items.productId'); 
-
-    const savedAddresses = await Address.find({ userId });
-
-    const total = cart.items.reduce((sum, item) => sum + item.productId.salePrice * item.quantity, 0);
-
-    res.render('user/checkout', { cart: cart.items, savedAddresses, total });
-  } catch (error) {
-    console.error('Error in checkout:', error.message);
-    res.status(500).send('Server error');
-  }
-};
-
-
-const orderconfirm = async (req, res) => {
-  try {
-      const {id} = req.params;
-      const userId = req.session.user;
-    
-      await Cart.findOneAndUpdate(
-        { userId },
-        { $set: { items: [] } }
-      );
-;
-      const order = await Order.findById({_id:id});
-      res.render("user/orderConfirmation", {order});
-  } catch (error) {
-      console.error("Error rendering home page:", error);
-      res.status(500).send("Server error");
-  }
-};
 
 
 
-const orderdetails = async (req, res) => {
-  try {
-      const {id} = req.params;
-      const order = await Order.findById({_id: id}).populate("items.productId");
-      res.render("user/orderDetails",{order});
-  } catch (error) {
-      console.error("Error rendering home page:", error);
-      res.status(500).send("Server error");
-  }
-};
 
 
-const orderlist = async (req, res) => {
-  try {
-     const id=req.session.user._id;
-     
-     const orders=await Order.find({userId:id})
-     console.log(orders)
-    
-      res.render("user/orderList",{orders});
-  } catch (error) {
-      console.error("Error rendering home page:", error);
-      res.status(500).send("Server error");
-  }
-};
 
 
-const cancelOrder = async (req, res) => {
-  try {
-    // Extract order ID from request parameters
-    const { id } = req.params;
-    
-    // Extract reason and description from the request body
-    const { reason, description } = req.body;
-    
-    // Fetch the order with the given ID
-    const order = await Order.findById(id);
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: 'Order not found'
-      });
-    }
 
-    // Check if the order is eligible for cancellation
-    if (!['Ordered'].includes(order.orderStatus)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Order cannot be cancelled at this stage'
-      });
-    }
 
-    // Update order status and cancellation details
-    order.orderStatus = 'Cancelled';
-    order.cancellationDetails = reason;
-    order.cancellationReason = reason;
-    order.cancellationComment = description;
-    order.cancelDate = new Date().toISOString();
 
-    // Save the updated order
-    await order.save();
 
-    res.json({
-      success: true,
-      message: 'Order cancelled successfully',
-      order
-    });
-  } catch (error) {
-    console.error('Cancel order error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to cancel order',
-      error: error.message
-    });
-  }
-};
 
 
 
@@ -597,13 +422,9 @@ module.exports = {
     addToCart,
     updateCart,
     removeFromWishlist,
-    getCheckout,
-    orderconfirm,
-    orderdetails,
-    placeOrder,
-    orderlist,
     getProductByCategory,
     removeFromCart,
-    cancelOrder
+    
+
    
 }

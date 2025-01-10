@@ -65,12 +65,18 @@
                       <br>
 
                     <div class="flex justify-between items-center mt-auto">
-                        <button  onclick="addToCart('<%= product._id %>')" id="addToCart" class="add-to-cart flex-grow bg-[#1a1a1a] text-white py-2 px-4 rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-gray-800">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
-                            Add to Cart
-                        </button>
+                        
+                            <button onclick="addToCart('<%= product._id %>', this)" 
+                              data-product-id="<%= product._id %>" 
+                              class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 cart-btn <%= product.quantity === 0 ? 'opacity-50 cursor-not-allowed' : '' %>" 
+                              <%= product.quantity === 0 ? 'disabled' : '' %>>
+                              <span class="cart-text flex items-center justify-center space-x-2">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Add to Cart</span>
+                              </span>
+                            </button>
+                         
+                    
                         <div class="product-card" data-item-id="ACTUAL_PRODUCT_ID_HERE">
                             <button class="remove-item p-2 text-gray-400 hover:text-red-500">
                               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,69 +197,53 @@ document.addEventListener("DOMContentLoaded", function () {
         });
        
 
+        async function addToCart(productId, button) {
+  try {
+   
+    button.classList.add('opacity-100');
+    button.querySelector('span').textContent = 'Adding...';
 
-function addToCart(productId) {
-    
-    const quantity = parseInt(document.getElementById('quantity').textContent, 10);
-    
-    const data = {
-        productId: productId,
-        quantity: quantity,
-    };
-
-    fetch('/addToCart', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json' 
-        },
-        body: JSON.stringify(data) 
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(error => {
-                throw new Error(error.message || 'Failed to add to cart');
-            });
-        }
-        return response.json();
-    })
-    .then(responseData => {
-        Swal.fire({
-            icon: 'success',
-            title: 'Added to Cart!',
-            text: responseData.message || 'Product added successfully',
-            showCancelButton: true,
-            confirmButtonText: 'Go to Cart',
-            cancelButtonText: 'Continue Shopping'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/cart'; 
-            } else {
-                location.reload(); 
-            }
-        });
-    })
-    .catch(error => {
-        if (error.message === 'Please Log In') {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Not Logged In',
-                text: 'Please log in to add items to your cart',
-                showConfirmButton: true,
-                confirmButtonText: 'Log In',
-                showCancelButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/login'; 
-                }
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: error.message || 'Something went wrong!'
-            });
-        }
+    const response = await fetch('/addToCart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ productId, quantity: 1, size: 'none' }),
+      credentials: 'same-origin',
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to add item to cart.');
+    }
+
+    const data = await response.json();
+
+ 
+    button.classList.remove('bg-red-600', 'hover:bg-red-700');
+    button.classList.add('bg-green-500', 'hover:bg-green-600');
+    button.querySelector('span').textContent = 'In Cart';
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Added!',
+      text: data.message || 'The item has been added to your cart.',
+      showConfirmButton: false,
+      timer: 1500,
+    });
+  } catch (error) {
+    console.error('Error:', error.message);
+
+    button.classList.remove('opacity-50', 'cursor-not-allowed');
+    button.classList.add('bg-red-600', 'hover:bg-red-700');
+    button.querySelector('span').textContent = 'Add to Cart';
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Error!',
+      text: error.message || 'Failed to add item to cart. Please try again.',
+    });
+  }
 }
 
 

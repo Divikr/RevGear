@@ -1,0 +1,118 @@
+<%- include("../partials/header.ejs") %>
+
+
+<br>
+
+ <nav class="text-sm ml-6 font-medium text-gray-700 mb-6 ">
+  <ol class="list-reset flex">
+    <li>
+      <a href="/home" class="text-blue-600 hover:text-blue-700">Home</a>
+    </li>
+    <li class="mx-2">/</li>
+    <li>
+      <a href="/profile" class="text-blue-600 hover:text-blue-700">Profile</a>
+    </li>
+    <li class="mx-2">/</li>
+  
+    <li class="text-gray-400">Wallet</li>
+  </ol>
+</nav>
+
+<div class="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
+    <div class="bg-gradient-to-br from-white to-blue-50 shadow-2xl rounded-xl overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 p-6">
+            <!-- Sidebar -->
+            <div class="col-span-1 bg-white border border-blue-100 p-6 rounded-xl shadow-lg">
+                <ul class="space-y-6">
+                    <li>
+                        <a href="#" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                            <i class="fas fa-user text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/addressbook" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                            <i class="fas fa-map-marker-alt text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Address</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/wallet" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                            <i class="fas fa-wallet text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Wallet</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/orderlist" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                            <i class="fas fa-box text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Order</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/logout" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-red-50 hover:shadow-md">
+                            <i class="fas fa-sign-out-alt text-red-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+                            <span class="text-gray-700 group-hover:text-red-600 group-hover:font-semibold">Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content Section -->
+            <div class="col-span-3 space-y-8">
+                <!-- Profile Section -->
+                <div class="bg-white border border-blue-100 p-6 rounded-xl shadow-lg">
+                    <div class="w-32 h-32 bg-red-400 rounded-full mx-auto flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-16 h-16 text-white">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <p class="text-center mt-4 text-lg font-semibold"><%= userName %></p>
+                </div>
+
+                <!-- Balance Section -->
+                <div class="flex items-center justify-between space-x-4">
+                    <!-- Current Balance Section -->
+                    <div class="text-white text-center py-3 rounded-lg w-1/2 bg-gray-800">
+                        <p class="mb-2">Current Balance:</p>
+                        <h2 class="font-bold text-2xl">₹ <%= wallet.balance %></h2>
+                    </div>
+                
+                    <!-- Actions Section -->
+                    <div class="text-white py-4 rounded-lg w-1/2 bg-gray-800">
+                        <button class="text-white w-full py-3 rounded-lg">Deposit Money</button>
+                    </div>
+                </div>
+                
+                
+
+                <!-- Transaction History -->
+                <div class="mt-5">
+                    <h3 class="text-xl font-semibold mb-3">Transaction History</h3>
+                    <table class="table-auto w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2">Date & Time</th>
+                                <th class="px-4 py-2">Type</th>
+                                <th class="px-4 py-2">Amount</th>
+                               
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% wallet.transactions.forEach(transaction => { %>
+                                <tr class="border-b">
+                                    <td class="px-4 py-2"><%= new Date(transaction.date).toLocaleString() %></td>
+                                    <td class="px-4 py-2"><%= transaction.type %></td>
+                                    <td class="px-4 py-2">₹ <%= transaction.amount %></td>
+                                   
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include("../partials/footer.ejs") %>

@@ -57,6 +57,9 @@ router.get('/blockProduct/:id',auth.isAdminAuth, productController.blockProduct)
 router.get('/orderlists',auth.isAdminAuth, adminController.orderlists)
 router.get('/viewOrderLists/:orderId',auth.isAdminAuth, adminController.viewOrder)
 router.patch("/changeStatus",adminController.changeStatus)
+router.post("/approve-return/:orderId", adminController.approveReturn)
+
+
 
 //coupon manegment
 

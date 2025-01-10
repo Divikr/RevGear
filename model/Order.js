@@ -44,7 +44,15 @@ const orderSchema = mongoose.Schema({
     },
     orderStatus: {
         type: String,
-        enum: ['Ordered', 'Shipped', 'Out For Delivery', 'Delivered', 'Cancelled', 'Return Requested', , 'Return Rejected', 'Return Pending'
+        enum: [
+            'Ordered', 
+            'Shipped', 
+            'Out For Delivery', 
+            'Delivered', 
+            'Cancelled', 
+            'Return Pending',
+            'Return Success'
+           
         ],
         default: 'Ordered'
     },
@@ -61,12 +69,11 @@ const orderSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
-    cancellationDetails:{
-        type:String,
-        enum:['select option','Got at Better Price','Wrong Item Ordered','Shipping Time Too Long','Other Reason'],
-        default:'select option',
-        description:String,
-       
+    cancellationDetails: {
+        type: String,
+        enum: ['select option', 'Got at Better Price', 'Wrong Item Ordered', 'Shipping Time Too Long', 'Other Reason'],
+        default: 'select option',
+        description: String,
     },
     cancellationReason: {
         type: String,
@@ -79,8 +86,29 @@ const orderSchema = mongoose.Schema({
     cancelDate: {
         type: String,
         default: null
+    },
+    returnDetails: {
+        productId: { 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Product' 
+        },
+        reason: { 
+            type: String 
+        },
+        description: { 
+            type: String 
+        },
+        requestedAt: { 
+            type: Date, 
+            default: Date.now 
+        },
+        status: { 
+            type: String, 
+            enum: ['Completed','Pending',], 
+            default: 'Pending' 
+        }
     }
-})
+});
 
 const Order = mongoose.model("Order", orderSchema);
 module.exports = Order;
