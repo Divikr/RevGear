@@ -312,7 +312,6 @@
 
 async function addToCart(productId, button) {
   try {
-   
     button.classList.add('opacity-100');
     button.querySelector('span').textContent = 'Adding...';
 
@@ -332,18 +331,32 @@ async function addToCart(productId, button) {
 
     const data = await response.json();
 
- 
     button.classList.remove('bg-red-600', 'hover:bg-red-700');
     button.classList.add('bg-green-500', 'hover:bg-green-600');
     button.querySelector('span').textContent = 'In Cart';
 
+    
     Swal.fire({
       icon: 'success',
       title: 'Added!',
       text: data.message || 'The item has been added to your cart.',
-      showConfirmButton: false,
-      timer: 1500,
+      showConfirmButton: true,
+      confirmButtonText: 'Go to Cart',
+      showCancelButton: true,
+      cancelButtonText: 'Continue Shopping',
+      cancelButtonColor: '#3085d6',
+      confirmButtonColor: '#28a745',
+      reverseButtons: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+       
+        window.location.href = '/cart'; 
+      } else if (result.isDismissed) {
+  
+        Swal.close();
+      }
     });
+
   } catch (error) {
     console.error('Error:', error.message);
 
@@ -358,6 +371,7 @@ async function addToCart(productId, button) {
     });
   }
 }
+
   </script>
 </body>
 

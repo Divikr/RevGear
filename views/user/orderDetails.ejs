@@ -20,18 +20,18 @@
             flex-direction: column;
         }
     }
-    /* Ensure modal is hidden by default */
+  
 #returnOrderModal {
     display: none;
 }
 
-/* Show the modal when active */
+
 #returnOrderModal.show {
     display: flex;
 }
 
 </style>
-<!-- GSAP CDN -->
+
 <script src="path/to/your/script.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.1/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -63,7 +63,7 @@
                             </div>
                         </div>
                     <% } else { %>
-                        <!-- Step 1: Ordered -->
+                       
                         <div class="flex-1 flex flex-col items-center order-progress-step">
                             <div class="progress-step <%= order.orderStatus === 'Ordered' || ['Shipped', 'Out For Delivery', 'Delivered', 'Return Pending'].includes(order.orderStatus) ? 'completed' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
                                 1
@@ -74,7 +74,7 @@
                             </span>
                         </div>
             
-                        <!-- Step 2: Shipped -->
+                     
                         <div class="flex-1 flex flex-col items-center order-progress-step">
                             <div class="progress-step <%= ['Shipped', 'Out For Delivery', 'Delivered', 'Return Pending'].includes(order.orderStatus) ? 'completed' : order.orderStatus === 'Ordered' ? 'active' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
                                 2
@@ -85,7 +85,7 @@
                             </span>
                         </div>
             
-                        <!-- Step 3: Out For Delivery -->
+                       
                         <div class="flex-1 flex flex-col items-center order-progress-step">
                             <div class="progress-step <%= ['Out For Delivery', 'Delivered', 'Return Pending'].includes(order.orderStatus) ? 'completed' : order.orderStatus === 'Shipped' ? 'active' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
                                 3
@@ -96,7 +96,7 @@
                             </span>
                         </div>
             
-                        <!-- Step 4: Delivered -->
+                     
                         <div class="flex-1 flex flex-col items-center order-progress-step">
                             <div class="progress-step <%= ['Delivered', 'Return Pending'].includes(order.orderStatus) ? 'completed' : order.orderStatus === 'Out For Delivery' ? 'active' : '' %> rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
                                 4
@@ -107,7 +107,6 @@
                             </span>
                         </div>
             
-                        <!-- Step 5: Return Pending -->
                         <% if (order.orderStatus === 'Return Pending') { %>
                             <div class="flex-1 flex flex-col items-center order-progress-step">
                                 <div class="progress-step active rounded-full h-12 w-12 flex items-center justify-center border-2 text-lg font-bold">
@@ -125,7 +124,7 @@
             
             
             
-            
+            <br><br>
             
             
 
@@ -164,6 +163,14 @@
                         <div class="flex justify-between items-center font-bold">
                             <span class="text-gray-900">Total</span>
                             <span class="text-blue-600 text-xl">₹<%= (order.totalAmount + (order.shippingCost || 100)).toFixed(2) %></span>
+                            
+                        
+                        </div>
+                        <br>
+                          
+                        <div>
+                            <span class="text-gray-900">Payment Method:</span>
+                            <span class="text-blue-400 text-m"> <%= order.paymentMethod %></span>
                         </div>
                     </div>
                     <% if (!['Shipped', 'Out For Delivery', 'Delivered','Cancelled','Return Pending','Return Success'].includes(order.orderStatus)) { %>
@@ -244,12 +251,12 @@ aria-modal="true">
     Return Order
 </button>
 <% } %>
-<!-- Modal Structure -->
+
 <div id="returnModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
     <div class="bg-white rounded-lg shadow-lg p-6 w-96">
         <h2 class="text-xl font-semibold mb-4 text-gray-800">Return Order</h2>
         <form id="returnForm">
-            <!-- Reason Dropdown -->
+            
             <label for="return-reason" class="block text-sm font-medium text-gray-700 mb-2">Reason</label>
             <select id="return-reason" name="return-reason" class="w-full border-gray-300 rounded-lg p-2 mb-4 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                 <option value="">Select a reason</option>
@@ -259,7 +266,6 @@ aria-modal="true">
                 <option value="Other">Other</option>
             </select>
 
-            <!-- Description Textarea -->
             <label for="return-description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
             <textarea
                 id="return-description"
@@ -268,7 +274,7 @@ aria-modal="true">
                 class="w-full border-gray-300 rounded-lg p-2 mb-4 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 placeholder="Describe the issue..."></textarea>
 
-            <!-- Buttons -->
+          
             <div class="flex justify-end space-x-4">
                 <button
                     id="cancelButton"
@@ -432,34 +438,34 @@ const cancelButton = document.getElementById('cancelButton');
 
 
 
-// Show modal
+
 showReturnButton.addEventListener('click', () => {
     console.log('Modal opened');
     returnModal.classList.remove('hidden');
 });
 
-// Hide modal
+
 cancelButton.addEventListener('click', () => {
     returnModal.classList.add('hidden');
 });
 
-// Handle submit
-document.getElementById("returnForm").addEventListener("submit", async function (event) {
-        event.preventDefault(); // Prevent the default form submission behavior
 
-        // Capture form data
+document.getElementById("returnForm").addEventListener("submit", async function (event) {
+        event.preventDefault(); 
+
+      
         const reason = document.getElementById("return-reason").value;
         const description = document.getElementById("return-description").value;
         const orderId = "<%= order._id %>";
         console.log(orderId)
 console.log("des",description)
-        // Check if all fields are filled
+      
         if (!reason || !description) {
             alert("Please fill in all fields before submitting.");
             return;
         }
 
-        // Data to send
+       
         const requestData = {
             orderId:orderId,
             reason: reason,
@@ -468,7 +474,7 @@ console.log("des",description)
 
         console.log(requestData)
         try {
-            // Send data to the server
+         
             const response = await fetch(`/orders/return-order/${orderId}`, {
                 method: "POST",
                 headers: {
@@ -477,25 +483,44 @@ console.log("des",description)
                 body: JSON.stringify(requestData),
             });
 
-            // Handle response
+           
             if (response.ok) {
-                const result = await response.json();
-                alert("Return order submitted successfully!");
-                console.log(result);
-            } else {
-                alert("Failed to submit return order.");
-                console.error("Error:", response.statusText);
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("An error occurred while submitting your return order.");
-        }
+    const result = await response.json();
+    Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Return order submitted successfully!",
+    }).then(() => {
+        // Reload the page
+        window.location.reload();
+    });
+    console.log(result);
+} else {
+    Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Failed to submit return order.",
+    });
+    console.error("Error:", response.statusText);
+}
+} catch (error) {
+    console.error("Error:", error);
+    Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An error occurred while submitting your return order.",
+    }).then(() => {
+        // Reload the page
+        window.location.reload();
+    });
+}
 
-        // Close the modal
+
+       
         document.getElementById("returnModal").classList.add("hidden");
     });
 
-    // Cancel button logic
+   
     document.getElementById("cancelButton").addEventListener("click", function () {
         document.getElementById("returnModal").classList.add("hidden");
     });

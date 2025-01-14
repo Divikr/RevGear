@@ -21,11 +21,11 @@
 <div class="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
     <div class="bg-gradient-to-br from-white to-blue-50 shadow-2xl rounded-xl overflow-hidden">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 p-6">
-            <!-- Sidebar -->
+           
             <div class="col-span-1 bg-white border border-blue-100 p-6 rounded-xl shadow-lg">
                 <ul class="space-y-6">
                     <li>
-                        <a href="#" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                        <a href="/profile" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
                             <i class="fas fa-user text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
                             <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Profile</span>
                         </a>
@@ -57,9 +57,9 @@
                 </ul>
             </div>
 
-            <!-- Main Content Section -->
+           
             <div class="col-span-3 space-y-8">
-                <!-- Profile Section -->
+               
                 <div class="bg-white border border-blue-100 p-6 rounded-xl shadow-lg">
                     <div class="w-32 h-32 bg-red-400 rounded-full mx-auto flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-16 h-16 text-white">
@@ -69,45 +69,50 @@
                     <p class="text-center mt-4 text-lg font-semibold"><%= userName %></p>
                 </div>
 
-                <!-- Balance Section -->
+             
                 <div class="flex items-center justify-between space-x-4">
-                    <!-- Current Balance Section -->
+                   
                     <div class="text-white text-center py-3 rounded-lg w-1/2 bg-gray-800">
                         <p class="mb-2">Current Balance:</p>
-                        <h2 class="font-bold text-2xl">₹ <%= wallet.balance %></h2>
+                        <h2 class="font-bold text-2xl">₹ <%= wallet.balance.toFixed(2) %></h2>
                     </div>
                 
-                    <!-- Actions Section -->
+                 
                     <div class="text-white py-4 rounded-lg w-1/2 bg-gray-800">
-                        <button class="text-white w-full py-3 rounded-lg">Deposit Money</button>
+                        <button class="text-white w-full py-3 rounded-lg">Credit Money</button>
                     </div>
                 </div>
                 
                 
 
-                <!-- Transaction History -->
+                
                 <div class="mt-5">
                     <h3 class="text-xl font-semibold mb-3">Transaction History</h3>
-                    <table class="table-auto w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="px-4 py-2">Date & Time</th>
-                                <th class="px-4 py-2">Type</th>
-                                <th class="px-4 py-2">Amount</th>
-                               
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% wallet.transactions.forEach(transaction => { %>
-                                <tr class="border-b">
-                                    <td class="px-4 py-2"><%= new Date(transaction.date).toLocaleString() %></td>
-                                    <td class="px-4 py-2"><%= transaction.type %></td>
-                                    <td class="px-4 py-2">₹ <%= transaction.amount %></td>
-                                   
+                    <div id="wallet-table-container" class="overflow-x-auto">
+                        <table class="table-auto w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-200">
+                                    <th class="px-4 py-2">Date & Time</th>
+                                    <th class="px-4 py-2">Type</th>
+                                    <th class="px-4 py-2">Amount</th>
                                 </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="wallet-table-body">
+                                <% wallet.transactions.forEach(transaction => { %>
+                                    <tr class="border-b">
+                                        <td class="px-4 py-2"><%= new Date(transaction.date).toLocaleString() %></td>
+                                        <td class="px-4 py-2"><%= transaction.type %></td>
+                                        <td class="px-4 py-2">₹ <%= transaction.amount.toFixed(2) %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="pagination" class="flex justify-center items-center mt-4">
+                        <button id="prev-btn" class="px-4 py-2 bg-gray-300 rounded-lg mr-2" disabled>Previous</button>
+                        <span id="page-info" class="px-4 py-2">Page 1</span>
+                        <button id="next-btn" class="px-4 py-2 bg-gray-300 rounded-lg ml-2">Next</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -116,3 +121,55 @@
 
 
 <%- include("../partials/footer.ejs") %>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+        const rowsPerPage = 5; 
+        const tableBody = document.getElementById("wallet-table-body");
+        const rows = tableBody.querySelectorAll("tr");
+        const totalRows = rows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        let currentPage = 1;
+
+        function updateTable() {
+            
+            rows.forEach((row, index) => {
+                row.style.display = "none";
+            });
+
+            
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            for (let i = start; i < end && i < totalRows; i++) {
+                rows[i].style.display = "";
+            }
+
+          
+            document.getElementById("page-info").innerText = `Page ${currentPage} of ${totalPages}`;
+
+            
+            document.getElementById("prev-btn").disabled = currentPage === 1;
+            document.getElementById("next-btn").disabled = currentPage === totalPages;
+        }
+
+    
+        document.getElementById("prev-btn").addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTable();
+            }
+        });
+
+        document.getElementById("next-btn").addEventListener("click", function () {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateTable();
+            }
+        });
+
+        
+        updateTable();
+    });
+
+</script>

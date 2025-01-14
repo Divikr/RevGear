@@ -67,11 +67,11 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span>Orders</span>
                 </a>
-                <a href="/admin/coupons" class="nav-item">
+                <a href="/admin/coupon" class="nav-item">
                     <i class="fas fa-tags"></i>
                     <span>Coupons</span>
                 </a>
-                <a href="/admin/sales" class="nav-item">
+                <a href="/admin/salesreport" class="nav-item">
                     <i class="fas fa-chart-line"></i>
                     <span>Sales</span>
                 </a>
@@ -102,7 +102,7 @@
                         <div id="image-preview-container" class="image-preview-container"></div>
                       </div>
             
-                      <!-- Cropper Modal (remains the same as previous version) -->
+                     
                       <div id="cropper-modal" class="modal" style="display: none;">
                         <div class="modal-content">
                           <h2>Crop Image</h2>
@@ -151,7 +151,7 @@
         const categoryOffer = document.getElementById('category-offer').value.trim();
         const imagePreviewContainer = document.getElementById('image-preview-container');
 
-        // Validation
+    
         if (!categoryName) {
             Swal.fire('Validation Error', 'Category Name is required.', 'error');
             return;
@@ -181,7 +181,7 @@
             return;
         }
 
-        // Prepare FormData
+       
         const formData = new FormData();
         formData.append('name', categoryName);
         formData.append('description', categoryDescription);

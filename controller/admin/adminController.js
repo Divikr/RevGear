@@ -188,30 +188,30 @@ const changeStatus=async(req,res)=>{
 
 const approveReturn = async (req, res) => {
     try {
-        const orderId = req.params.orderId; // Use orderId instead of id
-        const order = await Order.findById(orderId).populate('userId'); // Populate the user details to access userId
+        const orderId = req.params.orderId; 
+        const order = await Order.findById(orderId).populate('userId'); 
 
         if (!order) {
             return res.status(404).send('Order not found');
         }
 
-        // Check if the return is pending
+       
         if (order.returnDetails.status !== 'Pending') {
             return res.status(400).send('Return status is not pending');
         }
 
-        // Update the order's return status to 'Return Success'
+       
         order.returnDetails.status = 'Completed';
         order.orderStatus = 'Return Success';
 
-        // Find the user's wallet
+        
         const wallet = await Wallet.findOne({ userId: order.userId });
 
         if (!wallet) {
             return res.status(404).send('Wallet not found for user');
         }
 
-        // Add the total amount of the order to the wallet (assuming a refund of total amount)
+       
         wallet.balance += order.totalAmount;
         wallet.transactions.push({
             amount: order.totalAmount,
@@ -219,11 +219,11 @@ const approveReturn = async (req, res) => {
           
         });
 
-        // Save the updated wallet and order
+       
         await wallet.save();
         await order.save();
 
-        res.redirect(`/admin/viewOrderLists/${orderId}`); // Corrected URL
+        res.redirect(`/admin/viewOrderLists/${orderId}`); 
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');

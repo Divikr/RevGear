@@ -100,15 +100,15 @@
       <h3 class="text-lg font-medium mb-4">Payment Options</h3>
       <div class="space-y-2">
         <label class="payment-option flex items-center px-4 py-2 rounded-md border border-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-100">
-          <input type="radio" name="payment-method" value="cash" class="mr-2 hidden">
+          <input type="radio" name="payment-method" value="COD" class="mr-2 hidden">
           <i class="fas fa-money-bill-alt mr-2"></i> Cash on Delivery
         </label>
         <label class="payment-option flex items-center px-4 py-2 rounded-md border border-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-100">
-          <input type="radio" name="payment-method" value="razorpay" class="mr-2 hidden">
+          <input type="radio" name="payment-method" value="Razorpay" class="mr-2 hidden">
           <i class="fas fa-credit-card mr-2"></i> Online Payment
         </label>
         <label class="payment-option flex items-center px-4 py-2 rounded-md border border-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-100">
-          <input type="radio" name="payment-method" value="wallet" class="mr-2 hidden">
+          <input type="radio" name="payment-method" value="Wallet" class="mr-2 hidden">
           <i class="fas fa-wallet mr-2"></i> Wallet Payment
         </label>
       </div>
@@ -270,7 +270,7 @@
   document.getElementById('place-order-btn').addEventListener('click', () => {
     const selectedAddress = document.querySelector('input[name="savedaddress"]:checked')?.value;
     const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
-    const couponCode = document.getElementById("voucher-code").value; // Get coupon code value
+    const couponCode = document.getElementById("voucher-code").value; 
 
     if (!selectedAddress) {
       alert('Please select an address.');
@@ -285,13 +285,13 @@
     const orderDetails = {
       savedaddress: selectedAddress,
       paymentMethod,
-      cart: <%- JSON.stringify(cart || []) %>, // assuming cart is populated dynamically in your view
-      couponCode: couponCode // Include coupon code here
+      cart: <%- JSON.stringify(cart || []) %>, 
+      couponCode: couponCode 
     };
 
     console.log(orderDetails);
 
-    if (paymentMethod === 'razorpay') {
+    if (paymentMethod === 'Razorpay') {
         fetch('/create-razorpay-order', {
             method: 'POST',
             headers: {
@@ -357,13 +357,13 @@
             console.error('Error creating Razorpay order:', error);
             alert('An error occurred while creating Razorpay order.');
         });
-    } else if (paymentMethod === 'cash') {
+    } else if (paymentMethod === 'COD') {
         fetch('/place-order', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(orderDetails), // Send orderDetails with couponCode
+            body: JSON.stringify(orderDetails), 
         })
         .then(response => response.json())
         .then(data => {
@@ -377,7 +377,45 @@
             console.error('Error placing order:', error);
             alert('An error occurred while placing the order.');
         });
-    } else {
+    } else if (paymentMethod === 'Wallet') {
+  
+     // Debug log to check values
+     const orderDetails = {
+         
+        amount: parseFloat(totalAmount), // Ensure amount is a number
+        orderId: orderId 
+    };
+    
+    console.log('Sending order details:', orderDetails); // Debug log
+
+    fetch('/wallet-pay', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // Add any authentication headers if required
+            // 'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(orderDetails),
+    })
+    .then(response => {
+        // Debug log for response
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data); // Debug log
+        if (data.success) {
+            window.location.href = `/orderconfirm/${orderId}`;
+        } else {
+            alert(data.message || 'Failed to process wallet payment.');
+        }
+    })
+    .catch(error => {
+        console.error('Error processing wallet payment:', error);
+        alert('An error occurred while processing the wallet payment.');
+    });
+} 
+     else {
         alert('Unsupported payment method.');
     }
 });
@@ -448,7 +486,7 @@
 
   async function fetchCoupons() {
       try {
-          const response = await fetch('/coupons'); // Ensure the endpoint matches your backend setup
+          const response = await fetch('/coupons'); 
           if (!response.ok) throw new Error('Failed to fetch coupons');
           const coupons = await response.json();
 
@@ -465,7 +503,7 @@
       }
   }
 
-  // Fetch coupons when the page loads
+  
   document.addEventListener('DOMContentLoaded', fetchCoupons);
 
 

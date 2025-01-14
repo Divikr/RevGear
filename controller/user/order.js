@@ -46,26 +46,43 @@ const orderconfirm = async (req, res) => {
 
 
   
-const orderlist = async (req, res) => {
+  const orderlist = async (req, res) => {
     try {
-       const id=req.session.user._id;
-       
-       const orders=await Order.find({userId:id})
-       console.log(orders)
-      
-        res.render("user/orderList",{orders});
+        const id = req.session.user._id;
+        
+        const page = parseInt(req.query.page) || 1;
+        const limit = 6; 
+        const skip = (page - 1) * limit;
+        
+        const orders = await Order.find({ userId: id })
+                                  .skip(skip)
+                                  .limit(limit)
+                                  .sort({ orderDate: -1 });
+        
+        const totalOrders = await Order.countDocuments({ userId: id });
+        const totalPages = Math.ceil(totalOrders / limit);
+        
+        res.render("user/orderList", { 
+            orders,
+            page,
+            totalPages
+        });
     } catch (error) {
-        console.error("Error rendering home page:", error);
+        console.error("Error rendering order list:", error);
         res.status(500).send("Server error");
     }
-  };
+};
+
+
+
+  
   
   const cancelOrder = async (req, res) => {
     try {
       const { id } = req.params;
       const { reason, description } = req.body;
   
-      // Find the order by ID
+      
       const order = await Order.findById(id);
       if (!order) {
         return res.status(404).json({
@@ -74,7 +91,7 @@ const orderlist = async (req, res) => {
         });
       }
   
-      // Check if the order can be cancelled
+     
       if (!['Ordered'].includes(order.orderStatus)) {
         return res.status(400).json({
           success: false,
@@ -82,14 +99,14 @@ const orderlist = async (req, res) => {
         });
       }
   
-      // Update order status to 'Cancelled'
+      
       order.orderStatus = 'Cancelled';
       order.cancellationDetails = reason;
       order.cancellationReason = reason;
       order.cancellationComment = description;
       order.cancelDate = new Date().toISOString();
   
-      // Restock the product quantities
+    
       for (const item of order.items) {
         const product = await Product.findById(item.productId);
         if (product) {
@@ -103,36 +120,37 @@ const orderlist = async (req, res) => {
         }
       }
   
-      // Save the cancelled order
+      
       await order.save();
   
-      // Credit the amount to the user's wallet
-      const wallet = await Wallet.findOne({ userId: order.userId });
-      if (!wallet) {
-        return res.status(404).json({
-          success: false,
-          message: 'User wallet not found',
+     
+      if (['Wallet', 'Razorpay'].includes(order.paymentMethod)) {
+        const wallet = await Wallet.findOne({ userId: order.userId });
+        if (!wallet) {
+          return res.status(404).json({
+            success: false,
+            message: 'User wallet not found',
+          });
+        }
+  
+   
+        wallet.transactions.push({
+          amount: order.totalAmount,
+          type: 'credit',
+          date: new Date(),
         });
+  
+       
+        wallet.balance += order.totalAmount;
+  
+      
+        await wallet.save();
       }
-  
-      // Create a new transaction for the wallet
-      wallet.transactions.push({
-        amount: order.totalAmount,
-        type: 'credit',
-        date: new Date(),
-      });
-  
-      // Update the wallet balance
-      wallet.balance += order.totalAmount;
-  
-      // Save the updated wallet
-      await wallet.save();
   
       res.json({
         success: true,
-        message: 'Order cancelled successfully, amount credited to wallet, and stock updated',
+        message: 'Order cancelled successfully. Stock updated and amount credited to wallet (if applicable).',
         order,
-        wallet,
       });
     } catch (error) {
       console.error('Cancel order error:', error);
@@ -187,13 +205,13 @@ const orderlist = async (req, res) => {
                 return res.status(400).json({ success: false, message: 'Invalid or inactive coupon.' });
             }
 
-            // Check if the user has already used the coupon
+           
             const user = await User.findById(userId);
             if (user.couponUsed.includes(coupon._id)) {
                 return res.status(400).json({ success: false, message: 'You have already used this coupon.' });
             }
 
-            // Calculate the discount
+          
             if (coupon.offerType === 'Percentage') {
                 discount = (coupon.offerValue / 100) * totalAmount;
             } else if (coupon.offerType === 'flat') {
@@ -201,11 +219,11 @@ const orderlist = async (req, res) => {
             }
             totalAmount = Math.max(totalAmount - discount, 0);
 
-            // Update coupon usage
+          
             coupon.couponUsed += 1;
             await coupon.save();
 
-            // Update user's coupon usage
+            
             user.couponUsed.push(coupon._id);
             await user.save();
         }
@@ -281,45 +299,45 @@ const orderlist = async (req, res) => {
     try {
         console.log("Processing return request for order");
 
-        // Extract orderId, reason, and description from the request body
+        
         const { orderId, reason, description } = req.body;
 
         console.log("Request Data:", req.body);
 
-        // Validate required fields
+        
         if (!orderId || !reason || !description) {
             return res.status(400).json({ message: 'Order ID, reason, and description are required.' });
         }
 
-        // Find the order by its ID
+        
         const order = await Order.findById(orderId);
 
         if (!order) {
             return res.status(404).json({ message: 'Order not found.' });
         }
 
-        // Check if the order status allows a return
+        
         if (order.orderStatus !== 'Delivered') {
             return res.status(400).json({ message: 'Return is only allowed for delivered orders.' });
         }
 
-        // Update the return details
+        
         order.returnDetails = {
             reason,
             description,
             requestedAt: new Date(),
-            status: 'Pending', // Set the return status to "Pending"
+            status: 'Pending', 
         };
 
-        // Update the order status to "Return Pending"
+        
         order.orderStatus = 'Return Pending';
 
-        // Save the updated order to the database
+     
         const updatedOrder = await order.save();
 
         console.log("Return request processed successfully:", updatedOrder);
 
-        // Return a success response with updated order details
+       
         return res.status(200).json({
             message: 'Return request submitted successfully.',
             data: updatedOrder,

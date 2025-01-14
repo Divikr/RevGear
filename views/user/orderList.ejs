@@ -49,7 +49,7 @@
                     </li>
                    
                     <li class="sidebar-item">
-                        <a href="#" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
+                        <a href="/wallet" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
                             <i class="fas fa-wallet text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
                             <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Wallet</span>
                         </a>
@@ -101,10 +101,22 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="flex justify-between items-center py-4 px-4">
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">Previous</button>
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">Next</button>
-                    </div>
+            
+<div class="flex justify-center gap-3 items-center my-6">
+    <% if (page > 1) { %>
+        <a href="/orderlist?page=<%= page - 1 %>" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg">Previous</a>
+    <% } else { %>
+        <button class="bg-gray-300 text-white font-medium py-2 px-4 rounded-lg cursor-not-allowed" disabled>Previous</button>
+    <% } %>
+
+    <span class="text-lg font-medium">Page <%= page %> of <%= totalPages %></span>
+
+    <% if (page < totalPages) { %>
+        <a href="/orderlist?page=<%= page + 1 %>" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg">Next</a>
+    <% } else { %>
+        <button class="bg-gray-300 text-white font-medium py-2 px-4 rounded-lg cursor-not-allowed" disabled>Next</button>
+    <% } %>
+</div>
                 </section>
             </div>
         </div>

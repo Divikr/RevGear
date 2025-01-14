@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Transaction Schema for each transaction in the wallet
+
 const transactionSchema = new mongoose.Schema({
     amount: {
         type: Number,
@@ -8,7 +8,7 @@ const transactionSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['credit', 'debit'], // 'credit' for adding funds, 'debit' for spending
+        enum: ['credit', 'debit'],
         required: true
     },
     date: {
@@ -18,7 +18,7 @@ const transactionSchema = new mongoose.Schema({
    
 });
 
-// Wallet Schema
+
 const walletSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -27,16 +27,15 @@ const walletSchema = new mongoose.Schema({
     },
     balance: {
         type: Number,
-        default: 0 // Set default balance to 0 when wallet is created
+        default: 0 
     },
-    transactions: [transactionSchema], // Array of transactions
+    transactions: [transactionSchema],
     lastUpdated: {
         type: Date,
         default: Date.now
     }
 });
 
-// Update the lastUpdated field when saving the wallet
 walletSchema.pre('save', function(next) {
     this.lastUpdated = Date.now();
     next();

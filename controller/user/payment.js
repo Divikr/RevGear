@@ -78,17 +78,17 @@ const getWallet =  async (req, res) => {
         const userId = req.session.user;
         console.log("................", userId);
 
-        // Ensure the user is authenticated
+        
         const user = await User.findById(userId);
         if (!userId) {
             return res.status(401).send("User not authenticated");
         }
         console.log("-------->", user.name);
         
-        // Check if wallet exists
+       
         let wallet = await Wallet.findOne({ userId: userId });
 
-        // If wallet doesn't exist, create a new one with a 0 balance
+
         if (!wallet) {
             wallet = new Wallet({
                 userId: userId,
@@ -98,7 +98,7 @@ const getWallet =  async (req, res) => {
             await wallet.save();
         }
 
-        // Render the wallet page with the user's details and wallet information
+   
         res.render("user/wallet", { 
             wallet, 
             userName: user.name
@@ -110,11 +110,102 @@ const getWallet =  async (req, res) => {
     }
 };
 
- 
-  
+const paymentWallet = async (req, res) => {
+    try {
+        console.log('Received request body:', req.body); // Debug log
+
+        const {  amount, orderId } = req.body;
+
+        // Debug log for extracted values
+        console.log('Extracted values:', {  amount, orderId });
+
+        // Detailed validation with specific error messages
+        if (!user) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'User ID is required.' 
+            });
+        }
+
+        if (!amount) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Amount is required.' 
+            });
+        }
+
+        if (!orderId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Order ID is required.' 
+            });
+        }
+
+        // Fetch the user's wallet
+        const wallet = await Wallet.findOne({ userId: user });
+        console.log('Found wallet:', wallet); // Debug log
+
+        if (!wallet) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Wallet not found.' 
+            });
+        }
+
+        // Check if the wallet has enough balance
+        if (wallet.balance < amount) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Insufficient wallet balance.' 
+            });
+        }
+
+        // Deduct the amount from the wallet
+        wallet.balance -= amount;
+        wallet.transactions.push({
+            amount,
+            type: 'debit',
+            orderId, // Optional: store orderId in transaction for reference
+            timestamp: new Date()
+        });
+        await wallet.save();
+
+        // Mark the order as paid
+        const order = await Order.findById(orderId);
+        if (!order) {
+            // Rollback wallet transaction if order not found
+            wallet.balance += amount;
+            wallet.transactions.pop();
+            await wallet.save();
+            
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Order not found.' 
+            });
+        }
+
+        order.paymentStatus = 'Paid';
+        order.paymentMethod = 'Wallet';
+        await order.save();
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Payment successful.', 
+            balance: wallet.balance,
+            orderId: order._id
+        });
+    } catch (error) {
+        console.error('Error processing wallet payment:', error);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'An error occurred while processing the payment.' 
+        });
+    }
+};
 
   module.exports={
     createRazorpayOrder,
-    getWallet
+    getWallet,
+    paymentWallet
     
   }
