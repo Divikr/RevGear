@@ -379,41 +379,25 @@
         });
     } else if (paymentMethod === 'Wallet') {
   
-     // Debug log to check values
-     const orderDetails = {
-         
-        amount: parseFloat(totalAmount), // Ensure amount is a number
-        orderId: orderId 
-    };
-    
-    console.log('Sending order details:', orderDetails); // Debug log
-
-    fetch('/wallet-pay', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            // Add any authentication headers if required
-            // 'Authorization': `Bearer ${token}` 
-        },
-        body: JSON.stringify(orderDetails),
-    })
-    .then(response => {
-        // Debug log for response
-        console.log('Response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Response data:', data); // Debug log
-        if (data.success) {
-            window.location.href = `/orderconfirm/${orderId}`;
-        } else {
-            alert(data.message || 'Failed to process wallet payment.');
-        }
-    })
-    .catch(error => {
-        console.error('Error processing wallet payment:', error);
-        alert('An error occurred while processing the wallet payment.');
-    });
+      fetch('/place-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderDetails), 
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `/orderconfirm/${data.orderId}`;
+            } else {
+                alert(data.message || 'Failed to place order.');
+            }
+        })
+        .catch(error => {
+            console.error('Error placing order:', error);
+            alert('An error occurred while placing the order.');
+        });
 } 
      else {
         alert('Unsupported payment method.');

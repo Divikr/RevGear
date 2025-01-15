@@ -170,6 +170,7 @@ const orderconfirm = async (req, res) => {
     try {
         const { savedaddress, paymentMethod, cart, couponCode } = req.body;
         const userId = req.session.user;
+        console.log("payment",paymentMethod)
 
         console.log("Received order details:", { savedaddress, paymentMethod, cart, couponCode });
 
@@ -226,6 +227,31 @@ const orderconfirm = async (req, res) => {
             
             user.couponUsed.push(coupon._id);
             await user.save();
+        }
+        const validPaymentMethods = ['Wallet', 'Razorpay', 'COD'];
+        if (!validPaymentMethods.includes(paymentMethod)) {
+          return res.status(400).json({ error: "Invalid payment method" });
+        }
+
+
+        if (paymentMethod === "Wallet") {
+          const wallet = await Wallet.findOne({ userId: req.session.user });
+          if (!wallet) {
+            return res.status(404).json({ error: "Wallet not found" });
+          }
+    
+          if (wallet.balance < totalAmount) {
+            return res.status(400).json({ error: "Insufficient wallet balance" });
+          }
+    
+          // Deduct wallet balance
+          wallet.balance -= totalAmount;
+          wallet.transactions.push({
+            amount: totalAmount,
+            type: 'debit',
+            description: 'Order Payment',
+          });
+          await wallet.save();
         }
 
         console.log("Total amount after discount:", totalAmount);

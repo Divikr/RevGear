@@ -95,15 +95,7 @@
                         <textarea id="category-description" placeholder="Type category description here..."><%= cat.description %></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label for="category-offer">Offer</label>
-                        <input 
-                            type="text" 
-                            id="category-offer" 
-                            placeholder="Type category offer here..." 
-                            value="<%= cat.categoryOffer %>" 
-                        >
-                    </div>
+                   
                 </div>
                 <button class="save-category" id="update" onclick="updateCategory()">Update Category</button>
             </div>
@@ -177,13 +169,13 @@
         function updateCategory() {
             const categoryName = document.getElementById('category-name').value;
             const categoryDescription = document.getElementById('category-description').value;
-            const categoryOffer = document.getElementById('category-offer').value;
+           
             const categoryId = '<%= cat._id %>';
 
             const formData = new FormData();
             formData.append('name', categoryName);
             formData.append('description', categoryDescription);
-            formData.append('categoryOffer', categoryOffer);
+            
 
             const imageInput = document.getElementById('image-input');
 if (imageInput.files.length > 0) {

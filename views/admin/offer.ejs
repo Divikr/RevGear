@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Category</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/addCategory.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+ 
+   
+    
+    body {
+        overflow: auto;
+    }
+    
+    .main-content {
+        overflow-y: auto;
+        max-height: 100vh;    }
+    
+    .main-content::-webkit-scrollbar {
+        display: block; 
+    }
+    
+    .sidebar {
+        width: 250px;
+        min-width: 250px;
+    }
+</style>
+</head>
+
+<body class="bg-gray-900">
+    <div class="flex min-h-screen">
+        
+        <div class="sidebar">
+            <div class="admin-profile">
+                <div class="admin-avatar">A</div>
+            </div>
+            <ul class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/product" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="/admin/customer" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/category" class="nav-item">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+                <a href="/admin/orderlists" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/coupon" class="nav-item ">
+                    <i class="fas fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <a href="/admin/salesreport" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="/admin/banners" class="nav-item">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </ul>
+        </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>RevGear</h1>
+                <a href="/admin/dashboard" id="adminlogout">Back</a>
+            </div>
+            <br>
+
+
+            <section class="content-main bg-gray-900 text-white p-6">
+                <div class="content-header flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="content-title text-2xl font-semibold">Offers</h2>
+                        <p class="text-gray-400">Here are the offers.</p>
+                    </div>
+                    <div>
+                        <a class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded" href="/admin/addOffer">Add Offer</a>
+                    </div>
+                </div>
+            
+                <div class="card bg-gray-800 shadow-lg rounded-lg">
+                    <div class="card-body p-6">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table class="table-auto w-full text-left border-separate border-spacing-y-2">
+                                        <% if (offers.length > 0) { %>
+                                            <thead>
+                                                <tr class="bg-gray-700 text-gray-200">
+                                                    <th class="px-4 py-2">S no</th>
+                                                    <th class="px-4 py-2">Offer Name</th>
+                                                    <th class="px-4 py-2">Discount</th>
+                                                    <th class="px-4 py-2">Start Date</th>
+                                                    <th class="px-4 py-2">End Date</th>
+                                                    <th class="px-4 py-2">Offer Type</th>
+                                                    <th class="px-4 py-2">Product Name</th>
+                                                    <th class="px-4 py-2">Category Name</th> <!-- Add this column -->
+                                                  
+                                                    <th class="px-4 py-2">Remove</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% offers.forEach((offer, i) => { %>
+                                                    <tr class="bg-gray-800 hover:bg-gray-700">
+                                                        <td class="px-4 py-2"><%= i + 1 %></td>
+                                                        <td class="px-4 py-2"><%= offer.offerName %></td>
+                                                        <td class="px-4 py-2"><%= offer.discount %></td>
+                                                        <td class="px-4 py-2"><%= offer.formattedStartDate %></td>
+                                                        <td class="px-4 py-2"><%= offer.formattedEndDate %></td>
+                                                        <td class="px-4 py-2"><%= offer.offerType %></td>
+                                                        <td class="px-4 py-2"><%= offer.productNames || 'N/A' %></td>
+                                                        <td class="px-4 py-2"><%= offer.categoryNames || 'N/A' %></td> <!-- Display category names -->
+                                                        <td>
+                                                            <a href="" id="deletebtn" value="<%= offer._id %>"
+                                                                class="btn btn-danger btn-sm deletebtn badge rounded-pill text-decoration-none ms-2">Delete</a>
+                                                            <input type="hidden" id="offerId" name="" value=" <%= offer._id %>">
+                                                        </td>
+                                                    </tr>
+                                                <% }) %>
+                                            </tbody>
+                                        <% } else { %>
+                                            <tr class="text-center text-gray-400">
+                                                <td colspan="8" class="px-4 py-6">No offers to display</td>
+                                            </tr>
+                                        <% } %>
+                                    </table>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+               
+            </section>
+            
+
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+            
+            <script>
+               document.addEventListener('DOMContentLoaded', function () {
+const deleteButtons = document.querySelectorAll('.deletebtn');
+
+deleteButtons.forEach(deleteButton => {
+deleteButton.addEventListener('click', function (event) {
+    event.preventDefault(); // Prevent default form submission behavior
+
+    const offerId = this.getAttribute('value');
+
+    
+
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios.post('/admin/deleteoffer', { offerId })
+                .then(res => {
+                    if (res.data.success) {
+                        Swal.fire({
+                            title: "Deleted!",
+                            text: "The Offer has been deleted.",
+                            icon: "success"
+                        }).then(() => {
+                            window.location.href = '/admin/offer';
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Something went wrong.",
+                            icon: "error"
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.log('error in delete offer', err);
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Something went wrong.",
+                        icon: "error"
+                    });
+                });
+        }
+    });
+});
+});
+});
+            
+            </script>
+
+
+        </body>
+        </html>

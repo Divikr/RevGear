@@ -79,9 +79,9 @@ const addCategory = (req, res) => {
 
 
 const addCategorys = async (req, res) => {
-  const { name, description, categoryOffer } = req.body;
+  const { name, description} = req.body;
 
-console.log(",{name,description,categoryOffer}............",{name,description,categoryOffer})
+console.log(",{name,description}............",{name,description})
 
   try {
    
@@ -92,7 +92,6 @@ console.log(",{name,description,categoryOffer}............",{name,description,ca
     const newCategory = new Category({
       name,
       description,
-      categoryOffer,
       Image: Images 
     });
 
@@ -167,7 +166,7 @@ const editCategory = async (req, res) => {
 const editsCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, categoryOffer } = req.body;
+    const { name, description } = req.body;
 
     const category = await Category.findById(id);
     if (!category) {
@@ -176,7 +175,7 @@ const editsCategory = async (req, res) => {
 
     category.name = name || category.name;
     category.description = description || category.description;
-    category.categoryOffer = categoryOffer || category.categoryOffer;
+   
 
     console.log('file image updated =====> ', req.file)
 

@@ -122,10 +122,7 @@
                     <label for="category-description">Description</label>
                     <textarea id="category-description" placeholder="Type category description here..."></textarea>
                   </div>
-                  <div class="form-group">
-                    <label for="category-offer">Offer</label>
-                    <input type="text" id="category-offer" placeholder="Type category offer here...">
-                  </div>
+                  
                 </div>
                 <button class="save-category" onclick="openModal()">Save Category</button>
 
@@ -148,7 +145,7 @@
 
         const categoryName = document.getElementById('category-name').value.trim();
         const categoryDescription = document.getElementById('category-description').value.trim();
-        const categoryOffer = document.getElementById('category-offer').value.trim();
+       
         const imagePreviewContainer = document.getElementById('image-preview-container');
 
     
@@ -168,13 +165,7 @@
             return;
         }
 
-        if (!categoryOffer) {
-            Swal.fire('Validation Error', 'Category Offer is required.', 'error');
-            return;
-        } else if (isNaN(categoryOffer) || categoryOffer < 0 || categoryOffer > 100) {
-            Swal.fire('Validation Error', 'Category Offer must be a number between 0 and 100.', 'error');
-            return;
-        }
+       
 
         if (!imagePreviewContainer.querySelector('.cropped-image')) {
             Swal.fire('Validation Error', 'Category Image is required.', 'error');
@@ -185,7 +176,7 @@
         const formData = new FormData();
         formData.append('name', categoryName);
         formData.append('description', categoryDescription);
-        formData.append('offer', categoryOffer);
+        
 
         const imageElement = imagePreviewContainer.querySelector('.cropped-image');
         if (imageElement) {
@@ -205,7 +196,7 @@
                 Swal.fire('Success', 'Category saved successfully!', 'success');
                 document.getElementById('category-name').value = '';
                 document.getElementById('category-description').value = '';
-                document.getElementById('category-offer').value = '';
+                
                 imagePreviewContainer.innerHTML = '';
             } else {
                 Swal.fire('Error', data.message || 'Error saving category.', 'error');

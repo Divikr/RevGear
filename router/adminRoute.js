@@ -5,6 +5,7 @@ const customerController = require("../controller/admin/customer")
 const categoryController = require("../controller/admin/category")
 const productController = require('../controller/admin/product')
 const couponController = require('../controller/admin/coupon')
+const offerController = require('../controller/admin/offer')
 const salesController = require('../controller/admin/salesController')
 const auth = require("../middleware/adminAuth")
 const multer = require('multer')
@@ -76,5 +77,16 @@ router.get('/salesWeekly',salesController.generateWeeklyReport)
 router.get('/salesMonthly',salesController.generateMonthlyReport)
 router.get('/salesYearly',salesController.generateYearlyReport)
 router.get('/customDateReport',salesController.generateCustomDateReport)
+
+
+//offer manegment
+
+router.get('/offer',offerController.offerPage)
+router.get('/addoffer',offerController.loadAddOffer)
+router.post('/addoffer',offerController.addOffer)
+router.post('/deleteoffer',offerController.deleteOffer)
+
+
+
 
 module.exports = router
