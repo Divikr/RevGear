@@ -6,6 +6,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="/admin/dashboard.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<style>
+
+
+</style>
 </head>
 <body>
     <div class="dashboard">
@@ -47,8 +52,8 @@
                     <span>Sales</span>
                 </a>
                 <a href="/admin/offer" class="nav-item">
-                    <i class="fas fa-image"></i>
-                    <span>Banners</span>
+                    <i class="fas fa-gift"></i>
+                    <span>Offer</span>
                 </a>
             </ul>
         </div>
@@ -59,55 +64,76 @@
                 <a href="/admin/adminlogout" id="adminlogout">Log Out</a>
             </div>
 
-            <div class="price-cards">
-                <div class="price-card">
-                    <h3>$12.34</h3>
-                    <p>+4.5%</p>
+            <div class="flex flex-wrap justify-between gap-6 mt-10 px-4 md:px-10 mb-8">
+                <!-- Total Revenue Card -->
+                <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white p-6 rounded-xl shadow-xl flex-1 text-center transition-transform duration-300 transform hover:scale-105 mb-6 md:mb-0">
+                    <h3 class="text-3xl font-semibold"><%= totalRevenue.toFixed(2) %></h3>
+                    <p class="text-lg mt-2 opacity-80">Total Revenue</p>
                 </div>
-                <div class="price-card">
-                    <h3>$17.34</h3>
-                    <p>+2.8%</p>
+            
+                <!-- Total Orders Card -->
+                <div class="bg-gradient-to-r from-green-500 to-green-700 text-white p-6 rounded-xl shadow-xl flex-1 text-center transition-transform duration-300 transform hover:scale-105 mb-6 md:mb-0">
+                    <h3 class="text-3xl font-semibold"><%= totalOrders %></h3>
+                    <p class="text-lg mt-2 opacity-80">Total Orders</p>
                 </div>
-                <div class="price-card">
-                    <h3>$12.34</h3>
-                    <p style="color: #f44336;">-1.4%</p>
+            
+                <!-- Number of Coupons Card -->
+                <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-6 rounded-xl shadow-xl flex-1 text-center transition-transform duration-300 transform hover:scale-105 mb-6 md:mb-0">
+                    <h3 class="text-3xl font-semibold"><%= totalCoupons %></h3>
+                    <p class="text-lg mt-2 opacity-80">Number of Coupons</p>
                 </div>
-                <div class="price-card">
-                    <h3>$23.45</h3>
-                    <p>+3.2%</p>
+            
+                <!-- Number of Offers Card -->
+                <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-xl shadow-xl flex-1 text-center transition-transform duration-300 transform hover:scale-105 mb-6 md:mb-0">
+                    <h3 class="text-3xl font-semibold"><%= totalOffers %></h3>
+                    <p class="text-lg mt-2 opacity-80">Number of Offers</p>
                 </div>
             </div>
-
-            <div class="dashboard-grid">
-                <div class="chart-container">
-                    <h3 class="chart-title">Transaction History</h3>
-                    <div class="donut-container">
-                        <canvas id="donutChart"></canvas>
+            
+            
+            
+            <div class="flex flex-wrap gap-8 justify-center bg-gray-900 min-h-screen py-8">
+                <!-- Payment Method Distribution Card -->
+                <div class="flex-1 min-w-[50px] max-w-[20%] bg-gradient-to-r from-blue-700 to-indigo-800 p-8 rounded-xl shadow-2xl transform transition duration-300 ease-in-out hover:scale-105">
+                    <h3 class="text-3xl font-semibold text-white mb-6 text-center">Payment Method Distribution</h3>
+                    <div class="w-full">
+                        <canvas id="paymentMethodChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <h3 class="chart-title">Bar Chart</h3>
-                    <canvas id="barChart"></canvas>
+                
+                <!-- Bar Chart Card -->
+                <div class="flex-1 min-w-[200px] max-w-[40%] bg-gradient-to-r from-purple-700 to-pink-800 p-8 rounded-xl shadow-2xl transform transition duration-300 ease-in-out hover:scale-105">
+                    <h3 class="text-3xl font-semibold text-white mb-6 text-center">Line Graph</h3>
+                    <div class="w-full">
+                        <canvas id="lineGraph"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <div class="stats-container">
-                <div class="stat-card">
-                    <h3>Revenue</h3>
-                    <p style="font-size: 1.5rem;">$32,123</p>
-                    <p style="color: #66bb6a">+4.2%</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Sales</h3>
-                    <p style="font-size: 1.5rem;">$45,850</p>
-                    <p style="color: #66bb6a">+2.8%</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Purchase</h3>
-                    <p style="font-size: 1.5rem;">$2,039</p>
-                    <p style="color: #f44336">-1.2%</p>
-                </div>
-            </div>
+          <div class="flex flex-wrap justify-between gap-6 mt-10 px-4 md:px-10 mb-8">
+    <!-- Delivered Orders Card -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-xl shadow-xl flex-1 text-center mb-6 md:mb-0 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+        <h3 class="text-3xl font-semibold tracking-tight">Orders Delivered</h3>
+        <p class="text-4xl font-extrabold mt-3 opacity-90"><%= deliveredOrders %></p>
+       
+    </div>
+
+    <!-- Canceled Orders Card -->
+    <div class="bg-gradient-to-r from-red-600 to-red-800 text-white p-6 rounded-xl shadow-xl flex-1 text-center mb-6 md:mb-0 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+        <h3 class="text-3xl font-semibold tracking-tight">Orders Canceled</h3>
+        <p class="text-4xl font-extrabold mt-3 opacity-90"><%= canceledOrders %></p>
+       
+    </div>
+
+    <!-- Returned Orders Card -->
+    <div class="bg-gradient-to-r from-green-600 to-green-800 text-white p-6 rounded-xl shadow-xl flex-1 text-center mb-6 md:mb-0 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+        <h3 class="text-3xl font-semibold tracking-tight">Orders Returned</h3>
+        <p class="text-4xl font-extrabold mt-3 opacity-90"><%= returnedOrders %></p>
+      
+    </div>
+</div>
+            
+            
 
             <div class="orders-table">
                 <h2>Order Status</h2>
@@ -150,79 +176,134 @@
     </div>
 
     <script>
+const paymentMethodData = <%- JSON.stringify(paymentMethodData) %>;
 
-        const donutCtx = document.getElementById('donutChart').getContext('2d');
-        new Chart(donutCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Online Payment', 'Cash on Delivery'],
-                datasets: [{
-                    data: [4000, 3000],
-                    backgroundColor: ['#66bb6a', '#ffd700'],
-                    borderWidth: 0
-                }]
+// Extract labels and data for the chart
+const labels = paymentMethodData.map(data => data.method);
+const dataCounts = paymentMethodData.map(data => data.count);
+
+// Create a donut chart using Chart.js
+const ctx = document.getElementById('paymentMethodChart').getContext('2d');
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: labels,
+        datasets: [{
+            data: dataCounts,
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+            hoverOffset: 6, // More distinct hover effect
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    font: {
+                        size: 12, // More readable legend
+                        weight: 'bold'
+                    }
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                cutout: '70%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#fff',
-                            padding: 10,
-                            font: {
-                                size: 11
-                            }
-                        }
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        return `${context.label}: ${context.raw} votes`;
                     }
                 }
             }
-        });
+        },
+        animation: {
+            animateScale: true,
+            animateRotate: true,
+        }
+    }
+});
 
-     
-        const barCtx = document.getElementById('barChart').getContext('2d');
-        new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: ['2017', '2018', '2019', '2020', '2021', '2022'],
-                datasets: [{
-                    label: 'Revenue',
-                    data: [15, 20, 8, 10, 12, 8],
-                    backgroundColor: '#66bb6a',
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#2a2f3a'
-                        },
-                        ticks: {
-                            color: '#fff'
-                        }
+let chartInstance;
+
+// Set up the chart for the first time
+const setupChart = (labels, dataPoints) => {
+    const lineCtx = document.getElementById('lineGraph').getContext('2d');
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+    chartInstance = new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: labels,  // X-axis labels
+            datasets: [{
+                label: 'Revenue',  // Dataset label
+                data: dataPoints,  // Y-axis data points
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',  // Fill color under the line
+                borderColor: '#007bff',  // Line color
+                borderWidth: 2,  // Line thickness
+                tension: 0.4  // Smoothness of the line
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#2a2f3a'
                     },
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: '#fff'
+                    ticks: {
+                        color: '#fff'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#fff'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: 'bold'
                         }
                     }
                 },
-                plugins: {
-                    legend: {
-                        display: false
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.label}: ${context.raw} units`;  // Customize tooltip
+                        }
                     }
                 }
             }
-        });
+        }
+    });
+};
+
+// Handle time range selection
+const updateChartData = (labels, dataPoints) => {
+    setupChart(labels, dataPoints);
+};
+
+// Event listener for time range buttons
+document.querySelectorAll('.btn-time-range').forEach(button => {
+    button.addEventListener('click', () => {
+        const range = button.getAttribute('data-range');
+        const data = chartData[range];
+        updateChartData(data.labels, data.dataPoints);
+    });
+});
+
+// Initialize chart with default data (Day-wise)
+updateChartData(chartData.day.labels, chartData.day.dataPoints);
+
+
         document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.getElementById('sidebarToggle');
@@ -251,6 +332,25 @@
                 }, 1500);
             }, 5000);
         });
+
+
+
+        async function loadDashboardStats() {
+        try {
+            const response = await fetch('/dashboard-stats');
+            const stats = await response.json();
+
+            document.getElementById('total-revenue').textContent = `$${stats.totalRevenue.toFixed(2)}`;
+            document.getElementById('total-orders').textContent = stats.totalOrders;
+            document.getElementById('total-coupons').textContent = stats.totalCoupons;
+            document.getElementById('total-offers').textContent = stats.totalOffers;
+        } catch (err) {
+            console.error('Failed to load dashboard stats:', err);
+        }
+    }
+
+    // Load stats on page load
+    document.addEventListener('DOMContentLoaded', loadDashboardStats);
     </script>
 </body>
 </html>

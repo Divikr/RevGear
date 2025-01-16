@@ -107,8 +107,9 @@ route.post('/update', productController.updateCart);
 route.post('/wishlist/add', productController.addToWishlist);
 route.get('/wishlist', productController.getwishlist);
 
+//invoice download
 
-
+route.get('/invoice/:orderId', orderController.downloadInvoice);
 
 //order manegment
 

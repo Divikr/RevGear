@@ -259,9 +259,9 @@
                     <i class="fas fa-chart-line"></i>
                     <span>Sales</span>
                 </a>
-                <a href="/admin/banners" class="nav-item">
-                    <i class="fas fa-image"></i>
-                    <span>Banners</span>
+                <a href="/admin/offer" class="nav-item">
+                    <i class="fas fa-gift"></i>
+                    <span>Offer</span>
                 </a>
             </ul>
         </div>
@@ -282,23 +282,22 @@
             </div>
         </div>
             
-
+<% if (!['Cancelled', 'Return Success'].includes(orderDetails.orderStatus)) { %>
     <div class="modal fade" id="orderStatusModal" tabindex="-1" aria-labelledby="orderStatusModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                
                 <div class="modal-body">
                     <select id="orderStatusSelect" class="form-select custom-select">
-                        <option value="Ordered">Ordered</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Out For Delivery">Out For Delivery</option>
-                        <option value="Delivered">Delivered</option>
-                    
+                        <option value="Ordered" <%= orderDetails.orderStatus === 'Ordered' ? 'selected' : '' %>>Ordered</option>
+                        <option value="Shipped" <%= orderDetails.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                        <option value="Out For Delivery" <%= orderDetails.orderStatus === 'Out For Delivery' ? 'selected' : '' %>>Out For Delivery</option>
+                        <option value="Delivered" <%= orderDetails.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                     </select>
                 </div>
             </div>
         </div>
     </div>
+<% } %>
        
 <br>
         <div class="order-details-container">

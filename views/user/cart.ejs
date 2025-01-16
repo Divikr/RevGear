@@ -129,7 +129,7 @@
                     <a href="/" class="w-full sm:w-auto px-6 py-3 text-center text-sm text-gray-600 hover:text-gray-800 uppercase tracking-wide transition-colors border border-gray-300 hover:border-gray-400">
                         Continue Shopping
                     </a>
-                    <a href="/checkout" class="w-full sm:w-auto px-6 py-3 text-center bg-black text-white hover:bg-gray-800 text-sm uppercase tracking-wide transition-colors">
+                    <a href="#"  id="checkoutButton" class="w-full sm:w-auto px-6 py-3 text-center bg-black text-white hover:bg-gray-800 text-sm uppercase tracking-wide transition-colors">
                         Proceed to Checkout
                     </a>
                 </div>
@@ -282,6 +282,68 @@ function updateQuantity(button, change) {
     input.value = value;
     input.dispatchEvent(new Event('change'));
 }
+
+
+document.getElementById('checkoutButton').addEventListener('click', async function(event) {
+  event.preventDefault(); // Prevent the default anchor behavior
+  
+  // Get the cart items and check the quantities
+  const cartItems = [/* Cart items data, populate with actual data from your frontend */];
+
+  const invalidItems = cartItems.filter(item => {
+    return item.quantity > item.productId.quantity; // Compare cart quantity with product quantity
+  });
+
+  if (invalidItems.length > 0) {
+    // SweetAlert for validation error
+    Swal.fire({
+      icon: 'error',
+      title: 'Quantity Error',
+      text: 'Some items in your cart have quantities greater than available stock. Please adjust them.',
+    });
+    return;
+  }
+
+  // Send the fetch request to proceed to checkout
+  try {
+    const response = await fetch('/checkout', {
+      method: 'GET', // Or 'POST' if required
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      // SweetAlert for success
+      Swal.fire({
+        icon: 'success',
+        title: 'Go to Checkout',
+        text: '',
+      }).then(() => {
+        window.location.href = '/checkout'; // Redirect to checkout page after the alert
+      });
+    } else {
+      // SweetAlert for failure
+      Swal.fire({
+        icon: 'error',
+        title: 'Checkout Failed',
+        text: 'Currently Stock is not Available',
+      });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    // SweetAlert for network error
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'An error occurred while proceeding to checkout.',
+    });
+  }
+});
+
+
+
+
  </script>
  
 </body>

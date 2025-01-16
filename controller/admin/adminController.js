@@ -2,6 +2,8 @@ const User=require("../../model/users")
 const mongoose=require("mongoose")
 const Order=require("../../model/Order")
 const Wallet=require("../../model/wallet")
+const Coupon=require("../../model/coupon")
+const Offer=require("../../model/offer")
 const bcrypt=require("bcrypt")
 
 
@@ -64,12 +66,90 @@ const adminlogin = async (req, res) => {
     }
 };
 
-//get dashboard
+
+const getGraphData = async (range) => {
+    const dateNow = new Date();
+    let match = {};
+
+    // Define time ranges for filtering orders
+    if (range === 'day') {
+        match.orderDate = { $gte: new Date(dateNow.setHours(0, 0, 0, 0)) };  // Start of the current day
+    } else if (range === 'week') {
+        const startOfWeek = dateNow.setDate(dateNow.getDate() - dateNow.getDay());
+        match.orderDate = { $gte: new Date(startOfWeek) };  // Start of the current week
+    } else if (range === 'month') {
+        match.orderDate = { $gte: new Date(dateNow.getFullYear(), dateNow.getMonth(), 1) };  // Start of the current month
+    } else if (range === 'year') {
+        match.orderDate = { $gte: new Date(dateNow.getFullYear(), 0, 1) };  // Start of the current year
+    }
+
+    // Aggregate total revenue by date
+    const orders = await Order.aggregate([
+        { $match: match },
+        {
+            $group: {
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
+                totalRevenue: { $sum: "$totalAmount" }
+            }
+        },
+        { $sort: { "_id": 1 } }
+    ]);
+
+    const labels = orders.map(order => order._id);
+    const dataPoints = orders.map(order => order.totalRevenue);
+
+    return { labels, dataPoints };
+};
+
 
 const dashboard = async (req, res) => {
     try {
-        res.render("dashBoard", {
-            admin: req.session.admin, 
+        // Get the time range from the query parameter, default to 'day'
+        const range = req.query.range || 'day';
+
+        // Fetch data for all time ranges (Day, Week, Month, Year)
+        const dayData = await getGraphData('day');
+        const weekData = await getGraphData('week');
+        const monthData = await getGraphData('month');
+        const yearData = await getGraphData('year');
+
+        // Fetch other dashboard data like total revenue, orders, coupons, etc.
+        const totalRevenue = await Order.aggregate([
+            { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+        ]);
+
+        const totalOrders = await Order.countDocuments();
+        const totalCoupons = await Coupon.countDocuments({ isdelete: false });
+        const totalOffers = await Offer.countDocuments();
+        const deliveredOrders = await Order.countDocuments({ orderStatus: 'Delivered' });
+        const canceledOrders = await Order.countDocuments({ orderStatus: 'Cancelled' });
+        const returnedOrders = await Order.countDocuments({ 'returnDetails.status': 'Completed' });
+
+        // Aggregate payment methods data
+        const paymentMethodStats = await Order.aggregate([
+            {
+                $group: {
+                    _id: "$paymentMethod",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+        const paymentMethodData = paymentMethodStats.map(method => ({
+            method: method._id,
+            count: method.count
+        }));
+
+        // Render the dashboard with all data, including chart data for each range
+        res.render("dashboard", {
+            totalRevenue: totalRevenue[0]?.total || 0,
+            totalOrders,
+            totalCoupons,
+            totalOffers,
+            paymentMethodData,
+            deliveredOrders,
+            canceledOrders,
+            returnedOrders,
+         
         });
     } catch (error) {
         console.error("Error rendering dashboard:", error);

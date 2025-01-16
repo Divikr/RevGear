@@ -72,22 +72,22 @@ const createRazorpayOrder = async (req, res) => {
 };
 
   
-  
-const getWallet =  async (req, res) => {
+const getWallet = async (req, res) => {
     try {
         const userId = req.session.user;
         console.log("................", userId);
 
-        
-        const user = await User.findById(userId);
         if (!userId) {
             return res.status(401).send("User not authenticated");
         }
-        console.log("-------->", user.name);
-        
-       
-        let wallet = await Wallet.findOne({ userId: userId });
 
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+        console.log("-------->", user.name);
+
+        let wallet = await Wallet.findOne({ userId: userId });
 
         if (!wallet) {
             wallet = new Wallet({
@@ -98,17 +98,20 @@ const getWallet =  async (req, res) => {
             await wallet.save();
         }
 
-   
+        // Sort transactions by date in descending order (latest first)
+        wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
         res.render("user/wallet", { 
             wallet, 
             userName: user.name
         });
-        
+
     } catch (error) {
         console.error("Error fetching wallet details:", error);
         res.status(500).send("Internal Server Error");
     }
 };
+
 
 
   module.exports={

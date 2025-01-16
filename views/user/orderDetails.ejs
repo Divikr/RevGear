@@ -172,7 +172,18 @@
                             <span class="text-gray-900">Payment Method:</span>
                             <span class="text-blue-400 text-m"> <%= order.paymentMethod %></span>
                         </div>
+                       
                     </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <% if (order.orderStatus === 'Delivered') { %>
+                            <a href="/invoice/<%= order._id %>" 
+                               class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow hover:bg-blue-700 transition duration-200">
+                                Download Invoice
+                            </a>
+                        <% } %>
+                    </div>
+
                     <% if (!['Shipped', 'Out For Delivery', 'Delivered','Cancelled','Return Pending','Return Success'].includes(order.orderStatus)) { %>
                         <button  onclick="showCancelModal()" class="mt-6 w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
 

@@ -9,6 +9,7 @@ const Order = require('../../model/Order');
 const Coupon = require('../../model/coupon');
 const mongoose = require("mongoose"); 
 const path = require("path");
+const PDFDocument = require('pdfkit');
 
 const orderconfirm = async (req, res) => {
     try {
@@ -295,28 +296,33 @@ const orderconfirm = async (req, res) => {
 
 
 
-
-   const getCheckout = async (req, res) => {
-    try {
-      const user = req.session.user; 
-      const userId = user._id; 
-      if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return res.status(400).send('Invalid User ID');
-      }
-  
-  
-      const cart = await Cart.findOne({ userId }).populate('items.productId'); 
-  
-      const savedAddresses = await Address.find({ userId });
-  
-      const total = cart.items.reduce((sum, item) => sum + item.productId.salePrice * item.quantity, 0);
-  
-      res.render('user/checkout', { cart: cart.items, savedAddresses, total });
-    } catch (error) {
-      console.error('Error in checkout:', error.message);
-      res.status(500).send('Server error');
+const getCheckout = async (req, res) => {
+  try {
+    const user = req.session.user; 
+    const userId = user._id; 
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).send('Invalid User ID');
     }
-  };
+
+    const cart = await Cart.findOne({ userId }).populate('items.productId'); 
+    const savedAddresses = await Address.find({ userId });
+
+    // Validate if any cart item quantity exceeds product availability
+    for (let item of cart.items) {
+      if (item.quantity > item.productId.quantity) {
+        return res.status(400).send('One or more items exceed available stock.');
+      }
+    }
+
+    const total = cart.items.reduce((sum, item) => sum + item.productId.salePrice * item.quantity, 0);
+
+    res.render('user/checkout', { cart: cart.items, savedAddresses, total });
+  } catch (error) {
+    console.error('Error in checkout:', error.message);
+    res.status(500).send('Server error');
+  }
+};
+
 
 
 
@@ -374,9 +380,249 @@ const orderconfirm = async (req, res) => {
     }
 };
 
+const downloadInvoice = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const order = await Order.findById(orderId)
+      .populate('items.productId', 'productName')
+      .populate('couponApplied')
+      .lean();
 
-   
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
 
+    if (order.orderStatus !== 'Delivered') {
+      return res.status(400).send('Invoice can only be downloaded for delivered orders.');
+    }
+
+    const doc = new PDFDocument({ 
+      margin: 50,
+      size: 'A4',
+      bufferPages: true
+    });
+
+    const pageWidth = doc.page.width;
+    const contentWidth = pageWidth - 100;
+    const leftMargin = 50;
+    const rightMargin = pageWidth - 50;
+    const rightColumnStart = pageWidth / 2 + 20;
+
+    const fileName = `revgear-invoice-${orderId}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    doc.pipe(res);
+
+    const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shippingAmount = 100;
+    let discountAmount = 0;
+    let discountText = "No Coupon Applied";
+    
+    if (order.couponApplied) {
+      if (order.couponApplied.offerType === 'percentage') {
+        discountAmount = (order.couponApplied.offerValue / 100) * subtotal;
+        discountText = `${order.couponApplied.offerValue}% Off (${order.couponApplied.couponCode})`;
+      } else {
+        discountAmount = order.couponApplied.offerValue;
+        discountText = `₹${discountAmount} Off (${order.couponApplied.couponCode})`;
+      }
+    }
+
+    // Header Section
+    doc
+      .rect(0, 0, pageWidth, 160)
+      .fill('#1a237e');
+
+    doc
+      .fontSize(32)
+      .font('Helvetica-Bold')
+      .fillColor('#ffffff')
+      .text('REVGEAR', leftMargin, 50)
+      .fontSize(13)
+      .font('Helvetica')
+      .text('Your Ultimate Gear Destination', leftMargin, 90)
+      .text('www.revgear.com | support@revgear.com', leftMargin, 110);
+
+    doc
+      .rect(rightMargin - 190, 40, 170, 100)
+      .fill('#303f9f');
+
+    doc
+      .fillColor('#ffffff')
+      .fontSize(16)
+      .font('Helvetica-Bold')
+      .text('INVOICE', rightMargin - 170, 55)
+      .fontSize(11)
+      .font('Helvetica')
+      .text(`Invoice No: ${orderId}`, rightMargin - 170, 100)
+      .text(`Date: ${new Date(order.orderDate).toLocaleDateString()}`, rightMargin - 170, 150);
+
+    // Address Section
+    doc.y = 190;
+    const addressY = doc.y;
+
+    doc
+      .fillColor('#000000')
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('BILL TO', leftMargin, addressY)
+      .moveDown(0.5)
+      .fontSize(11)
+      .font('Helvetica');
+
+    const billingDetails = [
+      order.deliveryAddress.name,
+      order.deliveryAddress.phone,
+      order.deliveryAddress.streetAddress,
+      order.deliveryAddress.apartment && `Apt: ${order.deliveryAddress.apartment}`,
+      order.deliveryAddress.landMark && `Landmark: ${order.deliveryAddress.landMark}`,
+      `${order.deliveryAddress.city}${order.deliveryAddress.postalCode ? ` - ${order.deliveryAddress.postalCode}` : ''}`,
+      `Address Type: ${order.deliveryAddress.addressType || 'Not specified'}`
+    ].filter(Boolean);
+
+    billingDetails.forEach(detail => {
+      doc.text(detail, leftMargin, doc.y + 3);
+      doc.moveDown(0.5);
+    });
+
+    doc
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('SHIP TO', rightColumnStart, addressY)
+      .moveDown(0.5)
+      .fontSize(11)
+      .font('Helvetica');
+
+    const shippingDetails = [
+      order.deliveryAddress.name,
+      order.deliveryAddress.streetAddress,
+      order.deliveryAddress.apartment && `Apt: ${order.deliveryAddress.apartment}`,
+      order.deliveryAddress.landMark && `Landmark: ${order.deliveryAddress.landMark}`,
+      `${order.deliveryAddress.city}${order.deliveryAddress.postalCode ? ` - ${order.deliveryAddress.postalCode}` : ''}`,
+      `Phone: ${order.deliveryAddress.phone}`
+    ].filter(Boolean);
+
+    shippingDetails.forEach(detail => {
+      doc.text(detail, rightColumnStart, doc.y + 3);
+      doc.moveDown(0.5);
+    });
+
+    // Items Section - Added more spacing here
+    doc.y += 50; // Increased from 20 to 50 for more space
+    const itemStart = doc.y;
+    
+    // Add a section title for items
+    doc
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('ORDER DETAILS', leftMargin, itemStart - 30); // Added section title
+    
+    const columnPositions = {
+      item: leftMargin + 10,
+      qty: pageWidth - 260,
+      price: pageWidth - 180,
+      total: pageWidth - 100
+    };
+
+    // Table header
+    doc
+      .rect(leftMargin, itemStart - 10, contentWidth, 30)
+      .fill('#f5f5f5');
+
+    doc
+      .fillColor('#000000')
+      .fontSize(11)
+      .font('Helvetica-Bold')
+      .text('ITEM', columnPositions.item, itemStart)
+      .text('QTY', columnPositions.qty, itemStart, { width: 50, align: 'right' })
+      .text('PRICE', columnPositions.price, itemStart, { width: 70, align: 'right' })
+      .text('TOTAL', columnPositions.total, itemStart, { width: 80, align: 'right' });
+
+    let currentY = itemStart + 40;
+    order.items.forEach((item, index) => {
+      if (index % 2 === 0) {
+        doc
+          .rect(leftMargin, currentY - 10, contentWidth, 30)
+          .fill('#fafafa');
+      }
+
+      doc
+        .fillColor('#000000')
+        .fontSize(10)
+        .font('Helvetica')
+        .text(item.productId.productName, columnPositions.item, currentY, { width: 250 })
+        .text(item.quantity.toString(), columnPositions.qty, currentY, { width: 50, align: 'right' })
+        .text(`₹${item.price.toFixed(2)}`, columnPositions.price, currentY, { width: 70, align: 'right' })
+        .text(`₹${(item.price * item.quantity).toFixed(2)}`, columnPositions.total, currentY, { width: 80, align: 'right' });
+
+      currentY += 40;
+    });
+
+    // Summary Section
+    currentY += 20;
+    const summaryWidth = 250;
+    const summaryX = rightMargin - summaryWidth;
+
+    doc
+      .rect(summaryX, currentY, summaryWidth, 200)
+      .fill('#f8f9fa');
+
+    const summaryStartY = currentY + 15;
+    const summaryLeftX = summaryX + 20;
+    const summaryRightX = rightMargin - 20;
+
+    doc
+      .fillColor('#000000')
+      .fontSize(11)
+      .font('Helvetica')
+      .text('Subtotal:', summaryLeftX, summaryStartY)
+      .text(`₹${subtotal.toFixed(2)}`, summaryRightX - 80, summaryStartY, { width: 80, align: 'right' })
+      .text('Discount:', summaryLeftX, summaryStartY + 25)
+      .text(`₹${discountAmount.toFixed(2)}`, summaryRightX - 80, summaryStartY + 25, { width: 80, align: 'right' })
+      .fontSize(9)
+      .text(discountText, summaryLeftX, summaryStartY + 45, { width: 210 })
+      .fontSize(11)
+      .text('Shipping:', summaryLeftX, summaryStartY + 70)
+      .text(`₹${shippingAmount.toFixed(2)}`, summaryRightX - 80, summaryStartY + 70, { width: 80, align: 'right' });
+
+    doc
+      .rect(summaryX, summaryStartY + 120, summaryWidth, 65)
+      .fill('#1a237e');
+
+    doc
+      .fillColor('#ffffff')
+      .fontSize(13)
+      .font('Helvetica-Bold')
+      .text('TOTAL AMOUNT:', summaryLeftX, summaryStartY + 140)
+      .fontSize(16)
+      .text(
+        `₹${(subtotal - discountAmount + shippingAmount).toFixed(2)}`,
+        summaryRightX - 100,
+        summaryStartY + 140,
+        { width: 100, align: 'right' }
+      );
+
+    doc
+      .rect(0, doc.page.height - 40, pageWidth, 40)
+      .fill('#f5f5f5');
+
+    doc
+      .fillColor('#666666')
+      .fontSize(9)
+      .font('Helvetica')
+      .text(
+        'RevGear Pvt. Ltd. | support@revgear.com | +91 9876543210',
+        0,
+        doc.page.height - 25,
+        { align: 'center' }
+      );
+
+    doc.end();
+  } catch (error) {
+    console.error('Error generating invoice:', error);
+    res.status(500).send('Unable to generate invoice');
+  }
+};
 
 
    module.exports={
@@ -387,5 +633,6 @@ const orderconfirm = async (req, res) => {
     cancelOrder,
     getCheckout,
     returnOrder,
+    downloadInvoice,
    
    }

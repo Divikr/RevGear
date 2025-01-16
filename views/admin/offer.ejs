@@ -64,13 +64,13 @@
                     <i class="fas fa-tags"></i>
                     <span>Coupons</span>
                 </a>
-                <a href="/admin/salesreport" class="nav-item active">
+                <a href="/admin/salesreport" class="nav-item">
                     <i class="fas fa-chart-line"></i>
                     <span>Sales</span>
                 </a>
-                <a href="/admin/banners" class="nav-item">
-                    <i class="fas fa-image"></i>
-                    <span>Banners</span>
+                <a href="/admin/offer" class="nav-item  active">
+                    <i class="fas fa-gift"></i>
+                    <span>Offer</span>
                 </a>
             </ul>
         </div>
@@ -88,7 +88,7 @@
                 <div class="content-header flex justify-between items-center mb-6">
                     <div>
                         <h2 class="content-title text-2xl font-semibold">Offers</h2>
-                        <p class="text-gray-400">Here are the offers.</p>
+                        
                     </div>
                     <div>
                         <a class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded" href="/admin/addOffer">Add Offer</a>
@@ -100,53 +100,52 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="table-responsive">
-                                    <table class="table-auto w-full text-left border-separate border-spacing-y-2">
+                                    <table class="table-auto w-full text-left border-collapse border border-gray-500">
                                         <% if (offers.length > 0) { %>
                                             <thead>
                                                 <tr class="bg-gray-700 text-gray-200">
-                                                    <th class="px-4 py-2">S no</th>
-                                                    <th class="px-4 py-2">Offer Name</th>
-                                                    <th class="px-4 py-2">Discount</th>
-                                                    <th class="px-4 py-2">Start Date</th>
-                                                    <th class="px-4 py-2">End Date</th>
-                                                    <th class="px-4 py-2">Offer Type</th>
-                                                    <th class="px-4 py-2">Product Name</th>
-                                                    <th class="px-4 py-2">Category Name</th> <!-- Add this column -->
-                                                  
-                                                    <th class="px-4 py-2">Remove</th>
+                                                    <th class="px-4 py-2 border border-gray-500">S no</th>
+                                                    <th class="px-4 py-2 border border-gray-500">Offer Name</th>
+                                                    <th class="px-4 py-2 border border-gray-500">Discount</th>
+                                                    <th class="px-4 py-2 border border-gray-500">Start Date</th>
+                                                    <th class="px-4 py-2 border border-gray-500">End Date</th>
+                                                    <th class="px-4 py-2 border border-gray-500">Offer Type</th>
+                                                    <th class="px-4 py-2 border border-gray-500">Product Name</th>
+                                                    <th class="px-4 py-2 border border-gray-500">Category Name</th>
+                                                    <th class="px-4 py-2 border border-gray-500">Remove</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% offers.forEach((offer, i) => { %>
                                                     <tr class="bg-gray-800 hover:bg-gray-700">
-                                                        <td class="px-4 py-2"><%= i + 1 %></td>
-                                                        <td class="px-4 py-2"><%= offer.offerName %></td>
-                                                        <td class="px-4 py-2"><%= offer.discount %></td>
-                                                        <td class="px-4 py-2"><%= offer.formattedStartDate %></td>
-                                                        <td class="px-4 py-2"><%= offer.formattedEndDate %></td>
-                                                        <td class="px-4 py-2"><%= offer.offerType %></td>
-                                                        <td class="px-4 py-2"><%= offer.productNames || 'N/A' %></td>
-                                                        <td class="px-4 py-2"><%= offer.categoryNames || 'N/A' %></td> <!-- Display category names -->
-                                                        <td>
+                                                        <td class="px-4 py-2 border border-gray-500"><%= i + 1 %></td>
+                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.offerName %></td>
+                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.discount %></td>
+                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.formattedStartDate %></td>
+                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.formattedEndDate %></td>
+                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.offerType %></td>
+                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.productNames || 'N/A' %></td>
+                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.categoryNames || 'N/A' %></td>
+                                                        <td class="px-4 py-2 border border-gray-500">
                                                             <a href="" id="deletebtn" value="<%= offer._id %>"
                                                                 class="btn btn-danger btn-sm deletebtn badge rounded-pill text-decoration-none ms-2">Delete</a>
-                                                            <input type="hidden" id="offerId" name="" value=" <%= offer._id %>">
+                                                            <input type="hidden" id="offerId" name="" value="<%= offer._id %>">
                                                         </td>
                                                     </tr>
                                                 <% }) %>
                                             </tbody>
                                         <% } else { %>
                                             <tr class="text-center text-gray-400">
-                                                <td colspan="8" class="px-4 py-6">No offers to display</td>
+                                                <td colspan="9" class="px-4 py-6 border border-gray-500">No offers to display</td>
                                             </tr>
                                         <% } %>
                                     </table>
-                                    
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                
             
                
             </section>
