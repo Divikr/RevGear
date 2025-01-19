@@ -316,7 +316,7 @@ const getCheckout = async (req, res) => {
 
     const total = cart.items.reduce((sum, item) => sum + item.productId.salePrice * item.quantity, 0);
 
-    res.render('user/checkout', { cart: cart.items, savedAddresses, total });
+    res.render('user/checkout', { cart: cart.items, savedAddresses, total , offerApplied:0});
   } catch (error) {
     console.error('Error in checkout:', error.message);
     res.status(500).send('Server error');

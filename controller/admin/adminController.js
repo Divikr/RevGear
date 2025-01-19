@@ -66,44 +66,68 @@ const adminlogin = async (req, res) => {
     }
 };
 
-
-const getGraphData = async (range) => {
-    const dateNow = new Date();
-    let match = {};
-
-    // Define time ranges for filtering orders
-    if (range === 'day') {
-        match.orderDate = { $gte: new Date(dateNow.setHours(0, 0, 0, 0)) };  // Start of the current day
-    } else if (range === 'week') {
-        const startOfWeek = dateNow.setDate(dateNow.getDate() - dateNow.getDay());
-        match.orderDate = { $gte: new Date(startOfWeek) };  // Start of the current week
-    } else if (range === 'month') {
-        match.orderDate = { $gte: new Date(dateNow.getFullYear(), dateNow.getMonth(), 1) };  // Start of the current month
-    } else if (range === 'year') {
-        match.orderDate = { $gte: new Date(dateNow.getFullYear(), 0, 1) };  // Start of the current year
+const getGraphData = async (timeRange) => {
+    const now = new Date();
+    let startDate;
+    
+    switch(timeRange) {
+        case 'day':
+            startDate = new Date(now.setDate(now.getDate() - 1));
+            break;
+        case 'week':
+            startDate = new Date(now.setDate(now.getDate() - 7));
+            break;
+        case 'month':
+            startDate = new Date(now.setMonth(now.getMonth() - 1));
+            break;
+        case 'year':
+            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+            break;
+        default:
+            startDate = new Date(now.setDate(now.getDate() - 1));
     }
 
-    // Aggregate total revenue by date
-    const orders = await Order.aggregate([
-        { $match: match },
+    return await Order.aggregate([
         {
-            $group: {
-                _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
-                totalRevenue: { $sum: "$totalAmount" }
+            $match: {
+                orderDate: { $gte: startDate }
             }
         },
-        { $sort: { "_id": 1 } }
+        {
+            $group: {
+                _id: {
+                    $dateToString: { format: "%Y-%m-%d", date: "$orderDate" }
+                },
+                count: { $sum: 1 }
+            }
+        },
+        { $sort: { _id: 1 } }
     ]);
+};;
 
-    const labels = orders.map(order => order._id);
-    const dataPoints = orders.map(order => order.totalRevenue);
 
-    return { labels, dataPoints };
-};
 
 
 const dashboard = async (req, res) => {
     try {
+
+        const orderGraphData = await Order.aggregate([
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: "%Y-%m-%d", date: "$orderDate" }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } } // Sort by date
+        ]).then(data =>
+            data.map(item => ({
+                date: item._id,
+                count: item.count
+            }))
+        );
+
         // Get the time range from the query parameter, default to 'day'
         const range = req.query.range || 'day';
 
@@ -139,9 +163,102 @@ const dashboard = async (req, res) => {
             count: method.count
         }));
 
+//
+
+const topProducts = await Order.aggregate([
+    { $unwind: "$items" },
+    {
+        $group: {
+            _id: "$items.productId",
+            totalQuantity: { $sum: "$items.quantity" }
+        }
+    },
+    { $sort: { totalQuantity: -1 } },
+    { $limit: 5 },
+    {
+        $lookup: {
+            from: "products",
+            localField: "_id",
+            foreignField: "_id",
+            as: "productDetails"
+        }
+    },
+    { $unwind: "$productDetails" },
+    {
+        $project: {
+            _id: 0,
+            productName: "$productDetails.productName", // Assuming your Product model has 'productName' field
+            totalQuantity: 1,
+            // You can add more fields if needed
+            price: "$productDetails.price",
+            category: "$productDetails.category"
+        }
+    }
+]);
+
+
+const recentOrders = await Order.aggregate([
+    {
+        $sort: { orderDate: -1 } // Sort by most recent first
+    },
+    { $limit: 5 },
+    // Lookup to get user details
+    {
+        $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails"
+        }
+    },
+    { $unwind: "$userDetails" },
+    // Lookup for products in items array
+    {
+        $lookup: {
+            from: "products",
+            localField: "items.productId",
+            foreignField: "_id",
+            as: "productDetails"
+        }
+    },
+    {
+        $project: {
+            orderDate: 1,
+            totalAmount: 1,
+            orderStatus: 1,
+            paymentMethod: 1,
+            "userDetails.name": 1,
+            "deliveryAddress": 1,
+            items: {
+                $map: {
+                    input: "$items",
+                    as: "item",
+                    in: {
+                        quantity: "$$item.quantity",
+                        price: "$$item.price",
+                        product: {
+                            $arrayElemAt: [
+                                {
+                                    $filter: {
+                                        input: "$productDetails",
+                                        as: "prod",
+                                        cond: { $eq: ["$$prod._id", "$$item.productId"] }
+                                    }
+                                },
+                                0
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+]);
+
         // Render the dashboard with all data, including chart data for each range
         res.render("dashboard", {
             totalRevenue: totalRevenue[0]?.total || 0,
+            orderGraphData,
             totalOrders,
             totalCoupons,
             totalOffers,
@@ -149,6 +266,12 @@ const dashboard = async (req, res) => {
             deliveredOrders,
             canceledOrders,
             returnedOrders,
+            topProducts,
+            recentOrders ,
+            dayData, // Daily data
+            weekData, // Weekly data
+            monthData, // Monthly data
+            yearData 
          
         });
     } catch (error) {
@@ -156,6 +279,7 @@ const dashboard = async (req, res) => {
         res.status(500).send("Server error");
     }
 };
+
 
 
 //logout

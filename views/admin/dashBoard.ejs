@@ -132,46 +132,99 @@
       
     </div>
 </div>
-            
-            
 
-            <div class="orders-table">
-                <h2>Order Status</h2>
-                <table>
-                    <thead>
+
+
+<div class="flex flex-wrap lg:flex-nowrap gap-6 p-6 bg-gray-900 rounded-lg shadow-md">
+    <!-- Top Products Section -->
+    <div class="top-products flex-1 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg shadow-lg p-6 animate-fade-in">
+        <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-2">Top 5 Products</h2>
+        <% try { %>
+            <% if (typeof topProducts !== 'undefined' && topProducts && topProducts.length > 0) { %>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-gray-800 border border-gray-700 rounded-lg animate-fade-in transition-transform duration-500 ease-in-out">
+                        <thead class="bg-gradient-to-r from-gray-700 to-gray-800 text-gray-300">
+                            <tr>
+                                <th class="px-6 py-4 border-b border-gray-700 text-left uppercase tracking-wide text-sm">Product Name</th>
+                                <th class="px-6 py-4 border-b border-gray-700 text-left uppercase tracking-wide text-sm">Total Quantity Ordered</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% topProducts.forEach((product) => { %>
+                                <tr class="hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
+                                    <td class="px-6 py-4 border-b border-gray-700 text-gray-300 font-medium">
+                                        <%= product?.productName || 'N/A' %>
+                                    </td>
+                                    <td class="px-6 py-4 border-b border-gray-700 text-gray-300 font-medium">
+                                        <%= product?.totalQuantity || 0 %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <p class="text-gray-400 italic mt-4">No top products data available.</p>
+            <% } %>
+        <% } catch (error) { %>
+            <p class="text-red-400 mt-4">Error displaying top products: <%= error.message %></p>
+        <% } %>
+    </div>
+
+    <!-- Recent Orders Section -->
+    <div class="recent-orders flex-1 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg shadow-lg p-6 animate-fade-in">
+        <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-2">Recent Orders</h2>
+        <% if (recentOrders && recentOrders.length > 0) { %>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-gray-800 border border-gray-700 rounded-lg animate-fade-in transition-transform duration-500 ease-in-out">
+                    <thead class="bg-gradient-to-r from-gray-700 to-gray-800 text-gray-300">
                         <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Product</th>
-                            <th>Amount</th>
-                            <th>Status</th>
+                            <th class="px-6 py-4 border-b border-gray-700 text-left uppercase tracking-wide text-sm">Order Date</th>
+                            <th class="px-6 py-4 border-b border-gray-700 text-left uppercase tracking-wide text-sm">Products</th>
+                            <th class="px-6 py-4 border-b border-gray-700 text-left uppercase tracking-wide text-sm">Status</th>
+                            <th class="px-6 py-4 border-b border-gray-700 text-left uppercase tracking-wide text-sm">Payment Method</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>#001</td>
-                            <td>John Doe</td>
-                            <td>Website</td>
-                            <td>$4,000</td>
-                            <td><span class="status pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>#002</td>
-                            <td>Jane Smith</td>
-                            <td>Mobile App</td>
-                            <td>$5,000</td>
-                            <td><span class="status approved">Approved</span></td>
-                        </tr>
-                        <tr>
-                            <td>#003</td>
-                            <td>Bob Wilson</td>
-                            <td>Design</td>
-                            <td>$2,500</td>
-                            <td><span class="status rejected">Rejected</span></td>
-                        </tr>
+                        <% recentOrders.forEach(order => { %>
+                            <tr class="hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
+                                <td class="px-6 py-4 border-b border-gray-700 text-gray-300 font-medium">
+                                    <%= new Date(order.orderDate).toLocaleDateString() %>
+                                </td>
+                                <td class="px-6 py-4 border-b border-gray-700 text-gray-300 font-medium">
+                                    <% order.items.forEach(item => { %>
+                                        <div class="mb-1">
+                                            <%= item.product.productName %>
+                                        </div>
+                                    <% }) %>
+                                </td>
+                                <td class="px-8 py-6 border-b border-gray-700">
+                                    <span class="whitespace-nowrap px-3 py-2 rounded-full text-sm
+                                        <%= order.orderStatus === 'Delivered' ? 'bg-green-600 text-green-100' :
+                                           order.orderStatus === 'Cancelled' ? 'bg-red-600 text-red-100' :
+                                           'bg-blue-600 text-blue-100' %>">
+                                        <%= order.orderStatus %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 border-b border-gray-700 text-gray-300 font-medium">
+                                    <%= order.paymentMethod %>
+                                </td>
+                            </tr>
+                        <% }) %>
                     </tbody>
                 </table>
             </div>
+        <% } else { %>
+            <p class="text-gray-400 italic mt-4">No recent orders to display.</p>
+        <% } %>
+    </div>
+</div>
+
+
+
+
+
+
         </div>
     </div>
 
@@ -221,75 +274,71 @@ new Chart(ctx, {
     }
 });
 
-let chartInstance;
 
-// Set up the chart for the first time
-const setupChart = (labels, dataPoints) => {
-    const lineCtx = document.getElementById('lineGraph').getContext('2d');
-    if (chartInstance) {
-        chartInstance.destroy();
-    }
-    chartInstance = new Chart(lineCtx, {
-        type: 'line',
-        data: {
-            labels: labels,  // X-axis labels
-            datasets: [{
-                label: 'Revenue',  // Dataset label
-                data: dataPoints,  // Y-axis data points
-                backgroundColor: 'rgba(0, 123, 255, 0.2)',  // Fill color under the line
-                borderColor: '#007bff',  // Line color
-                borderWidth: 2,  // Line thickness
-                tension: 0.4  // Smoothness of the line
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: '#2a2f3a'
-                    },
-                    ticks: {
-                        color: '#fff'
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: '#fff'
-                    }
-                }
+document.addEventListener('DOMContentLoaded', () => { 
+        const orderGraphData = <%- JSON.stringify(orderGraphData)  %>;
+        const labels = orderGraphData.map(data => data.date);
+        const dataPoints = orderGraphData.map(data => data.count);
+
+        const ctx = document.getElementById('lineGraph').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Order Count',
+                    data: dataPoints,
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)', // White fill under the line
+                    borderColor: 'rgba(255, 255, 255, 1)',       // White line color
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
             },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        font: {
-                            size: 14,
-                            weight: 'bold'
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.2)', // White grid lines
+                        },
+                        ticks: {
+                            color: 'white' // White text for Y-axis labels
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.2)' // White grid lines
+                        },
+                        ticks: {
+                            color: 'white' // White text for X-axis labels
                         }
                     }
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return `${context.label}: ${context.raw} units`;  // Customize tooltip
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white', // White text for legend labels
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
                         }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return `${context.label}: ${context.raw} orders`; // Customize tooltip
+                            }
+                        },
+                        bodyColor: 'white', // White text in tooltip
+                        titleColor: 'white', // White title in tooltip
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)' // Dark background for better contrast
                     }
                 }
             }
-        }
+        });
     });
-};
-
-// Handle time range selection
-const updateChartData = (labels, dataPoints) => {
-    setupChart(labels, dataPoints);
-};
 
 // Event listener for time range buttons
 document.querySelectorAll('.btn-time-range').forEach(button => {

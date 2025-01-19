@@ -64,11 +64,11 @@
                     <i class="fas fa-tags"></i>
                     <span>Coupons</span>
                 </a>
-                <a href="/admin/salesreport" class="nav-item active">
+                <a href="/admin/salesreport" class="nav-item ">
                     <i class="fas fa-chart-line"></i>
                     <span>Sales</span>
                 </a>
-                <a href="/admin/offer" class="nav-item">
+                <a href="/admin/offer" class="nav-item active">
                     <i class="fas fa-gift"></i>
                     <span>Offer</span>
                 </a>
@@ -79,13 +79,13 @@
         <div class="main-content">
             <div class="header">
                 <h1>RevGear</h1>
-                <a href="/admin/dashboard" id="adminlogout">Back</a>
+                <a href="/admin/offer" id="adminlogout">Back</a>
             </div>
             <br>
 
 
 
-            <h1 class="text-3xl font-bold text-white text-center mb-6">Add Offer !!!</h1>
+            <h1 class="text-3xl font-bold text-white text-center mb-6">Add Offer </h1>
 
             <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
                 <div class="alert bg-red-500 text-white rounded-lg p-4 mb-4">
@@ -110,10 +110,12 @@
                         <div>
                             <label for="startDate" class="block text-gray-200 font-medium mb-2">Start Date</label>
                             <input type="date" class="w-full px-4 py-2 bg-gray-900 text-white rounded-lg border border-gray-600 focus:ring focus:ring-indigo-500 focus:outline-none" id="startDate" name="startDate" >
+                            
                         </div>
                         <div>
                             <label for="endDate" class="block text-gray-200 font-medium mb-2">End Date</label>
                             <input type="date" class="w-full px-4 py-2 bg-gray-900 text-white rounded-lg border border-gray-600 focus:ring focus:ring-indigo-500 focus:outline-none" id="endDate" name="endDate" >
+                           
                         </div>
                     </div>
             
@@ -262,6 +264,43 @@
                 return;
             }
         });
+
+
+        const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayDate = `${yyyy}-${mm}-${dd}`;
+
+  
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const nextDay = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+
+   
+    const validFromInput = document.getElementById('startDate');
+    const validUntilInput = document.getElementById('endDate');
+
+    validFromInput.min = todayDate;
+    validUntilInput.min = nextDay;
+
+    
+    validFromInput.value = todayDate;
+    validUntilInput.value = nextDay;
+
+  
+    validFromInput.addEventListener('change', (event) => {
+        const selectedDate = new Date(event.target.value);
+        const newExpireDate = new Date(selectedDate);
+        newExpireDate.setDate(selectedDate.getDate() + 1);
+
+        const updatedExpireDate = `${newExpireDate.getFullYear()}-${String(newExpireDate.getMonth() + 1).padStart(2, '0')}-${String(newExpireDate.getDate()).padStart(2, '0')}`;
+        validUntilInput.min = updatedExpireDate;
+
+        if (new Date(validUntilInput.value) < newExpireDate) {
+            validUntilInput.value = updatedExpireDate;
+        }
+    });
    
 
 </script>

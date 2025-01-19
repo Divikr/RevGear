@@ -94,59 +94,75 @@
                         <a class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded" href="/admin/addOffer">Add Offer</a>
                     </div>
                 </div>
-            
-                <div class="card bg-gray-800 shadow-lg rounded-lg">
-                    <div class="card-body p-6">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="table-responsive">
-                                    <table class="table-auto w-full text-left border-collapse border border-gray-500">
-                                        <% if (offers.length > 0) { %>
-                                            <thead>
-                                                <tr class="bg-gray-700 text-gray-200">
-                                                    <th class="px-4 py-2 border border-gray-500">S no</th>
-                                                    <th class="px-4 py-2 border border-gray-500">Offer Name</th>
-                                                    <th class="px-4 py-2 border border-gray-500">Discount</th>
-                                                    <th class="px-4 py-2 border border-gray-500">Start Date</th>
-                                                    <th class="px-4 py-2 border border-gray-500">End Date</th>
-                                                    <th class="px-4 py-2 border border-gray-500">Offer Type</th>
-                                                    <th class="px-4 py-2 border border-gray-500">Product Name</th>
-                                                    <th class="px-4 py-2 border border-gray-500">Category Name</th>
-                                                    <th class="px-4 py-2 border border-gray-500">Remove</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% offers.forEach((offer, i) => { %>
-                                                    <tr class="bg-gray-800 hover:bg-gray-700">
-                                                        <td class="px-4 py-2 border border-gray-500"><%= i + 1 %></td>
-                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.offerName %></td>
-                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.discount %></td>
-                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.formattedStartDate %></td>
-                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.formattedEndDate %></td>
-                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.offerType %></td>
-                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.productNames || 'N/A' %></td>
-                                                        <td class="px-4 py-2 border border-gray-500"><%= offer.categoryNames || 'N/A' %></td>
-                                                        <td class="px-4 py-2 border border-gray-500">
-                                                            <a href="" id="deletebtn" value="<%= offer._id %>"
-                                                                class="btn btn-danger btn-sm deletebtn badge rounded-pill text-decoration-none ms-2">Delete</a>
-                                                            <input type="hidden" id="offerId" name="" value="<%= offer._id %>">
-                                                        </td>
-                                                    </tr>
-                                                <% }) %>
-                                            </tbody>
-                                        <% } else { %>
-                                            <tr class="text-center text-gray-400">
-                                                <td colspan="9" class="px-4 py-6 border border-gray-500">No offers to display</td>
+                <div class="card bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl rounded-xl overflow-hidden">
+                    <div class="card-body p-8">
+                        <!-- Table Header Section -->
+                        
+                        
+                        <div class="overflow-x-auto">
+                            <table class="table-auto w-full text-left border-collapse">
+                                <% if (offers.length > 0) { %>
+                                    <thead>
+                                        <tr class="bg-gradient-to-r from-indigo-600 to-purple-600">
+                                            <th class="px-4 py-3 text-sm font-semibold text-white uppercase tracking-wider whitespace-nowrap">Sl no</th>
+                                            <th class="px-4 py-3 text-sm font-semibold text-white uppercase tracking-wider whitespace-nowrap">Name</th>
+                                            <th class="px-4 py-3 text-sm font-semibold text-white uppercase tracking-wider whitespace-nowrap">Discount</th>
+                                            <th class="px-4 py-3 text-sm font-semibold text-white uppercase tracking-wider whitespace-nowrap">Start Date</th>
+                                            <th class="px-4 py-3 text-sm font-semibold text-white uppercase tracking-wider whitespace-nowrap">End Date</th>
+                                            <th class="px-4 py-3 text-sm font-semibold text-white uppercase tracking-wider whitespace-nowrap">Offer Type</th>
+                                            <th class="px-4 py-3 text-sm font-semibold text-white uppercase tracking-wider whitespace-nowrap">Product </th>
+                                            <th class="px-4 py-3 text-sm font-semibold text-white uppercase tracking-wider whitespace-nowrap">Category </th>
+                                            <th class="px-4 py-3 text-sm font-semibold text-white uppercase tracking-wider text-center whitespace-nowrap">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% offers.forEach((offer, i) => { %>
+                                            <tr class="bg-gray-800/50 hover:bg-gray-700/50 transition-all duration-300">
+                                                <td class="px-4 py-3 text-gray-300 font-medium whitespace-nowrap"><%= i + 1 %></td>
+                                                <td class="px-4 py-3 whitespace-nowrap truncate max-w-xs">
+                                                    <span class="font-medium text-indigo-400"><%= offer.offerName %></span>
+                                                </td>
+                                                <td class="px-4 py-3 whitespace-nowrap">
+                                                    <span class="px-2 py-1 text-sm font-medium text-green-400 bg-green-400/10 rounded-full">
+                                                        ₹<%= offer.discount %>
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-3 text-gray-300 whitespace-nowrap"><%= offer.formattedStartDate %></td>
+                                                <td class="px-4 py-3 text-gray-300 whitespace-nowrap"><%= offer.formattedEndDate %></td>
+                                                <td class="px-4 py-3 whitespace-nowrap">
+                                                    <span class="px-2 py-1 text-sm font-medium text-purple-400 bg-purple-400/10 rounded-full">
+                                                        <%= offer.offerType %>
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-3 text-gray-300 whitespace-nowrap truncate max-w-xs"><%= offer.productNames || 'N/A' %></td>
+                                                <td class="px-4 py-3 text-gray-300 whitespace-nowrap truncate max-w-xs"><%= offer.categoryNames || 'N/A' %></td>
+                                                <td class="px-4 py-3 text-center whitespace-nowrap">
+                                                   
+                <a href="" id="deletebtn" value="<%= offer._id %>"
+                    class="btn text-red-500 hover:text-red-700 transition-transform transform hover:scale-110 btn-sm deletebtn badge rounded-pill text-decoration-none ms-2"><i class="fas fa-trash-alt"></i></a>
+                                                    <input type="hidden" id="offerId" value="<%= offer._id %>">
+                                                </td>
                                             </tr>
-                                        <% } %>
-                                    </table>
-                                </div>
-                            </div>
+                                        <% }) %>
+                                    </tbody>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="9" class="px-6 py-12 text-center">
+                                            <div class="flex flex-col items-center justify-center space-y-3">
+                                                <i class="fas fa-inbox text-4xl text-gray-500"></i>
+                                                <p class="text-gray-400 text-lg">No offers available</p>
+                                                <p class="text-gray-500 text-sm">Create your first offer to get started</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </table>
                         </div>
                     </div>
                 </div>
                 
-            
+                
+                
                
             </section>
             

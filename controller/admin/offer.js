@@ -204,38 +204,50 @@ const deleteOffer = async (req, res) => {
             return res.status(404).json({ success: false, message: "Offer not found" });
         }
 
-        // Check if offer type is Product or Category
         if (offer.offerType === 'Product') {
             // If offer is for a product, update the product
             const product = await Product.findById(offer.productId);
             if (product) {
-                await Product.findByIdAndUpdate(
-                    offer.productId,
-                    {
-                        $unset: {
-                            productOfferId: 1, // Remove the reference to offer
-                            productDiscount: 1, // Remove the discount
+                if (product.regularPrice) {
+                    await Product.findByIdAndUpdate(
+                        offer.productId,
+                        {
+                            $unset: {
+                                productOfferId: 1,
+                                productDiscount: 1,
+                            },
+                            $set: { salePrice: product.regularPrice },
                         },
-                        $set: { salePrice: product.regularPrice } // Reset sale price to regular price
-                    },
-                    { new: true }
-                );
+                        { new: true }
+                    );
+                    console.log(`Updated product ${product._id} salePrice to ${product.regularPrice}`);
+                } else {
+                    console.warn(`Product ${product._id} is missing regularPrice`);
+                }
+            } else {
+                console.warn(`Product with ID ${offer.productId} not found`);
             }
         } else if (offer.offerType === 'Category') {
             // If offer is for a category, update all products in that category
             const catProducts = await Product.find({ category: offer.categoryId });
             for (const product of catProducts) {
-                await Product.findByIdAndUpdate(
-                    product._id,
-                    {
-                        $unset: {
-                            categoryOfferId: 1, // Remove the reference to offer
-                            categoryDiscount: 1, // Remove the discount
+                console.log(`Product ${product._id} has regularPrice: ${product.regularPrice}`);
+                if (product.regularPrice) {
+                    await Product.findByIdAndUpdate(
+                        product._id,
+                        {
+                            $unset: {
+                                categoryOfferId: 1,
+                                categoryDiscount: 1,
+                            },
+                            $set: { salePrice: product.regularPrice },
                         },
-                        $set: { salePrice: product.regularPrice } // Reset sale price to regular price
-                    },
-                    { new: true }
-                );
+                        { new: true }
+                    );
+                    console.log(`Updated product ${product._id} salePrice to ${product.regularPrice}`);
+                } else {
+                    console.warn(`Product ${product._id} is missing regularPrice`);
+                }
             }
         }
 

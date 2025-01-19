@@ -67,7 +67,7 @@ router.post("/approve-return/:orderId", adminController.approveReturn)
 
 router.get("/coupon",couponController.getCoupon)
 router.post('/coupon',couponController.addCoupon)
-
+router.delete('/coupon/:code',couponController.deleteCoupon)
 
 //report manegment
 
