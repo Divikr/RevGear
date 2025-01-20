@@ -42,7 +42,7 @@ const loadSalesReport = async (req, res) => {
 
 const dailySalesReport = async (req, res) => {
     try {
-        // Get date range for current day
+     
         const startDate = moment().startOf('day').toDate();
         const endDate = moment().endOf('day').toDate();
 
@@ -68,7 +68,7 @@ const dailySalesReport = async (req, res) => {
             },
             {
                 $addFields: {
-                    // Calculate final amount after all discounts
+                    
                     finalAmount: {
                         $subtract: [
                             "$totalAmount",
@@ -135,7 +135,7 @@ const dailySalesReport = async (req, res) => {
             }
         ]);
 
-        // Format the report data with hourly breakdown
+        
         const formattedReport = Array.from({ length: 24 }, (_, hour) => {
             const hourData = dailyReport.find(report => report._id.hour === hour) || {
                 totalOrders: 0,
@@ -151,7 +151,6 @@ const dailySalesReport = async (req, res) => {
             };
         });
 
-        // Calculate totals
         const totals = formattedReport.reduce((acc, curr) => ({
             totalOrders: acc.totalOrders + curr.totalOrders,
             grossAmount: acc.grossAmount + curr.grossAmount,
@@ -184,7 +183,7 @@ const dailySalesReport = async (req, res) => {
 
 const generateWeeklyReport = async (req, res) => {
     try {
-        // Get date range for current week
+        
         const startDate = moment().startOf('isoWeek').toDate();
         const endDate = moment().endOf('isoWeek').toDate();
 
@@ -210,7 +209,7 @@ const generateWeeklyReport = async (req, res) => {
             },
             {
                 $addFields: {
-                    // Calculate final amount after all discounts
+                    
                     finalAmount: {
                         $subtract: [
                             "$totalAmount",
@@ -277,7 +276,6 @@ const generateWeeklyReport = async (req, res) => {
             }
         ]);
 
-        // Format the report data with daily breakdown
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const formattedReport = daysOfWeek.map((day, index) => {
             const dayData = weeklyReport.find(report => report._id.dayOfWeek === index + 1) || {
@@ -294,7 +292,7 @@ const generateWeeklyReport = async (req, res) => {
             };
         });
 
-        // Calculate totals
+
         const totals = formattedReport.reduce((acc, curr) => ({
             totalOrders: acc.totalOrders + curr.totalOrders,
             grossAmount: acc.grossAmount + curr.grossAmount,
@@ -327,7 +325,7 @@ const generateWeeklyReport = async (req, res) => {
 
 const generateMonthlyReport = async (req, res) => {
     try {
-        // Get date range for current year
+
         const currentYear = new Date().getFullYear();
         const startDate = new Date(currentYear, 0, 1);
         const endDate = new Date(currentYear, 11, 31);
@@ -340,7 +338,7 @@ const generateMonthlyReport = async (req, res) => {
                         $lte: endDate 
                     },
                     orderStatus: {
-                        $nin: ['Cancelled', 'Return Success'] // Exclude cancelled and returned orders
+                        $nin: ['Cancelled', 'Return Success'] 
                     }
                 }
             },
@@ -354,7 +352,7 @@ const generateMonthlyReport = async (req, res) => {
             },
             {
                 $addFields: {
-                    // Calculate final amount after all discounts
+             
                     finalAmount: {
                         $subtract: [
                             "$totalAmount",
@@ -425,7 +423,7 @@ const generateMonthlyReport = async (req, res) => {
             }
         ]);
 
-        // Format the report data
+    
         const formattedReport = monthlyReport.map(report => ({
             _id: moment().month(report._id.month - 1).format('MMMM'),
             totalOrders: report.totalOrders,
@@ -435,7 +433,7 @@ const generateMonthlyReport = async (req, res) => {
             netAmount: report.netAmount
         }));
 
-        // Calculate totals
+       
         const totals = formattedReport.reduce((acc, curr) => ({
             totalOrders: acc.totalOrders + curr.totalOrders,
             grossAmount: acc.grossAmount + curr.grossAmount,
@@ -450,7 +448,7 @@ const generateMonthlyReport = async (req, res) => {
             netAmount: 0
         });
 
-        // Add empty entries for months with no orders
+      
         const allMonths = moment.months();
         const completeReport = allMonths.map(month => {
             const existingReport = formattedReport.find(report => report._id === month);
@@ -481,7 +479,7 @@ const generateMonthlyReport = async (req, res) => {
 
 const generateYearlyReport = async (req, res) => {
     try {
-        // Get all years from the oldest order to current year
+     
         const oldestOrder = await Orders.findOne().sort({ orderDate: 1 });
         const startYear = oldestOrder ? moment(oldestOrder.orderDate).year() : moment().year();
         const currentYear = moment().year();
@@ -504,7 +502,7 @@ const generateYearlyReport = async (req, res) => {
             },
             {
                 $addFields: {
-                    // Calculate final amount after all discounts
+                   
                     finalAmount: {
                         $subtract: [
                             "$totalAmount",
@@ -569,7 +567,7 @@ const generateYearlyReport = async (req, res) => {
             }
         ]);
 
-        // Create array of all years including those with no orders
+  
         const formattedReport = Array.from(
             { length: currentYear - startYear + 1 },
             (_, index) => {
@@ -589,7 +587,7 @@ const generateYearlyReport = async (req, res) => {
             }
         );
 
-        // Calculate totals
+      
         const totals = formattedReport.reduce((acc, curr) => ({
             totalOrders: acc.totalOrders + curr.totalOrders,
             grossAmount: acc.grossAmount + curr.grossAmount,
@@ -625,7 +623,7 @@ const generateCustomDateReport = async (req, res) => {
         const startDate = moment(req.query.startDate, 'YYYY-MM-DD').startOf('day');
         const endDate = moment(req.query.endDate, 'YYYY-MM-DD').endOf('day');
 
-        // Validate dates
+  
         if (!startDate.isValid() || !endDate.isValid()) {
             return res.status(400).json({
                 success: false,
@@ -662,7 +660,7 @@ const generateCustomDateReport = async (req, res) => {
             },
             {
                 $addFields: {
-                    // Calculate final amount after all discounts
+                   
                     finalAmount: {
                         $subtract: [
                             "$totalAmount",
@@ -729,7 +727,6 @@ const generateCustomDateReport = async (req, res) => {
             }
         ]);
 
-        // Create array of all dates in range including those with no orders
         const allDates = [];
         const currentDate = startDate.clone();
         while (currentDate.isSameOrBefore(endDate)) {
@@ -752,7 +749,7 @@ const generateCustomDateReport = async (req, res) => {
             };
         });
 
-        // Calculate totals
+
         const totals = formattedReport.reduce((acc, curr) => ({
             totalOrders: acc.totalOrders + curr.totalOrders,
             grossAmount: acc.grossAmount + curr.grossAmount,

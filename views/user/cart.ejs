@@ -285,17 +285,17 @@ function updateQuantity(button, change) {
 
 
 document.getElementById('checkoutButton').addEventListener('click', async function(event) {
-  event.preventDefault(); // Prevent the default anchor behavior
+  event.preventDefault();
   
-  // Get the cart items and check the quantities
-  const cartItems = [/* Cart items data, populate with actual data from your frontend */];
+  
+  const cartItems = [];
 
   const invalidItems = cartItems.filter(item => {
-    return item.quantity > item.productId.quantity; // Compare cart quantity with product quantity
+    return item.quantity > item.productId.quantity; 
   });
 
   if (invalidItems.length > 0) {
-    // SweetAlert for validation error
+   
     Swal.fire({
       icon: 'error',
       title: 'Quantity Error',
@@ -304,26 +304,26 @@ document.getElementById('checkoutButton').addEventListener('click', async functi
     return;
   }
 
-  // Send the fetch request to proceed to checkout
+  
   try {
     const response = await fetch('/checkout', {
-      method: 'GET', // Or 'POST' if required
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
     if (response.ok) {
-      // SweetAlert for success
+    
       Swal.fire({
         icon: 'success',
         title: 'Go to Checkout',
         text: '',
       }).then(() => {
-        window.location.href = '/checkout'; // Redirect to checkout page after the alert
+        window.location.href = '/checkout'; 
       });
     } else {
-      // SweetAlert for failure
+      
       Swal.fire({
         icon: 'error',
         title: 'Checkout Failed',
@@ -332,7 +332,7 @@ document.getElementById('checkoutButton').addEventListener('click', async functi
     }
   } catch (error) {
     console.error('Error:', error);
-    // SweetAlert for network error
+    
     Swal.fire({
       icon: 'error',
       title: 'Error',

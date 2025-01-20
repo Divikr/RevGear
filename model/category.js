@@ -25,7 +25,7 @@ const categorySchema = new mongoose.Schema({
     },
     Image: {
         type: [String],
-        required: true, // Ensure at least one image exists
+        required: true, 
     },
     createdAt: {
         type: Date,

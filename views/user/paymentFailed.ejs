@@ -1,0 +1,72 @@
+<%- include("../partials/header.ejs")  %>
+
+<style>
+    @keyframes checkAnimation {
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.2); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .error-checkmark {
+        animation: checkAnimation 0.5s ease-in-out;
+    }
+</style>
+
+<body class="bg-gray-50 font-sans">
+    <div class="container mx-auto px-4 py-16 max-w-xl">
+        <div class="bg-white shadow-2xl rounded-2xl p-8 text-center">
+            <div class="error-checkmark mb-6">
+                <svg class="mx-auto w-24 h-24 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"></path>
+                  </svg>
+                  
+            </div>
+
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Pyment Failed!</h1>
+            <p class="text-gray-600 mb-6">Sorry for the  Inconveniencee.</p>
+
+           
+
+         
+
+            <div class="mt-8 flex space-x-4 justify-center">
+                <a href="/home" class="flex-1 bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    Continue Shopping
+                </a>
+                <a href="/checkout" class="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Retry Payment
+                </a>
+                
+            </div>
+        </div>
+
+        <div class="text-center mt-8 text-gray-500">
+            <p>Need help? Contact our support at <a href="mailto:support@yourstore.com" class="text-blue-500 hover:underline">support@yourstore.com</a></p>
+        </div>
+    </div>
+
+
+    <%- include("../partials/footer")  %>
+
+
+    <script>
+    
+        gsap.from(".success-checkmark", {
+            duration: 0.5,
+            scale: 0,
+            opacity: 0,
+            ease: "back.out(1.7)"
+        });
+
+        gsap.from(".bg-green-50", {
+            duration: 0.5,
+            y: 50,
+            opacity: 0,
+            delay: 0.3
+        });
+    </script>

@@ -63,12 +63,12 @@ const  deleteCoupon = async (req, res) => {
     try {
         const { code } = req.params;
 
-        // Validate if code is provided
+   
         if (!code) {
             return res.status(400).json({ success: false, message: "Coupon code is required" });
         }
 
-        // Find and delete the coupon by code
+
         const deletedCoupon = await Coupon.findOneAndDelete({ code });
 
         if (!deletedCoupon) {
@@ -86,19 +86,21 @@ const  deleteCoupon = async (req, res) => {
 const checkExpiredCoupons = async () => {
     try {
         const now = new Date();
+        console.log("Checking expired coupons. Current date:", now);
+
         const expiredCoupons = await Coupon.updateMany(
             { expiredOn: { $lt: now }, status: true },
-            { status: false, isActive: false }
+            { $set: { status: false, isActive: false } }
         );
 
         console.log(`${expiredCoupons.modifiedCount} coupons expired and deactivated.`);
     } catch (error) {
-        console.error("Error updating expired coupons:", error);
+        console.error("Error updating expired coupons:", error.message, error.stack);
     }
 };
 
-// Example: Run this function periodically (e.g., using a cron job or a scheduler)
-setInterval(checkExpiredCoupons, 24 * 60 * 60 * 1000); // Check every 24 hours
+
+setInterval(checkExpiredCoupons, 24 * 60 * 60 * 1000); 
 
 
 module.exports={

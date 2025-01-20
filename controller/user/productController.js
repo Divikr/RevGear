@@ -10,7 +10,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 
 
-//get single prooduct
+
 
 const singleproduct = async (req, res) => {
     try {

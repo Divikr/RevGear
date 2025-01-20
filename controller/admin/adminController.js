@@ -120,7 +120,7 @@ const dashboard = async (req, res) => {
                     count: { $sum: 1 }
                 }
             },
-            { $sort: { _id: 1 } } // Sort by date
+            { $sort: { _id: 1 } }
         ]).then(data =>
             data.map(item => ({
                 date: item._id,
@@ -128,16 +128,14 @@ const dashboard = async (req, res) => {
             }))
         );
 
-        // Get the time range from the query parameter, default to 'day'
         const range = req.query.range || 'day';
 
-        // Fetch data for all time ranges (Day, Week, Month, Year)
+       
         const dayData = await getGraphData('day');
         const weekData = await getGraphData('week');
         const monthData = await getGraphData('month');
         const yearData = await getGraphData('year');
 
-        // Fetch other dashboard data like total revenue, orders, coupons, etc.
         const totalRevenue = await Order.aggregate([
             { $group: { _id: null, total: { $sum: "$totalAmount" } } }
         ]);
@@ -149,7 +147,6 @@ const dashboard = async (req, res) => {
         const canceledOrders = await Order.countDocuments({ orderStatus: 'Cancelled' });
         const returnedOrders = await Order.countDocuments({ 'returnDetails.status': 'Completed' });
 
-        // Aggregate payment methods data
         const paymentMethodStats = await Order.aggregate([
             {
                 $group: {
@@ -187,9 +184,9 @@ const topProducts = await Order.aggregate([
     {
         $project: {
             _id: 0,
-            productName: "$productDetails.productName", // Assuming your Product model has 'productName' field
+            productName: "$productDetails.productName", 
             totalQuantity: 1,
-            // You can add more fields if needed
+         
             price: "$productDetails.price",
             category: "$productDetails.category"
         }
@@ -199,10 +196,10 @@ const topProducts = await Order.aggregate([
 
 const recentOrders = await Order.aggregate([
     {
-        $sort: { orderDate: -1 } // Sort by most recent first
+        $sort: { orderDate: -1 } 
     },
     { $limit: 5 },
-    // Lookup to get user details
+   
     {
         $lookup: {
             from: "users",
@@ -212,7 +209,7 @@ const recentOrders = await Order.aggregate([
         }
     },
     { $unwind: "$userDetails" },
-    // Lookup for products in items array
+   
     {
         $lookup: {
             from: "products",
@@ -255,7 +252,6 @@ const recentOrders = await Order.aggregate([
     }
 ]);
 
-        // Render the dashboard with all data, including chart data for each range
         res.render("dashboard", {
             totalRevenue: totalRevenue[0]?.total || 0,
             orderGraphData,
@@ -268,9 +264,9 @@ const recentOrders = await Order.aggregate([
             returnedOrders,
             topProducts,
             recentOrders ,
-            dayData, // Daily data
-            weekData, // Weekly data
-            monthData, // Monthly data
+            dayData, 
+            weekData, 
+            monthData, 
             yearData 
          
         });

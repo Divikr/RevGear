@@ -126,7 +126,7 @@ route.post('/orders/return-order/:id', orderController. returnOrder);
 //payment
 
 route.post('/create-razorpay-order', paymentController.createRazorpayOrder);
-
+route.get('/payment-failed', paymentController.paymentFailed);
 route.get('/wallet', paymentController.getWallet);
 
 //coupon manegment

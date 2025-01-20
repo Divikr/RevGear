@@ -65,25 +65,25 @@
             </div>
 
             <div class="flex flex-wrap justify-between gap-6 mt-10 px-4 md:px-10 mb-8">
-                <!-- Total Revenue Card -->
+             
                 <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white p-6 rounded-xl shadow-xl flex-1 text-center transition-transform duration-300 transform hover:scale-105 mb-6 md:mb-0">
                     <h3 class="text-3xl font-semibold"><%= totalRevenue.toFixed(2) %></h3>
                     <p class="text-lg mt-2 opacity-80">Total Revenue</p>
                 </div>
             
-                <!-- Total Orders Card -->
+               
                 <div class="bg-gradient-to-r from-green-500 to-green-700 text-white p-6 rounded-xl shadow-xl flex-1 text-center transition-transform duration-300 transform hover:scale-105 mb-6 md:mb-0">
                     <h3 class="text-3xl font-semibold"><%= totalOrders %></h3>
                     <p class="text-lg mt-2 opacity-80">Total Orders</p>
                 </div>
             
-                <!-- Number of Coupons Card -->
+             
                 <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-6 rounded-xl shadow-xl flex-1 text-center transition-transform duration-300 transform hover:scale-105 mb-6 md:mb-0">
                     <h3 class="text-3xl font-semibold"><%= totalCoupons %></h3>
                     <p class="text-lg mt-2 opacity-80">Number of Coupons</p>
                 </div>
             
-                <!-- Number of Offers Card -->
+               
                 <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-xl shadow-xl flex-1 text-center transition-transform duration-300 transform hover:scale-105 mb-6 md:mb-0">
                     <h3 class="text-3xl font-semibold"><%= totalOffers %></h3>
                     <p class="text-lg mt-2 opacity-80">Number of Offers</p>
@@ -93,7 +93,7 @@
             
             
             <div class="flex flex-wrap gap-8 justify-center bg-gray-900 min-h-screen py-8">
-                <!-- Payment Method Distribution Card -->
+            
                 <div class="flex-1 min-w-[50px] max-w-[20%] bg-gradient-to-r from-blue-700 to-indigo-800 p-8 rounded-xl shadow-2xl transform transition duration-300 ease-in-out hover:scale-105">
                     <h3 class="text-3xl font-semibold text-white mb-6 text-center">Payment Method Distribution</h3>
                     <div class="w-full">
@@ -101,7 +101,6 @@
                     </div>
                 </div>
                 
-                <!-- Bar Chart Card -->
                 <div class="flex-1 min-w-[200px] max-w-[40%] bg-gradient-to-r from-purple-700 to-pink-800 p-8 rounded-xl shadow-2xl transform transition duration-300 ease-in-out hover:scale-105">
                     <h3 class="text-3xl font-semibold text-white mb-6 text-center">Line Graph</h3>
                     <div class="w-full">
@@ -111,21 +110,20 @@
             </div>
 
           <div class="flex flex-wrap justify-between gap-6 mt-10 px-4 md:px-10 mb-8">
-    <!-- Delivered Orders Card -->
+
     <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-xl shadow-xl flex-1 text-center mb-6 md:mb-0 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
         <h3 class="text-3xl font-semibold tracking-tight">Orders Delivered</h3>
         <p class="text-4xl font-extrabold mt-3 opacity-90"><%= deliveredOrders %></p>
        
     </div>
 
-    <!-- Canceled Orders Card -->
     <div class="bg-gradient-to-r from-red-600 to-red-800 text-white p-6 rounded-xl shadow-xl flex-1 text-center mb-6 md:mb-0 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
         <h3 class="text-3xl font-semibold tracking-tight">Orders Canceled</h3>
         <p class="text-4xl font-extrabold mt-3 opacity-90"><%= canceledOrders %></p>
        
     </div>
 
-    <!-- Returned Orders Card -->
+ 
     <div class="bg-gradient-to-r from-green-600 to-green-800 text-white p-6 rounded-xl shadow-xl flex-1 text-center mb-6 md:mb-0 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
         <h3 class="text-3xl font-semibold tracking-tight">Orders Returned</h3>
         <p class="text-4xl font-extrabold mt-3 opacity-90"><%= returnedOrders %></p>
@@ -136,7 +134,7 @@
 
 
 <div class="flex flex-wrap lg:flex-nowrap gap-6 p-6 bg-gray-900 rounded-lg shadow-md">
-    <!-- Top Products Section -->
+
     <div class="top-products flex-1 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg shadow-lg p-6 animate-fade-in">
         <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-2">Top 5 Products</h2>
         <% try { %>
@@ -171,7 +169,7 @@
         <% } %>
     </div>
 
-    <!-- Recent Orders Section -->
+   
     <div class="recent-orders flex-1 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg shadow-lg p-6 animate-fade-in">
         <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-2">Recent Orders</h2>
         <% if (recentOrders && recentOrders.length > 0) { %>
@@ -231,11 +229,11 @@
     <script>
 const paymentMethodData = <%- JSON.stringify(paymentMethodData) %>;
 
-// Extract labels and data for the chart
+
 const labels = paymentMethodData.map(data => data.method);
 const dataCounts = paymentMethodData.map(data => data.count);
 
-// Create a donut chart using Chart.js
+
 const ctx = document.getElementById('paymentMethodChart').getContext('2d');
 new Chart(ctx, {
     type: 'doughnut',
@@ -244,7 +242,7 @@ new Chart(ctx, {
         datasets: [{
             data: dataCounts,
             backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-            hoverOffset: 6, // More distinct hover effect
+            hoverOffset: 6,
         }]
     },
     options: {
@@ -253,9 +251,11 @@ new Chart(ctx, {
             legend: {
                 position: 'top',
                 labels: {
+                    
                     font: {
-                        size: 12, // More readable legend
-                        weight: 'bold'
+                        size: 12, 
+                        weight: 'bold',
+                        color: 'white'
                     }
                 }
             },
@@ -288,8 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     label: 'Order Count',
                     data: dataPoints,
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)', // White fill under the line
-                    borderColor: 'rgba(255, 255, 255, 1)',       // White line color
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    borderColor: 'rgba(255, 255, 255, 1)',       
                     borderWidth: 2,
                     tension: 0.4
                 }]
@@ -300,25 +300,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     y: {
                         beginAtZero: true,
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.2)', // White grid lines
+                            color: 'rgba(255, 255, 255, 0.2)', 
                         },
                         ticks: {
-                            color: 'white' // White text for Y-axis labels
+                            color: 'white'
                         }
                     },
                     x: {
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.2)' // White grid lines
+                            color: 'rgba(255, 255, 255, 0.2)' 
                         },
                         ticks: {
-                            color: 'white' // White text for X-axis labels
+                            color: 'white' 
                         }
                     }
                 },
                 plugins: {
                     legend: {
                         labels: {
-                            color: 'white', // White text for legend labels
+                            color: 'white', 
                             font: {
                                 size: 14,
                                 weight: 'bold'
@@ -328,19 +328,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                return `${context.label}: ${context.raw} orders`; // Customize tooltip
+                                return `${context.label}: ${context.raw} orders`; 
                             }
                         },
-                        bodyColor: 'white', // White text in tooltip
-                        titleColor: 'white', // White title in tooltip
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)' // Dark background for better contrast
+                        bodyColor: 'white', 
+                        titleColor: 'white', 
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)' 
                     }
                 }
             }
         });
     });
 
-// Event listener for time range buttons
+
 document.querySelectorAll('.btn-time-range').forEach(button => {
     button.addEventListener('click', () => {
         const range = button.getAttribute('data-range');
@@ -349,7 +349,6 @@ document.querySelectorAll('.btn-time-range').forEach(button => {
     });
 });
 
-// Initialize chart with default data (Day-wise)
 updateChartData(chartData.day.labels, chartData.day.dataPoints);
 
 
@@ -398,7 +397,7 @@ updateChartData(chartData.day.labels, chartData.day.dataPoints);
         }
     }
 
-    // Load stats on page load
+    
     document.addEventListener('DOMContentLoaded', loadDashboardStats);
     </script>
 </body>

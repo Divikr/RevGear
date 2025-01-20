@@ -15,8 +15,8 @@ const razorpay = new Razorpay({
 
 const createRazorpayOrder = async (req, res) => {
     try {
-        const { savedaddress, paymentMethod, cart } = req.body;
-
+        const { finalTotal,savedaddress, paymentMethod, cart } = req.body;
+console.log(req.body)
       
         console.log("Received order details:", { savedaddress, paymentMethod, cart });
 
@@ -42,7 +42,7 @@ const createRazorpayOrder = async (req, res) => {
 
        
         const options = {
-            amount: totalAmount * 100, 
+            amount: (finalTotal.toFixed(2)) * 100, 
             currency: 'INR',
             receipt: `order_rcptid_${Math.floor(Math.random() * 1000000)}`,
         };
@@ -98,7 +98,7 @@ const getWallet = async (req, res) => {
             await wallet.save();
         }
 
-        // Sort transactions by date in descending order (latest first)
+        
         wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         res.render("user/wallet", { 
@@ -113,10 +113,19 @@ const getWallet = async (req, res) => {
 };
 
 
+const paymentFailed = (req, res) => {
+    try {
+      res.render('user/paymentFailed');
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
 
   module.exports={
     createRazorpayOrder,
     getWallet,
+    paymentFailed
     
     
   }

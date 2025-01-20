@@ -63,22 +63,21 @@ const addOffer = async (req, res) => {
         console.log('Adding offer started');
         const { offerName, discount, startDate, endDate, offerType, productId, categoryId } = req.body;
 
-        // Validate required fields
+     
         if (!offerName || !discount || !startDate || !endDate || !offerType) {
             return res.status(400).json({ success: false, errorMessage: 'All fields are required' });
         }
 
-        // Validate offer name
         if (offerName.trim().length < 3) {
             return res.status(400).json({ success: false, errorMessage: 'Offer name must be at least 3 characters long' });
         }
 
-        // Validate discount
+
         if (isNaN(discount) || discount <= 0) {
             return res.status(400).json({ success: false, errorMessage: 'Discount must be a positive number' });
         }
 
-        // Validate dates
+      
         const start = new Date(startDate);
         const end = new Date(endDate);
         const now = new Date();
@@ -95,7 +94,6 @@ const addOffer = async (req, res) => {
             return res.status(400).json({ success: false, errorMessage: 'Start date must be before end date' });
         }
 
-        // Validate offer type
         if (!['Product', 'Category', 'Referral'].includes(offerType)) {
             return res.status(400).json({ success: false, errorMessage: 'Invalid offer type' });
         }
@@ -180,7 +178,7 @@ const addOffer = async (req, res) => {
             newOffer.categoryId = categoryId;
         }
 
-        // Save the offer
+       
         await newOffer.save();
         console.log('Offer saved successfully:', newOffer);
         res.redirect('/admin/offer');
@@ -197,7 +195,7 @@ const deleteOffer = async (req, res) => {
         console.log('Entered deleting');
         const { offerId } = req.body;
 
-        // Find the offer to delete
+     
         const offer = await Offer.findById(offerId);
 
         if (!offer) {
@@ -205,7 +203,7 @@ const deleteOffer = async (req, res) => {
         }
 
         if (offer.offerType === 'Product') {
-            // If offer is for a product, update the product
+           
             const product = await Product.findById(offer.productId);
             if (product) {
                 if (product.regularPrice) {
@@ -228,7 +226,7 @@ const deleteOffer = async (req, res) => {
                 console.warn(`Product with ID ${offer.productId} not found`);
             }
         } else if (offer.offerType === 'Category') {
-            // If offer is for a category, update all products in that category
+           
             const catProducts = await Product.find({ category: offer.categoryId });
             for (const product of catProducts) {
                 console.log(`Product ${product._id} has regularPrice: ${product.regularPrice}`);
@@ -251,7 +249,7 @@ const deleteOffer = async (req, res) => {
             }
         }
 
-        // Delete the offer from the database
+    
         await Offer.deleteOne({ _id: offerId });
 
         res.status(200).json({ success: true, message: "Offer deleted successfully" });

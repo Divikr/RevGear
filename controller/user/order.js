@@ -234,6 +234,7 @@ const orderconfirm = async (req, res) => {
           return res.status(400).json({ error: "Invalid payment method" });
         }
 
+        
 
         if (paymentMethod === "Wallet") {
           const wallet = await Wallet.findOne({ userId: req.session.user });
@@ -245,7 +246,7 @@ const orderconfirm = async (req, res) => {
             return res.status(400).json({ error: "Insufficient wallet balance" });
           }
     
-          // Deduct wallet balance
+        
           wallet.balance -= totalAmount;
           wallet.transactions.push({
             amount: totalAmount,
@@ -303,11 +304,15 @@ const getCheckout = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).send('Invalid User ID');
     }
+   
+
+
+   
 
     const cart = await Cart.findOne({ userId }).populate('items.productId'); 
     const savedAddresses = await Address.find({ userId });
-
-    // Validate if any cart item quantity exceeds product availability
+  
+ 
     for (let item of cart.items) {
       if (item.quantity > item.productId.quantity) {
         return res.status(400).send('One or more items exceed available stock.');
@@ -315,8 +320,9 @@ const getCheckout = async (req, res) => {
     }
 
     const total = cart.items.reduce((sum, item) => sum + item.productId.salePrice * item.quantity, 0);
+    const disabledCOD=total>3000;
 
-    res.render('user/checkout', { cart: cart.items, savedAddresses, total , offerApplied:0});
+    res.render('user/checkout', { cart: cart.items, savedAddresses, total , offerApplied:0 , disabledCOD});
   } catch (error) {
     console.error('Error in checkout:', error.message);
     res.status(500).send('Server error');
@@ -428,7 +434,7 @@ const downloadInvoice = async (req, res) => {
       }
     }
 
-    // Header Section
+
     doc
       .rect(0, 0, pageWidth, 160)
       .fill('#1a237e');
@@ -457,7 +463,7 @@ const downloadInvoice = async (req, res) => {
       .text(`Invoice No: ${orderId}`, rightMargin - 170, 100)
       .text(`Date: ${new Date(order.orderDate).toLocaleDateString()}`, rightMargin - 170, 150);
 
-    // Address Section
+
     doc.y = 190;
     const addressY = doc.y;
 
@@ -507,15 +513,15 @@ const downloadInvoice = async (req, res) => {
       doc.moveDown(0.5);
     });
 
-    // Items Section - Added more spacing here
-    doc.y += 50; // Increased from 20 to 50 for more space
+   
+    doc.y += 50;
     const itemStart = doc.y;
     
-    // Add a section title for items
+   
     doc
       .fontSize(14)
       .font('Helvetica-Bold')
-      .text('ORDER DETAILS', leftMargin, itemStart - 30); // Added section title
+      .text('ORDER DETAILS', leftMargin, itemStart - 30); 
     
     const columnPositions = {
       item: leftMargin + 10,
@@ -524,7 +530,7 @@ const downloadInvoice = async (req, res) => {
       total: pageWidth - 100
     };
 
-    // Table header
+    
     doc
       .rect(leftMargin, itemStart - 10, contentWidth, 30)
       .fill('#f5f5f5');
@@ -558,7 +564,7 @@ const downloadInvoice = async (req, res) => {
       currentY += 40;
     });
 
-    // Summary Section
+
     currentY += 20;
     const summaryWidth = 250;
     const summaryX = rightMargin - summaryWidth;
