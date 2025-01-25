@@ -132,6 +132,7 @@ const loadlogin = async (req, res) => {
         res.status(500).send("Server error");
     }
 };
+
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -146,18 +147,26 @@ const login = async (req, res) => {
         }
 
         const user = await User.findOne({ email });
-        if (!user || !(await bcrypt.compare(password, user.password))) {
+        if (!user) {
             return res.status(401).render("user/login", { error: "Invalid email or password" });
         }
 
-        req.session.user = user; 
+        if (user.isBlocked) {
+            return res.status(403).render("user/login", { error: "You have been blocked. Please contact support." });
+        }
+
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        if (!isPasswordMatch) {
+            return res.status(401).render("user/login", { error: "Invalid email or password" });
+        }
+
+        req.session.user = user;
         res.redirect("/home");
     } catch (error) {
         console.error(`Login error for email ${req.body.email}:`, error.message);
         res.status(500).render("user/login", { error: "Internal Server Error" });
     }
 };
-
 
 
 const getForget= async  (req,res)=>{
@@ -371,6 +380,7 @@ const logout = async (req, res) => {
 const getAllProducts = async (req, res) => {
     try {
         const { page = 1, limit = 5, sort } = req.query;
+        console.log("guiifdbfgujh",req.body)
 
   
         let sortCriteria = {};
@@ -404,7 +414,8 @@ const getAllProducts = async (req, res) => {
             currentPage: parseInt(page),
             totalPages,
             limit: 8,
-            sort,
+            sort,  
+            query: req.query 
         });
     } catch (error) {
         console.error('Error fetching products with sorting and pagination:', error);

@@ -90,11 +90,23 @@
                     <form action="/admin/customDateReport" method="GET" class="border p-4 rounded-lg bg-gray-800 shadow-md">
                         <div class="mb-4">
                             <label for="startDate" class="block text-sm font-medium text-gray-300">Start Date</label>
-                            <input type="date" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" id="startDate" name="startDate" required>
+                            <input 
+                                type="date" 
+                                class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                                id="startDate" 
+                                name="startDate" 
+                                max="{{ new Date().toISOString().split('T')[0] }}" 
+                                required>
                         </div>
                         <div class="mb-4">
                             <label for="endDate" class="block text-sm font-medium text-gray-300">End Date</label>
-                            <input type="date" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" id="endDate" name="endDate" required>
+                            <input 
+                                type="date" 
+                                class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                                id="endDate" 
+                                name="endDate" 
+                                max="{{ new Date().toISOString().split('T')[0] }}" 
+                                required>
                         </div>
                         <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Generate Report</button>
                     </form>
@@ -176,6 +188,58 @@
             </div>
         </div>
         
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const form = document.querySelector('form');
+                const startDateInput = document.getElementById('startDate');
+                const endDateInput = document.getElementById('endDate');
+        
+                // Set the maximum date to today for both inputs
+                const today = new Date().toISOString().split('T')[0];
+                startDateInput.setAttribute('max', today);
+                endDateInput.setAttribute('max', today);
+        
+                form.addEventListener('submit', (event) => {
+                    // Get selected dates
+                    const startDate = new Date(startDateInput.value);
+                    const endDate = new Date(endDateInput.value);
+        
+                    // Check if dates are valid
+                    if (!startDateInput.value || !endDateInput.value || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                        event.preventDefault();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Date Format',
+                            text: 'Please use YYYY-MM-DD.',
+                        });
+                        return;
+                    }
+        
+                    // Check if dates exceed the current date
+                    if (startDate > new Date(today) || endDate > new Date(today)) {
+                        event.preventDefault();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Date',
+                            text: 'Dates cannot exceed the current date.',
+                        });
+                        return;
+                    }
+        
+                    // Check if start date is after end date
+                    if (startDate > endDate) {
+                        event.preventDefault();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Date Range',
+                            text: 'Start date cannot be after the end date.',
+                        });
+                        return;
+                    }
+                });
+            });
+        </script>
 
+       
 </body>
 </html>

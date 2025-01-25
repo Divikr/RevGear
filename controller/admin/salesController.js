@@ -620,10 +620,11 @@ const generateYearlyReport = async (req, res) => {
 
 const generateCustomDateReport = async (req, res) => {
     try {
+        const currentdate = moment().endOf('day'); // Current date till the end of the day
         const startDate = moment(req.query.startDate, 'YYYY-MM-DD').startOf('day');
         const endDate = moment(req.query.endDate, 'YYYY-MM-DD').endOf('day');
 
-  
+        // Validate date formats
         if (!startDate.isValid() || !endDate.isValid()) {
             return res.status(400).json({
                 success: false,
@@ -631,6 +632,15 @@ const generateCustomDateReport = async (req, res) => {
             });
         }
 
+        // Check if dates exceed current date
+        if (startDate.isAfter(currentdate) || endDate.isAfter(currentdate)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Dates cannot exceed the current date.'
+            });
+        }
+
+        // Check if start date is after end date
         if (startDate.isAfter(endDate)) {
             return res.status(400).json({
                 success: false,

@@ -111,35 +111,38 @@ const form = document.getElementById('profileForm');
 const nameInput = document.getElementById('name');
 const emailInput = document.getElementById('email');
 const phoneInput = document.getElementById('phone');
-
+                                    
 form.addEventListener('submit', function(event) {
   event.preventDefault();
 
- 
   const name = nameInput.value.trim();
   const email = emailInput.value.trim();
   const phone = phoneInput.value.trim();
 
-  const nameRegex = /^[A-Za-z\s]{3,}$/; 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
-  const phoneRegex = /^\d{10}$/;
+  // Updated Regular Expressions
+  const nameRegex = /^[A-Za-z][A-Za-z\s]{2,}$/; // Starts with a letter, minimum 3 characters, no leading space
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Standard email validation
+  const phoneRegex = /^[1-9]\d{9}$/; // Starts with a digit 1-9, exactly 10 digits, no leading space
 
   let isValid = true;
   let message = '';
 
-  if (!nameRegex.test(name)) {
+  // Validate Name
+  if (!nameRegex.test(name) || /^\s/.test(nameInput.value)) {
     isValid = false;
-    message += 'Enter Valid Name';
+    message += 'Enter a valid name\n';
   }
 
+  // Validate Email
   if (!emailRegex.test(email)) {
     isValid = false;
     message += 'Invalid Email: Please enter a valid email address.\n';
   }
 
-  if (!phoneRegex.test(phone)) {
+  // Validate Phone Number
+  if (!phoneRegex.test(phone) || /^\s/.test(phoneInput.value)) {
     isValid = false;
-    message += 'Invalid Phone Number: Must be exactly 10 digits.\n';
+    message += 'Invalid Phone Number \n';
   }
 
   if (isValid) {
@@ -162,6 +165,8 @@ form.addEventListener('submit', function(event) {
     });
   }
 });
+
+
 </script>
 </body>
 </html>

@@ -52,6 +52,8 @@ const orderSchema = mongoose.Schema({
             'Cancelled', 
             'Return Pending',
             'Return Success',
+            'Return Reject',
+            'Payment Pending'
             
            
         ],
@@ -105,7 +107,7 @@ const orderSchema = mongoose.Schema({
         },
         status: { 
             type: String, 
-            enum: ['Completed','Pending',], 
+            enum: ['Completed','Pending','Reject'], 
             default: 'Pending' 
         }
     }

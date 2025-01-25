@@ -2,11 +2,13 @@ const Cart = require("../../model/cart");
 const User = require("../../model/users");
 const Address = require('../../model/address');
 const Order = require('../../model/Order');
+const Product = require('../../model/product');
 const Wallet = require('../../model/wallet');
 const env = require("dotenv").config();
 const mongoose = require("mongoose"); 
 const Razorpay = require('razorpay');
 const crypto=require("crypto")
+
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -50,6 +52,7 @@ console.log(req.body)
         console.log("Creating Razorpay order with options:", options);
 
         const order = await razorpay.orders.create(options);
+        console.log('.......fgsegg....',order)
 
         console.log("Razorpay order created successfully:", order);
 
@@ -113,19 +116,218 @@ const getWallet = async (req, res) => {
 };
 
 
-const paymentFailed = (req, res) => {
+const handlePaymentFailure = async (req, res) => {
     try {
-      res.render('user/paymentFailed');
+      const {
+        savedaddress,
+        cart,
+        couponCode,
+        discount,
+        finalTotal,
+        paymentFailureDetails
+      } = req.body;
+  
+      console.log("Received payment failure data:", req.body);
+  
+      if (!savedaddress || !cart || !finalTotal) {
+        throw new Error('Missing required order details');
+      }
+  
+      const userId = req.session.user;
+      const address = await Address.findById(savedaddress);
+      
+console.log("address........",address)
+
+      if (!address) {
+        throw new Error('Delivery address not found');
+      }
+  
+      for (const item of cart) {
+        const product = await Product.findById(item.productId._id);
+        if (!product) {
+          throw new Error(`Product not found for ID: ${item.productId._id}`);
+        }
+        if (product.quantity < item.quantity) {
+          throw new Error(`Insufficient stock for product: ${product.productName}`);
+        }
+      }
+
+      const items = cart.map(item => ({
+        productId: item.productId._id,
+        quantity: item.quantity,
+        price: item.productId.salePrice
+      }));
+  
+console.log("items......",items)
+
+      const newOrder = new Order({
+        userId,
+        deliveryAddress: {
+          name: address.name,
+          streetAddress: address.street,
+          addressType: address.addressType,
+          city: address.city,
+          apartment: address.apartment,
+          landMark: address.landmark,
+          postalCode: address.postalCode,
+          phone: address.phone
+        },
+        items,
+        totalAmount: finalTotal,
+        paymentMethod: 'Razorpay',
+        orderStatus: 'Payment Pending',
+        paymentDetails: paymentFailureDetails
+      });
+  console.log("newOrder......",newOrder)
+
+      const savedOrder = await newOrder.save();
+
+      console.log("savedorder.........",savedOrder)
+      
+      res.status(201).json({
+        success: true,
+        message: 'Order created with pending payment status',
+        orderId: savedOrder._id
+      });
+  
     } catch (error) {
-      console.log(error.message);
+      console.error('Payment failure handling error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to process failed payment'
+      });
+    }
+  };
+
+  const retryPayment = async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      console.log("order", orderId);
+  
+      // Find the order by ID
+      const order = await Order.findById(orderId);
+  
+      if (!order) {
+        return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+  
+      if (order.orderStatus !== 'Payment Pending') {
+        return res.status(400).json({
+          success: false,
+          message: 'Payment can only be retried for orders with status "Payment Pending"',
+        });
+      }
+
+     
+  
+      // Create a new Razorpay order
+      const razorpayOrder = await razorpay.orders.create({
+        amount: order.totalAmount * 100, // Amount in smallest currency unit
+        currency: 'INR',
+        receipt: `order_${order._id}`,
+        notes: {
+          userId: order.userId.toString(),
+          orderId: order._id.toString(),
+        },
+      });
+  
+      // Send Razorpay order details to the frontend
+      res.status(200).json({
+        success: true,
+        key: process.env.RAZORPAY_KEY_ID,
+        razorpayOrderId: razorpayOrder.id,
+        amount: order.totalAmount * 100,
+        currency: 'INR',
+      });
+    } catch (error) {
+      console.error('Error in retrying payment:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'An error occurred while retrying payment',
+      });
+    }
+  };
+  
+  // Payment Success Handler
+  const paymentSuccess = async (req, res) => {
+    try {
+      const { 
+        razorpay_payment_id, 
+        razorpay_order_id, 
+        razorpay_signature,
+        orderId 
+      } = req.body;
+  
+      // Find the order
+      const order = await Order.findById(orderId);
+      if (!order) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Order not found' 
+        });
+      }
+  
+      // Verify payment signature
+      const generated_signature = crypto
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .digest('hex');
+  
+      if (generated_signature !== razorpay_signature) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid payment signature' 
+        });
+      }
+  
+      // Update order status
+      order.orderStatus = 'Ordered';
+      order.paymentDetails = {
+        razorpayPaymentId: razorpay_payment_id,
+        razorpayOrderId: razorpay_order_id,
+        status: 'success'
+      };
+  
+      await order.save();
+  
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Payment successful',
+        orderId: order._id 
+      });
+    } catch (error) {
+      console.error('Payment success error:', error);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Payment processing failed' 
+      });
     }
   };
 
 
+  const paymentFailed = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+       
+
+        
+
+        const order = await Order.findById(orderId);
+        
+       
+
+        res.render('user/paymentFailed', { order });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send('Something went wrong');
+    }
+};
+
   module.exports={
     createRazorpayOrder,
     getWallet,
-    paymentFailed
-    
-    
+    handlePaymentFailure,
+    paymentFailed,
+    retryPayment,
+    paymentSuccess 
   }

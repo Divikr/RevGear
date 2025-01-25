@@ -152,7 +152,7 @@ const addToCart = async (req, res) => {
 
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "Product not found " });
     }
 
     if (product.status !== "Available") {
@@ -355,49 +355,34 @@ const removeFromCart = async (req, res) => {
 
 
 
-const removeFromWishlist = async (req, res) => {
+
+const  removeFromWishlist = async (req, res) => {
   try {
-    const { productId } = req.params;
-    const userId = req.session.user;
+      const { productId } = req.params; 
+      const user = req.session.user; 
 
-    console.log(`Attempting to remove product ${productId} for user ${userId}`);
+      console.log("User:", user);
+      console.log("Product ID to remove:", productId);
 
-   
-    if (!userId) {
-      console.log('User not authenticated');
-      return res.status(401).json({ message: "User not authenticated" });
-    }
+      
+      const updatedWishlist = await Wishlist.findOneAndUpdate(
+          { userId: user },
+          { $pull: { products: { productId } } }, 
+          { new: true }
+      );
 
-
-    const wishlist = await Wishlist.findOne({ userId });
-    if (!wishlist) {
-      console.log(`Wishlist not found for user ${userId}`);
-      return res.status(404).json({ message: "Wishlist not found" });
-    }
-
-   
-    const productIndex = wishlist.products.findIndex(item => 
-      item.productId.toString() === productId
-    );
-
-    if (productIndex === -1) {
-      console.log(`Product ${productId} not found in wishlist for user ${userId}`);
-      return res.status(404).json({ message: "Product not found in wishlist" });
-    }
-
-   
-    wishlist.products.splice(productIndex, 1);
-
-    await wishlist.save();
-    console.log(`Product ${productId} removed from wishlist for user ${userId}`);
-    res.status(200).json({ message: "Product removed from wishlist successfully" });
+      if (updatedWishlist) {
+    
+          res.status(200).json({ removed: true });
+      } else {
+        
+          res.status(404).json({ success: false, message: 'Product not found in wishlist.' });
+      }
   } catch (error) {
-    console.error("Error removing from wishlist:", error);
-    res.status(500).json({ message: "Error removing from wishlist", error: error.message });
+      console.error('Error deleting product from wishlist:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
   }
 };
-
-
 
 
 

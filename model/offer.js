@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const offerSchema = new mongoose.Schema({
     offerName: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
     },
     discount: {
         type: Number,
@@ -20,7 +21,7 @@ const offerSchema = new mongoose.Schema({
 
     offerType: {
         type: String,
-        enum:['Category','Product','Referral'],
+        enum:['Category','Product'],
         required: true
 
     },  

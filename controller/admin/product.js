@@ -167,6 +167,15 @@ const updateProduct = async (req, res) => {
       productImage: updatedProductImages
     };
 
+   if(quantity>0){
+    await Product.findByIdAndUpdate( productId,
+      {
+          $set: {
+              status:"Available"
+          },
+      },
+      { new: true })
+   }
    
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,

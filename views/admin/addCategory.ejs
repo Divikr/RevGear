@@ -143,35 +143,34 @@
                   document.querySelector('.save-category').addEventListener('click', async function (event) {
         event.preventDefault();
 
-        const categoryName = document.getElementById('category-name').value.trim();
-        const categoryDescription = document.getElementById('category-description').value.trim();
-       
-        const imagePreviewContainer = document.getElementById('image-preview-container');
-
+      
     
-        if (!categoryName) {
-            Swal.fire('Validation Error', 'Category Name is required.', 'error');
-            return;
-        } else if (categoryName.length < 3 || categoryName.length > 50) {
-            Swal.fire('Validation Error', 'Category Name must be between 3 and 50 characters.', 'error');
-            return;
-        }
+        const categoryName = document.getElementById('category-name').value;
+    const categoryDescription = document.getElementById('category-description').value;
+    const imagePreviewContainer = document.getElementById('image-preview-container');
 
-        if (!categoryDescription) {
-            Swal.fire('Validation Error', 'Category Description is required.', 'error');
-            return;
-        } else if (categoryDescription.length < 10 || categoryDescription.length > 200) {
-            Swal.fire('Validation Error', 'Category Description must be between 10 and 200 characters.', 'error');
-            return;
-        }
+   
+    if (!categoryName || categoryName[0] === ' ') {
+        Swal.fire('Validation Error', 'Enter valid name', 'error');
+        return;
+    } 
+    
+    const trimmedName = categoryName.trim();
+    if (trimmedName.length < 3 || trimmedName.length > 50) {
+        Swal.fire('Validation Error', 'Category Name must be between 3 and 50 characters.', 'error');
+        return;
+    }
 
-       
-
-        if (!imagePreviewContainer.querySelector('.cropped-image')) {
-            Swal.fire('Validation Error', 'Category Image is required.', 'error');
-            return;
-        }
-
+    if (!categoryDescription || categoryDescription[0] === ' ') {
+        Swal.fire('Validation Error', 'Enter valid description', 'error');
+        return;
+    }
+    
+    const trimmedDescription = categoryDescription.trim();
+    if (trimmedDescription.length < 5 || trimmedDescription.length > 50) {
+        Swal.fire('Validation Error', 'Category Description must be between 5 and 50 characters.', 'error');
+        return;
+    }
        
         const formData = new FormData();
         formData.append('name', categoryName);

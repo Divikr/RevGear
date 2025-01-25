@@ -96,7 +96,6 @@ route.post('/changePassword', profileController.postpassword)
 
 route.post('/addToCart', productController.addToCart);
 route.get('/cart', productController.getcart)
-route.delete('/wishlist/remove/:productId', productController.removeFromWishlist);
 route.delete('/cart/remove/:productId', productController.removeFromCart);
 route.get('/checkout', orderController.getCheckout);
 route.post('/update', productController.updateCart);
@@ -106,6 +105,7 @@ route.post('/update', productController.updateCart);
 
 route.post('/wishlist/add', productController.addToWishlist);
 route.get('/wishlist', productController.getwishlist);
+route.delete('/wishlist/remove/:productId', productController.removeFromWishlist);
 
 //invoice download
 
@@ -126,8 +126,11 @@ route.post('/orders/return-order/:id', orderController. returnOrder);
 //payment
 
 route.post('/create-razorpay-order', paymentController.createRazorpayOrder);
+route.post('/handle-payment-failure', paymentController.handlePaymentFailure);
 route.get('/payment-failed', paymentController.paymentFailed);
 route.get('/wallet', paymentController.getWallet);
+route.post('/retry-payment/:orderId', paymentController.retryPayment);
+route.post('/payment-success', paymentController.paymentSuccess);
 
 //coupon manegment
 

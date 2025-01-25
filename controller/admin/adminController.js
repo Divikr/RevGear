@@ -252,6 +252,36 @@ const recentOrders = await Order.aggregate([
     }
 ]);
 
+
+const topCategories = await Order.aggregate([
+    { $unwind: "$items" },
+    {
+        $lookup: {
+            from: "products",
+            localField: "items.productId",
+            foreignField: "_id",
+            as: "productDetails"
+        }
+    },
+    { $unwind: "$productDetails" },
+    {
+        $group: {
+            _id: "$productDetails.category",
+            totalQuantitySold: { $sum: "$items.quantity" },
+            totalRevenue: { $sum: { $multiply: ["$items.quantity", "$items.price"] } }
+        }
+    },
+    { $sort: { totalQuantitySold: -1 } },
+    { $limit: 4 },
+    {
+        $project: {
+            category: "$_id",
+            totalQuantitySold: 1,
+            totalRevenue: { $round: ["$totalRevenue", 2] }
+        }
+    }
+]);
+
         res.render("dashboard", {
             totalRevenue: totalRevenue[0]?.total || 0,
             orderGraphData,
@@ -263,11 +293,9 @@ const recentOrders = await Order.aggregate([
             canceledOrders,
             returnedOrders,
             topProducts,
+            topCategories,
             recentOrders ,
-            dayData, 
-            weekData, 
-            monthData, 
-            yearData 
+            
          
         });
     } catch (error) {
@@ -431,6 +459,35 @@ const approveReturn = async (req, res) => {
 };
 
 
+const rejectReturn = async (req, res) => {
+    try {
+        const orderId = req.params.orderId; 
+        const order = await Order.findById(orderId).populate('userId'); 
+
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        // Check if the return status is pending
+        if (order.returnDetails.status !== 'Pending') {
+            return res.status(400).send('Return status is not pending');
+        }
+
+        // Update the return status to 'Rejected'
+        order.returnDetails.status = 'Reject';
+        order.orderStatus = 'Return Reject';
+
+        // Save the updated order
+        await order.save();
+
+        // Redirect to the order list view
+        res.redirect(`/admin/viewOrderLists/${orderId}`); 
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+};
+
 
 module.exports={
     adminloadlogin,
@@ -440,6 +497,7 @@ module.exports={
     orderlists,
     viewOrder,
     changeStatus,
-    approveReturn
+    approveReturn,
+    rejectReturn
    
 }

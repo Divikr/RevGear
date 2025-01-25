@@ -211,6 +211,17 @@
     transition: background-color 0.3s, box-shadow 0.3s;
 }
 
+.btn-danger{
+    background-color: #e63e3e; 
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
 .btn-primary:hover {
     background-color: #45a049;
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
@@ -282,7 +293,7 @@
             </div>
         </div>
             
-<% if (!['Cancelled', 'Return Success'].includes(orderDetails.orderStatus)) { %>
+<% if (!['Cancelled', 'Return Success','Return Reject','Return Pending','Delivered'].includes(orderDetails.orderStatus)) { %>
     <div class="modal fade" id="orderStatusModal" tabindex="-1" aria-labelledby="orderStatusModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -351,8 +362,11 @@
                                             <strong>Return Description:</strong>
                                             <span><%= orderDetails.returnDetails.description %></span><br>
                                         </div>
-                                        <form action="/admin/approve-return/<%= orderDetails._id %>" method="POST">
+                                        <form action="/admin/approve-return/<%= orderDetails._id %>" method="POST" style="display: inline;">
                                             <button type="submit" class="btn btn-primary btn-lg ml-3">Approve Return</button>
+                                        </form>
+                                        <form action="/admin/reject-return/<%= orderDetails._id %>" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger btn-lg ml-3">Reject Return</button>
                                         </form>
                                         
                                     </div>

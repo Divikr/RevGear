@@ -159,10 +159,9 @@
               <label for="product-name">Product Name</label>
               <input type="text" name="productName" id="product-name" value="<%= product.productName %>" placeholder="Type product name here..." required>
             </div>
-
             <div class="form-group">
-              <label for="description">Product Description</label>
-              <input type="text" name="description" id="description" value="<%= product.description %>" placeholder="Type product name here..." required>
+              <label for="product-description">Product Description</label>
+              <input type="text" name="description" id="product-description" value="<%= product.description %>" placeholder="Type product description here..." required>
             </div>
 
             <div class="form-group">
@@ -204,207 +203,266 @@
     </div>
 
     <script>
-      const maxImages = 4;
-      const imageInput = document.getElementById('image-input');
-      const imagePreviewContainer = document.getElementById('image-preview-container');
-      const addImageButton = document.getElementById('add-image-button');
-      const cropperModal = document.getElementById('cropper-modal');
-      const cropperImage = document.getElementById('cropper-image');
-      const cropButton = document.getElementById('crop-button');
-      const cancelCropButton = document.getElementById('cancel-crop-button');
+  const maxImages = 4;
+const imageInput = document.getElementById('image-input');
+const imagePreviewContainer = document.getElementById('image-preview-container');
+const addImageButton = document.getElementById('add-image-button');
+const cropperModal = document.getElementById('cropper-modal');
+const cropperImage = document.getElementById('cropper-image');
+const cropButton = document.getElementById('crop-button');
+const cancelCropButton = document.getElementById('cancel-crop-button');
 
-      let cropper;
+let cropper;
 
-      
+addImageButton.addEventListener('click', () => {
+ 
+  const imageCount = imagePreviewContainer.querySelectorAll('img').length;
+  
+  if (imageCount < maxImages) {
+    imageInput.click();
+  } else {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Oops...',
+      text: 'Maximum of 4 images allowed.',
+    });
+  }
+});
 
+imageInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  const imageCount = imagePreviewContainer.querySelectorAll('img').length;
+  
+  if (file && imageCount < maxImages) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      cropperImage.src = event.target.result;
+      openCropperModal();
+    };
+    reader.readAsDataURL(file);
+  }
+});
 
-      addImageButton.addEventListener('click', () => {
-        if (imagePreviewContainer.childElementCount < maxImages) {
-          imageInput.click();
-        } else {
-          Swal.fire({
-    icon: 'warning',
-    title: 'Oops...',
-    text: 'Maximum of 4 images allowed.',
+function openCropperModal() {
+  cropperModal.style.display = 'block';
+  cropper = new Cropper(cropperImage, {
+    aspectRatio: 1,
+    viewMode: 1,
   });
-        }
-      }); 
+}
 
-   
-      imageInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            cropperImage.src = event.target.result;
-            openCropperModal();
-          };
-          reader.readAsDataURL(file);
-        }
-      });
+function closeCropperModal() {
+  cropperModal.style.display = 'none';
+  cropper.destroy();
+  cropper = null;
+}
 
+cropButton.addEventListener('click', (event) => {
+  event.preventDefault();
 
-      function openCropperModal() {
-        cropperModal.style.display = 'block';
-        cropper = new Cropper(cropperImage, {
-          aspectRatio: 1,
-          viewMode: 1,
-        });
-      }
+  const croppedCanvas = cropper.getCroppedCanvas();
 
-      function closeCropperModal() {
-        cropperModal.style.display = 'none';
-        cropper.destroy();
-        cropper = null;
-      }
+  croppedCanvas.toBlob((blob) => {
+    const dataTransfer = new DataTransfer();
+    const file = new File([blob], 'cropped-image.png', {
+      type: 'image/png',
+    });
+    dataTransfer.items.add(file);
+    imageInput.files = dataTransfer.files;
 
-      cropButton.addEventListener('click', (event) => {
-        event.preventDefault();
+    const croppedImage = document.createElement('img');
+    const deleteButton = document.createElement('button');
 
-        const croppedCanvas = cropper.getCroppedCanvas();
+    croppedImage.src = croppedCanvas.toDataURL('image/png');
+    croppedImage.classList.add('cropped-image');
 
-       
-        croppedCanvas.toBlob((blob) => {
-          
-          const dataTransfer = new DataTransfer();
-          const file = new File([blob], 'cropped-image.png', {
-            type: 'image/png'
-          });
-          dataTransfer.items.add(file);
-          imageInput.files = dataTransfer.files;
-
-          const croppedImage = document.createElement('img');
-          const deleteButton = document.createElement('button');
-
-          croppedImage.src = croppedCanvas.toDataURL('image/png');
-          croppedImage.classList.add('cropped-image');
-
-          deleteButton.textContent = 'Delete';
-          deleteButton.classList.add('delete-button');
-          deleteButton.addEventListener('click', () => {
-            
-            croppedImage.parentElement.remove();
-            imageInput.value = ''; 
-          });
-
-          const imageWrapper = document.createElement('div');
-          imageWrapper.classList.add('image-wrapper');
-          imageWrapper.appendChild(croppedImage);
-          imageWrapper.appendChild(deleteButton);
-
-          imagePreviewContainer.appendChild(imageWrapper);
-
-          closeCropperModal();
-        }, 'image/png');
-      });
+    deleteButton.textContent = 'Delete';
+    deleteButton.classList.add('delete-button');
+    deleteButton.addEventListener('click', () => {
+      croppedImage.parentElement.remove();
       
-      document.querySelector('.save-product').addEventListener('click', function(event) {
-       
-        const requiredFields = [
-          'product-name', 'product-category',
-          'stock', 'product-price',
-        ];
+      updateImageCount();
+    });
 
-       
-        const isValid = requiredFields.every(fieldId => {
-          const field = document.getElementById(fieldId);
-          return field && field.value.trim() !== '';
-        });
+    const imageWrapper = document.createElement('div');
+    imageWrapper.classList.add('image-wrapper');
+    imageWrapper.appendChild(croppedImage);
+    imageWrapper.appendChild(deleteButton);
 
-        if (!isValid) {
-          event.preventDefault(); 
-         
+    imagePreviewContainer.appendChild(imageWrapper);
+
+    closeCropperModal();
+ 
+    updateImageCount();
+  }, 'image/png');
+});
+
+function updateImageCount() {
+ 
+  const imageCount = imagePreviewContainer.querySelectorAll('img').length;
+
+ 
+  if (imageCount >= maxImages) {
+    imageInput.disabled = true;
+  } else {
+    imageInput.disabled = false;
+  }
+}
+
+document.querySelector('.save-product').addEventListener('click', function(event) {
+
+const requiredFields = [
+  'product-name', 'product-category',
+  'stock', 'product-price', 'product-description',
+];
+
+const isValid = requiredFields.every(fieldId => {
+  const field = document.getElementById(fieldId);
+  return field && field.value.trim() !== '';
+});
+
+if (!isValid) {
+  event.preventDefault();
+
   Swal.fire({
     icon: 'error',
     title: '',
-    text: 'Please fill in all  fields',
+    text: 'Please fill in all fields',
   });
   return;
-        }
+}
 
-    
-      });
 
-      document.querySelector('.image-upload-container').addEventListener('click', function(event) {
-        if (event.target.classList.contains('delete-button')) {
-          const imageWrapper = event.target.closest('.image-wrapper');
-          const imageUrl = event.target.dataset.image;
+    const productName = document.getElementById('product-name');
+    const productDescription = document.getElementById('product-description');
 
-        
-          if (confirm('Are you sure you want to delete this image?')) {
-          
-            imageWrapper.remove();
+    // Trim inputs to remove leading and trailing spaces
+    productName.value = productName.value.trim();
+    productDescription.value = productDescription.value.trim();
 
-            const hiddenDeletedImagesInput = document.getElementById('deleted-images') ||
-              document.createElement('input');
+    // Validation flags
+  
 
-            hiddenDeletedImagesInput.type = 'hidden';
-            hiddenDeletedImagesInput.name = 'deletedImages';
-            hiddenDeletedImagesInput.id = 'deleted-images';
+    // Validate product name
+    if (productName.value.length < 3) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Product name must be at least 3 characters long.',
+        });
+        isValid = false;
+    }
 
-            if (!hiddenDeletedImagesInput.value) {
-              hiddenDeletedImagesInput.value = JSON.stringify([imageUrl]);
-            } else {
-              const deletedImages = JSON.parse(hiddenDeletedImagesInput.value);
-              deletedImages.push(imageUrl);
-              hiddenDeletedImagesInput.value = JSON.stringify(deletedImages);
+    // Validate product description
+    if (productDescription.value.length < 10) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Product description must be at least 10 characters long.',
+        });
+        isValid = false;
+    }
+
+    // If validation passes, show confirmation and submit
+    if (isValid) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to update this product?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'Cancel',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Trim values before submitting
+                productName.value = productName.value.trim();
+                productDescription.value = productDescription.value.trim();
+                document.querySelector('form').submit();
             }
+        });
+    }
 
-            document.querySelector('form').appendChild(hiddenDeletedImagesInput);
-          }
-        }
-      });
-    </script>
+// Validate stock
+const stockValue = parseInt(document.getElementById('stock').value.trim());
+if (isNaN(stockValue) || stockValue <= 0) {
+  event.preventDefault();
 
-<script>
+  Swal.fire({
+    icon: 'error',
+    title: 'Invalid Stock',
+    text: 'Stock must be a positive number greater than 0.',
+  });
+  return;
+}
 
-  const priceInput = document.getElementById('product-price');
-  const offerInput = document.getElementById('product-offer');
-  const salePriceInput = document.getElementById('product-sale-price');
+// Validate price and offer as per your existing logic
+});
 
-  function calculateSalePrice() {
-    const regularPrice = parseFloat(priceInput.value) || 0;
-    const productOffer = parseFloat(offerInput.value) || 0;
+// Sale price calculation
+const name = document.getElementById('product-name');
+const stock = document.getElementById('stock');
+const priceInput = document.getElementById('product-price');
+const offerInput = document.getElementById('product-offer');
+const salePriceInput = document.getElementById('product-sale-price');
 
-    if (productOffer < 0 || productOffer > 100) {
-      Swal.fire({
+function calculateSalePrice() {
+const regularPrice = parseFloat(priceInput.value) || 0;
+const productOffer = parseFloat(offerInput.value) || 0;
+
+if (productOffer <= 0 || productOffer >= 100) {
+  Swal.fire({
     icon: 'error',
     title: 'Invalid Offer Percentage',
     text: 'Offer percentage should be between 0 and 100.',
   });
   return;
-    }
+}
 
-    const salePrice = regularPrice - (regularPrice * (productOffer / 100));
-    salePriceInput.value = salePrice.toFixed(2); 
-  }
-
-  priceInput.addEventListener('input', calculateSalePrice);
-  offerInput.addEventListener('input', calculateSalePrice);
-
-
-
-  document.querySelector('.save-product').addEventListener('click', function(event) {
-  event.preventDefault(); // Prevent the form from submitting immediately
-
-  // Show SweetAlert confirmation
+if (regularPrice <= 0) {
   Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you want to update this product?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, update it!',
-    cancelButtonText: 'Cancel',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // If confirmed, submit the form
-      document.querySelector('form').submit();
-    } else {
-      // If canceled, do nothing
-      Swal.fire('Canceled', 'Your product was not updated.', 'info');
-    }
+    icon: 'error',
+    title: 'Invalid Price',
+    text: 'Price cannot be 0',
   });
+  return;
+}
+
+if (stock <= 0) {
+  Swal.fire({
+    icon: 'error',
+    title: 'Invalid Stock',
+    text: 'Stock cannot be negative or 0 value',
+  });
+  return;
+}
+
+const salePrice = regularPrice - (regularPrice * (productOffer / 100));
+salePriceInput.value = salePrice.toFixed(2);
+}
+
+priceInput.addEventListener('input', calculateSalePrice);
+offerInput.addEventListener('input', calculateSalePrice);
+
+document.querySelector('.save-product').addEventListener('click', function(event) {
+event.preventDefault();
+
+Swal.fire({
+  title: 'Are you sure?',
+  text: 'Do you want to update this product?',
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonText: 'Yes, update it!',
+  cancelButtonText: 'Cancel',
+}).then((result) => {
+  if (result.isConfirmed) {
+    document.querySelector('form').submit();
+  } else {
+    Swal.fire('Canceled', 'Your product was not updated.', 'info');
+  }
 });
+});
+
+
 </script>
 </body>
 

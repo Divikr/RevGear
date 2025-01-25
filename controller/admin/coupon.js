@@ -42,7 +42,7 @@ const addCoupon = async (req, res) => {
             offerValue,
             minimumPrice,
             createdOn: createdOn || new Date(),
-            expiredOn,
+            expiredOn:new Date(expiredOn),
             usageLimit: usageLimit || null,
             usagePerUserLimit: usagePerUserLimit || 1,
             isActive: isActive ?? true,
@@ -82,26 +82,31 @@ const  deleteCoupon = async (req, res) => {
     }
 };
 
-
 const checkExpiredCoupons = async () => {
     try {
         const now = new Date();
         console.log("Checking expired coupons. Current date:", now);
 
         const expiredCoupons = await Coupon.updateMany(
-            { expiredOn: { $lt: now }, status: true },
-            { $set: { status: false, isActive: false } }
+            { 
+                expiredOn: { $lt: now }, 
+                status: true 
+            },
+            { 
+                $set: { 
+                    status: false, 
+                    isActive: false 
+                } 
+            }
         );
 
         console.log(`${expiredCoupons.modifiedCount} coupons expired and deactivated.`);
     } catch (error) {
-        console.error("Error updating expired coupons:", error.message, error.stack);
+        console.error("Error updating expired coupons:", error);
     }
 };
 
-
-setInterval(checkExpiredCoupons, 24 * 60 * 60 * 1000); 
-
+setInterval(checkExpiredCoupons, 24 * 60 * 60 * 1000);
 
 module.exports={
     getCoupon,

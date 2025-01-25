@@ -265,90 +265,179 @@
 
       cancelCropButton.addEventListener('click', closeCropperModal);
 
+
+      function validateProductForm() {
+    const productName = document.getElementById('product-name');
+    const description = document.getElementById('description');
+    const category = document.getElementById('product-category');
+    const stock = document.getElementById('stock');
+    const price = document.getElementById('product-price');
+    const offer = document.getElementById('product-offer');
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+
+    const errors = [];
+
+    const trimmedName = productName.value.trim();
+    if (!trimmedName) {
+        errors.push('Product name is required');
+        productName.classList.add('input-error');
+    } else if (productName.value !== trimmedName) {
+        errors.push('Enter valid name');
+        productName.classList.add('input-error');
+    } else if (trimmedName.includes(' ')) {
+        errors.push('Enter valid name');
+        productName.classList.add('input-error');
+    } else if (trimmedName.length < 3 || trimmedName.length > 50) {
+        errors.push('Enter valid name');
+        productName.classList.add('input-error');
+    } else {
+        productName.classList.remove('input-error');
+    }
+
+    
+    const trimmedDescription = description.value.trim();
+    if (!trimmedDescription) {
+        errors.push('Product description is required');
+        description.classList.add('input-error');
+    } else if (description.value !== trimmedDescription) {
+        errors.push('Enter valid Description');
+        description.classList.add('input-error');
+    } else if (trimmedDescription.includes(' ')) {
+        errors.push('Enter valid Description');
+        description.classList.add('input-error');
+    } else if (trimmedDescription.length < 5 || trimmedDescription.length > 50) {
+        errors.push('Enter valid Description');
+        description.classList.add('input-error');
+    } else {
+        description.classList.remove('input-error');
+    }
+
+   
+    if (!category.value) {
+        errors.push('Please select a product category');
+        category.classList.add('input-error');
+    } else {
+        category.classList.remove('input-error');
+    }
+
+  
+    const stockValue = parseInt(stock.value);
+    if (isNaN(stockValue) || stockValue <= 0) {
+        errors.push('Stock must be a positive number');
+        stock.classList.add('input-error');
+    } else if (stockValue > 500) {
+        errors.push('Stock cannot exceed 500 units');
+        stock.classList.add('input-error');
+    } else {
+        stock.classList.remove('input-error');
+    }
+
+    
+    const priceValue = parseFloat(price.value);
+    if (isNaN(priceValue) || priceValue <= 0) {
+        errors.push('Price must be a positive number');
+        price.classList.add('input-error');
+    } else if (priceValue > 10000) {
+        errors.push('Price cannot exceed $10,000');
+        price.classList.add('input-error');
+    } else {
+        price.classList.remove('input-error');
+    }
+
+    
+    const offerValue = parseFloat(offer.value);
+    if (isNaN(offerValue) || offerValue <= 0 || offerValue > 100) {
+        errors.push('Offer must be a positive number between 0 and 100');
+        offer.classList.add('input-error');
+    } else {
+        offer.classList.remove('input-error');
+    }
+
+  
+    const imageWrappers = imagePreviewContainer.querySelectorAll('.image-wrapper img');
+    if (imageWrappers.length === 0) {
+        errors.push('At least one product image is required');
+    } else if (imageWrappers.length > 4) {
+        errors.push('Maximum 4 images are allowed');
+    }
+
+
+    if (errors.length > 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Errors',
+            html: errors.map(error => `<p>${error}</p>`).join(''),
+        });
+        return false;
+    }
+
+    return true;
+}
+
+
       document.querySelector('.save-product').addEventListener('click', async function() {
           
-            const productName = document.getElementById('product-name').value;
-            const description = document.getElementById('description').value;
-            const category = document.getElementById('product-category').value;
-            const stock = document.getElementById('stock').value;
-            const price = document.getElementById('product-price').value;
-            const offer = document.getElementById('product-offer').value;
-            
-            if (!productName || !description || !category || !stock || !price) {
-              Swal.fire({
-        icon: 'error',
-        title: '',
-        text: 'Please fill all the  fields.',
-      });
-      return;
-            }
-
-            if (offer < 0 || offer > 100) {
-              Swal.fire({
-        icon: 'error',
-        title: 'Invalid Offer',
-        text: 'Offer percentage should be between 0 and 100.',
-      });
-      return;
-            }
-
-            const formData = new FormData();
-            formData.append('productName', productName);
-            formData.append('description', description);
-            formData.append('category', category);
-            formData.append('regularPrice', price);
-            formData.append('salePrice', document.getElementById('product-sale-price').value || '');
-            formData.append('productOffer', offer || '');
-            formData.append('quantity', stock);
-
-            const imageWrappers = document.querySelectorAll('.image-wrapper img');
-            if (imageWrappers.length === 0) {
-              Swal.fire({
-        icon: 'error',
-        title: 'No Images Uploaded',
-        text: 'Please add at least one image.',
-      });
-      return;
-            }
-
-            for (let [index, img] of imageWrappers.entries()) {
-                const response = await fetch(img.src);
-                const blob = await response.blob();
-                formData.append('productImage', blob, `product-image-${index}.png`);
-            }
-
-            try {
-                const response = await fetch('/admin/addproduct', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Product Saved',
-          text: 'Product saved successfully!',
-        }).then(() => {
-          window.location.href = '/admin/product';
-        });
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Save Failed',
-          text: result.error || 'Failed to save product',
-        });
-      }
-    } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'An error occurred while saving the product',
-      });
+        if (!validateProductForm()) {
+        return;
     }
-  });
 
+
+    const productName = document.getElementById('product-name').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const category = document.getElementById('product-category').value;
+    const stock = document.getElementById('stock').value;
+    const price = document.getElementById('product-price').value;
+    const offer = document.getElementById('product-offer').value;
+    
+    const formData = new FormData();
+    formData.append('productName', productName);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('regularPrice', price);
+    formData.append('salePrice', document.getElementById('product-sale-price').value || '');
+    formData.append('productOffer', offer || '');
+    formData.append('quantity', stock);
+
+    const imageWrappers = document.querySelectorAll('.image-wrapper img');
+    for (let [index, img] of imageWrappers.entries()) {
+        const response = await fetch(img.src);
+        const blob = await response.blob();
+        formData.append('productImage', blob, `product-image-${index}.png`);
+    }
+
+    try {
+        const response = await fetch('/admin/addproduct', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Product Saved',
+                text: 'Product saved successfully!',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = '/admin/product';
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Save Failed',
+                text: result.error || 'Failed to save product',
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An unexpected error occurred while saving the product',
+        });
+    }
+})
       document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.getElementById('sidebarToggle');
