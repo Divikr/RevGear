@@ -70,18 +70,50 @@ const getwishlist = async (req, res, next) => {
 
 //get allproduct
 
-const getProductByCategory = async (req,res) => {
+const getProductByCategory = async (req, res) => {
   try {
-    const {name} = req.params;
-    const categories = await Category.find({})
-    const products = await Product.find({category: name});
-
-
-    console.log(products)
-
-    res.render('user/allProducts', {products, categories})
-  } catch (error) {
+    const { name } = req.params;
+    const { sort } = req.query;
+    console.log("hjjjh",req.params)
     
+    const categories = await Category.find({});
+    
+    
+    let sortCriteria = {};
+    switch (sort) {
+      case 'a-z':
+        sortCriteria = { productName: 1 };
+        break;
+      case 'z-a':
+        sortCriteria = { productName: -1 };
+        break;
+      case 'low-to-high':
+        sortCriteria = { salePrice: 1 };
+        break;
+      case 'high-to-low':
+        sortCriteria = { salePrice: -1 };
+        break;
+      default:
+        sortCriteria = {};
+    }
+
+    const products = await Product.find({ 
+      category: name,
+      isBlocked: false 
+    }).sort(sortCriteria);
+
+    res.render('user/allProducts', {
+      products,
+      categories,
+      sort, 
+      currentPage: 1,
+      totalPages: 1,
+      limit: products.length
+    });
+
+  } catch (error) {
+    console.error('Error in getProductByCategory:', error);
+    res.status(500).send('Internal Server Error');
   }
 }
 

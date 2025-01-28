@@ -348,19 +348,26 @@ const setNewPassword = async (req, res) => {
 
 
 
-
 const home = async (req, res) => {
     try {
-        const products = await Products.find({ isBlocked: false }).limit(4);
-        const categories = await Category.find({isListed:true});
+     
+        const product = await Products.find({ isBlocked: false })
+            .sort({ salesCount: -1 }) 
+            .limit(4);
 
-        console.log(products)
-        res.render("user/home", { products, categories });
+        const products = await Products.find({ isBlocked: false })
+            .sort({ salePrice: 1 })
+            .limit(4);
+
+        const categories = await Category.find({ isListed: true });
+
+        res.render("user/home", { product, products, categories });
     } catch (error) {
-        console.error("Error rendering home page:", error);
-        res.status(500).send("Server error");
+        console.error("Error fetching products for the home page:", error);
+        res.status(500).send("An error occurred while loading the page.");
     }
 };
+
 
 
 const logout = async (req, res) => {
@@ -401,6 +408,8 @@ const getAllProducts = async (req, res) => {
                 sortCriteria = {};
         }
 
+
+        
         const products = await Products.find({ isBlocked: false })
             .sort(sortCriteria)
             .skip((page - 1) * 8)
@@ -459,6 +468,7 @@ const searchProducts = async (req, res) => {
             return res.render('user/allProducts', {
                 products: [],
                 categories, 
+               
                 message: 'No products found!',
             });
         }
@@ -466,6 +476,7 @@ const searchProducts = async (req, res) => {
         res.render('user/allProducts', {
             products,
             categories, 
+            sort
         });
     } catch (error) {
         console.error('Error searching products:', error);

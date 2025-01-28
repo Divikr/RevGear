@@ -522,7 +522,7 @@ console.log("des",description)
         title: "Success",
         text: "Return order submitted successfully!",
     }).then(() => {
-        // Reload the page
+       
         window.location.reload();
     });
     console.log(result);
@@ -541,7 +541,7 @@ console.log("des",description)
         title: "Error",
         text: "An error occurred while submitting your return order.",
     }).then(() => {
-        // Reload the page
+       
         window.location.reload();
     });
 }
@@ -562,7 +562,7 @@ console.log("des",description)
 
     async function retryPayment(orderId) {
   try {
-    // Call the backend API to create a Razorpay order
+    
     const response = await fetch(`/retry-payment/${orderId}`, {
       method: 'POST',
       headers: {

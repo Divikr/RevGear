@@ -55,7 +55,7 @@ route.get("/logout", userController.logout)
 
 //product manegment
 
-route.get("/product", userController.getAllProducts);
+
 
 route.get('/product/:id', productController.singleproduct)
 

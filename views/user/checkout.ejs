@@ -158,7 +158,6 @@ document.getElementById('add-new-address-btn').addEventListener('click', () => {
 });
 
 
-// View Coupons Dropdown: Populate Voucher Code
 document.getElementById('view-coupons').addEventListener('change', (event) => {
   const selectedCoupon = event.target.value;
   if (selectedCoupon) {
@@ -178,7 +177,6 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     postalCode: document.getElementById('new-address-postalCode').value.trim()
   };
 
-  // Validate required fields
   if (!newAddress.name || !newAddress.phone || !newAddress.street || !newAddress.city || !newAddress.postalCode) {
     Swal.fire({
       icon: 'error',
@@ -190,7 +188,7 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     return;
   }
 
-  // Check for leading spaces in name
+  
   if (/^\s/.test(document.getElementById('new-address-name').value)) {
     Swal.fire({
       icon: 'error',
@@ -202,7 +200,7 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     return;
   }
 
-  // Check for leading spaces in phone
+  
   if (/^\s/.test(document.getElementById('new-address-phone').value)) {
     Swal.fire({
       icon: 'error',
@@ -214,7 +212,7 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     return;
   }
 
-  // Validate name for valid characters
+ 
   if (!/^[A-Za-z\s]+$/.test(newAddress.name)) {
     Swal.fire({
       icon: 'error',
@@ -226,7 +224,7 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     return;
   }
 
-  // Validate phone number: must be exactly 10 digits and not contain only spaces
+ 
   const phoneRegex = /^\d{10}$/;
   if (!phoneRegex.test(newAddress.phone)) {
     Swal.fire({
@@ -239,7 +237,6 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     return;
   }
 
-  // Validate postal code
   const postalCodeRegex = /^\d{5,6}$/;
   if (!postalCodeRegex.test(newAddress.postalCode)) {
     Swal.fire({
@@ -252,7 +249,7 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     return;
   }
 
-  // Proceed with submitting the form
+
   fetch('/add-address-checkout', {
     method: 'POST',
     headers: {
@@ -542,7 +539,7 @@ document.getElementById('place-order-btn').addEventListener('click', () => {
   };
 
   console.log("..........failed........",failedPaymentDetails)
-  // Send data to backend
+
   fetch('/handle-payment-failure', {
     method: 'POST',
     headers: {
@@ -553,7 +550,7 @@ document.getElementById('place-order-btn').addEventListener('click', () => {
   .then(response => response.json())
   .then(data => {
     if (data.success) {
-      window.location.href = '/checkout';
+      window.location.href = '/payment-failed';
     } else {
       throw new Error(data.message);
     }

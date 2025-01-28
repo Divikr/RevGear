@@ -194,17 +194,17 @@
                 const startDateInput = document.getElementById('startDate');
                 const endDateInput = document.getElementById('endDate');
         
-                // Set the maximum date to today for both inputs
+            
                 const today = new Date().toISOString().split('T')[0];
                 startDateInput.setAttribute('max', today);
                 endDateInput.setAttribute('max', today);
         
                 form.addEventListener('submit', (event) => {
-                    // Get selected dates
+                 
                     const startDate = new Date(startDateInput.value);
                     const endDate = new Date(endDateInput.value);
         
-                    // Check if dates are valid
+                   
                     if (!startDateInput.value || !endDateInput.value || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
                         event.preventDefault();
                         Swal.fire({
@@ -215,7 +215,7 @@
                         return;
                     }
         
-                    // Check if dates exceed the current date
+                 
                     if (startDate > new Date(today) || endDate > new Date(today)) {
                         event.preventDefault();
                         Swal.fire({
@@ -226,7 +226,7 @@
                         return;
                     }
         
-                    // Check if start date is after end date
+                  
                     if (startDate > endDate) {
                         event.preventDefault();
                         Swal.fire({

@@ -204,7 +204,7 @@ console.log("items......",items)
       const { orderId } = req.params;
       console.log("order", orderId);
   
-      // Find the order by ID
+   
       const order = await Order.findById(orderId);
   
       if (!order) {
@@ -220,9 +220,9 @@ console.log("items......",items)
 
      
   
-      // Create a new Razorpay order
+  
       const razorpayOrder = await razorpay.orders.create({
-        amount: order.totalAmount * 100, // Amount in smallest currency unit
+        amount: order.totalAmount * 100, 
         currency: 'INR',
         receipt: `order_${order._id}`,
         notes: {
@@ -231,7 +231,7 @@ console.log("items......",items)
         },
       });
   
-      // Send Razorpay order details to the frontend
+    
       res.status(200).json({
         success: true,
         key: process.env.RAZORPAY_KEY_ID,
@@ -248,7 +248,7 @@ console.log("items......",items)
     }
   };
   
-  // Payment Success Handler
+
   const paymentSuccess = async (req, res) => {
     try {
       const { 
@@ -258,7 +258,7 @@ console.log("items......",items)
         orderId 
       } = req.body;
   
-      // Find the order
+   
       const order = await Order.findById(orderId);
       if (!order) {
         return res.status(404).json({ 
@@ -267,7 +267,7 @@ console.log("items......",items)
         });
       }
   
-      // Verify payment signature
+   
       const generated_signature = crypto
         .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
         .update(`${razorpay_order_id}|${razorpay_payment_id}`)
@@ -280,7 +280,7 @@ console.log("items......",items)
         });
       }
   
-      // Update order status
+     
       order.orderStatus = 'Ordered';
       order.paymentDetails = {
         razorpayPaymentId: razorpay_payment_id,

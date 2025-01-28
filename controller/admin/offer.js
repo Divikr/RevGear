@@ -7,28 +7,28 @@ const offerPage = async (req, res) => {
     try {
         console.log('entered offer page');
 
-        // Fetch offers with populated productId and categoryId
+    
         const offers = await Offer.find({})
-            .populate('productId')  // Populate productId to fetch product details
-            .populate('categoryId'); // Populate categoryId to fetch category details
+            .populate('productId')  
+            .populate('categoryId'); 
 
-        // Format dates and add productNames and categoryNames to the offer object
+      
         const formattedOffers = offers.map(item => {
             const formattedStartDate = moment(item.startDate).format('DD-MM-YYYY');
             const formattedEndDate = moment(item.endDate).format('DD-MM-YYYY');
 
-            // Extract product names from the populated productId array
+          
             const productNames = item.productId.map(product => product.productName).join(', ');
 
-            // Extract category names from the populated categoryId array
+            
             const categoryNames = item.categoryId.map(category => category.name).join(', ');
 console.log("......",categoryNames)
             return {
                 ...item.toObject(),
                 formattedStartDate,
                 formattedEndDate,
-                productNames: productNames || 'N/A', // Join product names if multiple products exist
-                categoryNames: categoryNames || 'N/A', // Join category names if multiple categories exist
+                productNames: productNames || 'N/A', 
+                categoryNames: categoryNames || 'N/A', 
             };
         });
 

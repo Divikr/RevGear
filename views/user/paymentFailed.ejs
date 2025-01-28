@@ -35,13 +35,12 @@
                     </svg>
                     Continue Shopping
                 </a>
-                <form onsubmit="event.preventDefault(); retryPayment('<%= order.orderId%>');" style="display: inline;">
-                    <button type="button" 
-                            class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md shadow hover:bg-blue-700 transition duration-200"
-                            onclick="retryPayment('<%= order.orderId %>')">
-                        Retry Payment
-                    </button>
-                </form>
+                <a href="/orderlist" class="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  View Order List
+              </a>
                 
             </div>
         </div>
@@ -73,83 +72,6 @@
 
 
 
-        
-    async function retryPayment(orderId) {
-  try {
-    // Call the backend API to create a Razorpay order
-    const response = await fetch(`/retry-payment/${orderId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    const data = await response.json();
-    console.log(data);
-
-    if (!data.success) {
-      throw new Error(data.message || 'Failed to initiate payment');
-    }
-
-    const options = {
-      key: data.key,
-      amount: data.amount,
-      currency: data.currency,
-      order_id: data.razorpayOrderId,
-      name: 'Your Store',
-      description: 'Order Payment',
-      handler: function(response) {
-        const paymentDetails = {
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-          orderId: orderId
-        };
-
-        fetch('/payment-success', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(paymentDetails),
-        })
-        .then(orderResponse => orderResponse.json())
-        .then(orderData => {
-          if (orderData.success) {
-            window.location.href = `/orderconfirm/${orderId}`;
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Order Failed',
-              text: orderData.message || 'Failed to place order.',
-            });
-          }
-        })
-        .catch(error => {
-          console.error('Error placing order:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An error occurred while placing the order.',
-          });
-        });
-      },
-      prefill: {
-        name: 'Customer Name',
-        email: 'customer@example.com',
-        contact: '9999999999',
-      },
-      theme: {
-        color: '#3399cc',
-      },
-    }; 
-
-    const rzp = new Razorpay(options);
-    rzp.open();
-  } catch (error) {
-    console.error('Payment retry error:', error);
-    alert(error.message || 'Failed to initiate payment');
-  }
-}
+   
 
     </script>

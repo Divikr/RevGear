@@ -293,7 +293,7 @@
             </div>
         </div>
             
-<% if (!['Cancelled', 'Return Success','Return Reject','Return Pending','Delivered'].includes(orderDetails.orderStatus)) { %>
+<% if (!['Cancelled', 'Return Success','Return Reject','Return Pending','Delivered','Payment Pending'].includes(orderDetails.orderStatus)) { %>
     <div class="modal fade" id="orderStatusModal" tabindex="-1" aria-labelledby="orderStatusModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

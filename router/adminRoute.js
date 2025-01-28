@@ -10,7 +10,7 @@ const salesController = require('../controller/admin/salesController')
 const auth = require("../middleware/adminAuth")
 const multer = require('multer')
 
-// Multer configuration
+// Multer 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./public/uploads");
@@ -21,12 +21,24 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+
+
+
+//admin login
+
 router.get("/login", adminController.adminloadlogin)
 router.post("/login", adminController.adminlogin)
 
-router.get("/dashboard", auth.isAdminAuth, adminController.dashboard)
-
 router.get("/adminlogout", adminController.adminlogout)
+
+
+
+//dashboard
+
+router.get("/dashboard", auth.isAdminAuth, adminController.dashboard)
+router.get('/lineGraphData', adminController.fetchLineGraphData);
+
+
 
 
 //customers managment

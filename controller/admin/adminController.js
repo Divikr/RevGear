@@ -66,11 +66,12 @@ const adminlogin = async (req, res) => {
     }
 };
 
+
 const getGraphData = async (timeRange) => {
     const now = new Date();
     let startDate;
-    
-    switch(timeRange) {
+
+    switch (timeRange) {
         case 'day':
             startDate = new Date(now.setDate(now.getDate() - 1));
             break;
@@ -111,30 +112,8 @@ const getGraphData = async (timeRange) => {
 const dashboard = async (req, res) => {
     try {
 
-        const orderGraphData = await Order.aggregate([
-            {
-                $group: {
-                    _id: {
-                        $dateToString: { format: "%Y-%m-%d", date: "$orderDate" }
-                    },
-                    count: { $sum: 1 }
-                }
-            },
-            { $sort: { _id: 1 } }
-        ]).then(data =>
-            data.map(item => ({
-                date: item._id,
-                count: item.count
-            }))
-        );
 
-        const range = req.query.range || 'day';
 
-       
-        const dayData = await getGraphData('day');
-        const weekData = await getGraphData('week');
-        const monthData = await getGraphData('month');
-        const yearData = await getGraphData('year');
 
         const totalRevenue = await Order.aggregate([
             { $group: { _id: null, total: { $sum: "$totalAmount" } } }
@@ -160,131 +139,130 @@ const dashboard = async (req, res) => {
             count: method.count
         }));
 
-//
+        //
 
-const topProducts = await Order.aggregate([
-    { $unwind: "$items" },
-    {
-        $group: {
-            _id: "$items.productId",
-            totalQuantity: { $sum: "$items.quantity" }
-        }
-    },
-    { $sort: { totalQuantity: -1 } },
-    { $limit: 5 },
-    {
-        $lookup: {
-            from: "products",
-            localField: "_id",
-            foreignField: "_id",
-            as: "productDetails"
-        }
-    },
-    { $unwind: "$productDetails" },
-    {
-        $project: {
-            _id: 0,
-            productName: "$productDetails.productName", 
-            totalQuantity: 1,
-         
-            price: "$productDetails.price",
-            category: "$productDetails.category"
-        }
-    }
-]);
+        const topProducts = await Order.aggregate([
+            { $unwind: "$items" },
+            {
+                $group: {
+                    _id: "$items.productId",
+                    totalQuantity: { $sum: "$items.quantity" }
+                }
+            },
+            { $sort: { totalQuantity: -1 } },
+            { $limit: 5 },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            { $unwind: "$productDetails" },
+            {
+                $project: {
+                    _id: 0,
+                    productName: "$productDetails.productName",
+                    totalQuantity: 1,
+
+                    price: "$productDetails.price",
+                    category: "$productDetails.category"
+                }
+            }
+        ]);
 
 
-const recentOrders = await Order.aggregate([
-    {
-        $sort: { orderDate: -1 } 
-    },
-    { $limit: 5 },
-   
-    {
-        $lookup: {
-            from: "users",
-            localField: "userId",
-            foreignField: "_id",
-            as: "userDetails"
-        }
-    },
-    { $unwind: "$userDetails" },
-   
-    {
-        $lookup: {
-            from: "products",
-            localField: "items.productId",
-            foreignField: "_id",
-            as: "productDetails"
-        }
-    },
-    {
-        $project: {
-            orderDate: 1,
-            totalAmount: 1,
-            orderStatus: 1,
-            paymentMethod: 1,
-            "userDetails.name": 1,
-            "deliveryAddress": 1,
-            items: {
-                $map: {
-                    input: "$items",
-                    as: "item",
-                    in: {
-                        quantity: "$$item.quantity",
-                        price: "$$item.price",
-                        product: {
-                            $arrayElemAt: [
-                                {
-                                    $filter: {
-                                        input: "$productDetails",
-                                        as: "prod",
-                                        cond: { $eq: ["$$prod._id", "$$item.productId"] }
-                                    }
-                                },
-                                0
-                            ]
+        const recentOrders = await Order.aggregate([
+            {
+                $sort: { orderDate: -1 }
+            },
+            { $limit: 5 },
+
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            { $unwind: "$userDetails" },
+
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "items.productId",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            {
+                $project: {
+                    orderDate: 1,
+                    totalAmount: 1,
+                    orderStatus: 1,
+                    paymentMethod: 1,
+                    "userDetails.name": 1,
+                    "deliveryAddress": 1,
+                    items: {
+                        $map: {
+                            input: "$items",
+                            as: "item",
+                            in: {
+                                quantity: "$$item.quantity",
+                                price: "$$item.price",
+                                product: {
+                                    $arrayElemAt: [
+                                        {
+                                            $filter: {
+                                                input: "$productDetails",
+                                                as: "prod",
+                                                cond: { $eq: ["$$prod._id", "$$item.productId"] }
+                                            }
+                                        },
+                                        0
+                                    ]
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
-    }
-]);
+        ]);
 
 
-const topCategories = await Order.aggregate([
-    { $unwind: "$items" },
-    {
-        $lookup: {
-            from: "products",
-            localField: "items.productId",
-            foreignField: "_id",
-            as: "productDetails"
-        }
-    },
-    { $unwind: "$productDetails" },
-    {
-        $group: {
-            _id: "$productDetails.category",
-            totalQuantitySold: { $sum: "$items.quantity" },
-            totalRevenue: { $sum: { $multiply: ["$items.quantity", "$items.price"] } }
-        }
-    },
-    { $sort: { totalQuantitySold: -1 } },
-    { $limit: 4 },
-    {
-        $project: {
-            category: "$_id",
-            totalQuantitySold: 1,
-            totalRevenue: { $round: ["$totalRevenue", 2] }
-        }
-    }
-]);
+        const topCategories = await Order.aggregate([
+            { $unwind: "$items" },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "items.productId",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            { $unwind: "$productDetails" },
+            {
+                $group: {
+                    _id: "$productDetails.category",
+                    totalQuantitySold: { $sum: "$items.quantity" },
+                    totalRevenue: { $sum: { $multiply: ["$items.quantity", "$items.price"] } }
+                }
+            },
+            { $sort: { totalQuantitySold: -1 } },
+            { $limit: 4 },
+            {
+                $project: {
+                    category: "$_id",
+                    totalQuantitySold: 1,
+                    totalRevenue: { $round: ["$totalRevenue", 2] }
+                }
+            }
+        ]);
 
-        res.render("dashboard", {
+        res.render("dashBoard", {
             totalRevenue: totalRevenue[0]?.total || 0,
-            orderGraphData,
             totalOrders,
             totalCoupons,
             totalOffers,
@@ -294,15 +272,72 @@ const topCategories = await Order.aggregate([
             returnedOrders,
             topProducts,
             topCategories,
-            recentOrders ,
-            
-         
+            recentOrders,
         });
     } catch (error) {
         console.error("Error rendering dashboard:", error);
         res.status(500).send("Server error");
     }
 };
+
+const fetchLineGraphData = async (req, res) => {
+    try {
+        const range = req.query.range || 'day'; 
+
+        const aggregationPipeline = [];
+        switch (range) {
+            case 'day':
+                aggregationPipeline.push({
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
+                        count: { $sum: 1 },
+                    },
+                });
+                break;
+            case 'week':
+                aggregationPipeline.push(
+                    {
+                        $group: {
+                            _id: { $dateToString: { format: "%Y-%U", date: "$orderDate" } }, 
+                            count: { $sum: 1 },
+                        },
+                    }
+                );
+                break;
+            case 'month':
+                aggregationPipeline.push({
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m", date: "$orderDate" } },
+                        count: { $sum: 1 },
+                    },
+                });
+                break;
+            case 'year':
+                aggregationPipeline.push({
+                    $group: {
+                        _id: { $year: "$orderDate" },
+                        count: { $sum: 1 },
+                    },
+                });
+                break;
+        }
+
+        aggregationPipeline.push({ $sort: { _id: 1 } }); 
+
+        const orderGraphData = await Order.aggregate(aggregationPipeline).then(data =>
+            data.map(item => ({
+                label: item._id, 
+                value: item.count,
+            }))
+        );
+
+        res.status(200).json({ orderGraphData })
+    } catch (error) {
+        console.error("Error rendering dashboard:", error);
+        res.status(500).send("Server error");
+    }
+}
+
 
 
 
@@ -468,19 +503,17 @@ const rejectReturn = async (req, res) => {
             return res.status(404).send('Order not found');
         }
 
-        // Check if the return status is pending
+        
         if (order.returnDetails.status !== 'Pending') {
             return res.status(400).send('Return status is not pending');
         }
 
-        // Update the return status to 'Rejected'
         order.returnDetails.status = 'Reject';
         order.orderStatus = 'Return Reject';
 
-        // Save the updated order
+      
         await order.save();
 
-        // Redirect to the order list view
         res.redirect(`/admin/viewOrderLists/${orderId}`); 
     } catch (error) {
         console.error(error);
@@ -493,6 +526,7 @@ module.exports={
     adminloadlogin,
     adminlogin,
     dashboard,
+    fetchLineGraphData,
     adminlogout,
     orderlists,
     viewOrder,

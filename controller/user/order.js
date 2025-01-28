@@ -187,7 +187,7 @@ const orderconfirm = async (req, res) => {
         let totalAmount = 0;
         const items = [];
 
-        // Check product quantity and calculate total
+       
         for (const item of cart) {
             if (!item.productId || !item.productId.salePrice || !item.quantity) {
                 return res.status(400).json({ success: false, message: 'Invalid item in cart.' });
@@ -283,7 +283,7 @@ const orderconfirm = async (req, res) => {
 
         console.log("Order saved:", savedOrder);
 
-        // Update product stock after order is placed
+        
         for (const item of items) {
             const updatedProduct = await Product.findOneAndUpdate(
                 { _id: item.productId },

@@ -165,11 +165,11 @@ const cityError = document.getElementById('cityError');
 const postalCodeError = document.getElementById('postalCodeError');
 
 form.addEventListener('submit', (event) => {
-  event.preventDefault(); // Prevent form submission
+  event.preventDefault(); 
 
   let isValid = true;
 
-// Name validation
+
 
 if (!form.name.value.match(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)) {
   nameError.textContent = 'Please enter a valid full name ';
@@ -179,7 +179,7 @@ if (!form.name.value.match(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)) {
   nameError.classList.add('hidden');
 }
 
-  // Phone number validation
+  
   if (!form.phone.value.match(/^\+?\d{10}$/)) {
     phoneError.textContent = 'Please enter a valid phone number (10 digits).';
     phoneError.classList.remove('hidden');
@@ -188,7 +188,7 @@ if (!form.name.value.match(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)) {
     phoneError.classList.add('hidden');
   }
 
-  // Street address validation
+
   if (form.street.value.trim() === '') {
     if (!streetError) {
       const errorDiv = document.createElement('div');
@@ -203,7 +203,7 @@ if (!form.name.value.match(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)) {
     if (errorDiv) errorDiv.remove();
   }
 
-  // City validation
+ 
   if (form.city.value.trim() === '') {
     if (!cityError) {
       const errorDiv = document.createElement('div');
@@ -218,7 +218,6 @@ if (!form.name.value.match(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)) {
     if (errorDiv) errorDiv.remove();
   }
 
-  // Postal code validation
   if (!form.postalCode.value.match(/^\d{5,6}$/)) {
     if (!postalCodeError) {
       const errorDiv = document.createElement('div');

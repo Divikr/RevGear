@@ -336,14 +336,14 @@ if (!isValid) {
     const productName = document.getElementById('product-name');
     const productDescription = document.getElementById('product-description');
 
-    // Trim inputs to remove leading and trailing spaces
+   
     productName.value = productName.value.trim();
     productDescription.value = productDescription.value.trim();
 
-    // Validation flags
+
   
 
-    // Validate product name
+
     if (productName.value.length < 3) {
         Swal.fire({
             icon: 'error',
@@ -353,7 +353,7 @@ if (!isValid) {
         isValid = false;
     }
 
-    // Validate product description
+  
     if (productDescription.value.length < 10) {
         Swal.fire({
             icon: 'error',
@@ -363,7 +363,7 @@ if (!isValid) {
         isValid = false;
     }
 
-    // If validation passes, show confirmation and submit
+    
     if (isValid) {
         Swal.fire({
             title: 'Are you sure?',
@@ -374,7 +374,7 @@ if (!isValid) {
             cancelButtonText: 'Cancel',
         }).then((result) => {
             if (result.isConfirmed) {
-                // Trim values before submitting
+            
                 productName.value = productName.value.trim();
                 productDescription.value = productDescription.value.trim();
                 document.querySelector('form').submit();
@@ -382,7 +382,6 @@ if (!isValid) {
         });
     }
 
-// Validate stock
 const stockValue = parseInt(document.getElementById('stock').value.trim());
 if (isNaN(stockValue) || stockValue <= 0) {
   event.preventDefault();
@@ -395,10 +394,10 @@ if (isNaN(stockValue) || stockValue <= 0) {
   return;
 }
 
-// Validate price and offer as per your existing logic
+
 });
 
-// Sale price calculation
+
 const name = document.getElementById('product-name');
 const stock = document.getElementById('stock');
 const priceInput = document.getElementById('product-price');
