@@ -33,7 +33,7 @@ const adminlogin = async (req, res) => {
         }
 
         if(!password){
-            return res.status(400).render("adminlogin", { error: "All fields are required." })
+            return res.status(400).render("adminlogin", { error: "All fields are required." }); 
         }
 
 
