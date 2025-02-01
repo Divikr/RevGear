@@ -67,7 +67,7 @@ const adminlogin = async (req, res) => {
         res.status(500).render("login", { error: "Internal Server Error." });
     }
 };
-}
+
 const dashboard = async (req, res) => {
     try {
        res.render('dashboard')
