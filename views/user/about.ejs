@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RevGear - Log In</title>
+    <title>RevGear </title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -21,54 +21,76 @@
                 <div class="text-2xl font-bold">REVGEAR</div>
                 <div class="flex items-center space-x-6">
                     <a href="/" class="hover:text-red-500 transition-colors">Home</a>
-                    <a href="#" class="hover:text-red-500 transition-colors">About</a>
-                    <a href="#" class="hover:text-red-500 transition-colors">Contact</a>
+                    <a href="about" class="hover:text-red-500 transition-colors">About</a>
+                    <a href="/contact" class="hover:text-red-500 transition-colors">Contact</a>
                 </div>
             </nav>
         </div>
     </header>
 
-
 <!-- Main Content -->
-<div class="container mx-auto px-4 py-16 max-w-4xl">
+<div class="container mx-auto px-4 py-16 max-w-7xl">
+
     <!-- Introduction -->
-    <div class="mb-16">
+    <div class="mb-16 text-center">
+        <h1 class="text-4xl font-extrabold text-gray-800 mb-4">Unleash Your Racing Potential</h1>
         <p class="text-lg text-gray-700 leading-relaxed mb-8">
             Experience unparalleled protection with our premium racing gear collection. Each piece is meticulously engineered to meet the demands of professional racing, ensuring maximum safety without compromising comfort or performance. Whether you're a track day enthusiast or a professional racer, our gear is designed to exceed your expectations.
         </p>
-        <img src="/api/placeholder/800/400" alt="Racing Collection" class="w-full rounded-lg shadow-lg mb-8">
-    </div>
-
-    <!-- Helmet Section -->
-    <div class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">Professional Racing Helmets</h2>
-        <p class="text-lg text-gray-700 leading-relaxed mb-8">
-            Our DOT-certified racing helmets represent the pinnacle of head protection technology. Featuring a multi-density EPS liner, advanced ventilation system, and quick-release anti-scratch visor, these helmets provide superior impact protection while maintaining optimal comfort during long races. The moisture-wicking comfort padding ensures a fresh feel, even during the most intense racing conditions.
-        </p>
-        <img src="/api/placeholder/800/400" alt="Racing Helmet" class="w-full rounded-lg shadow-lg">
-    </div>
-
-    <!-- Protection Gear Section -->
-    <div class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">Comprehensive Body Protection</h2>
-        <p class="text-lg text-gray-700 leading-relaxed mb-8">
-            Our chest guards and knee protection systems are engineered for maximum impact resistance and mobility. The chest protector features a reinforced polycarbonate shell with strategic ventilation, while our knee guards utilize an articulated design with dual-density foam padding. Each piece is CE certified, providing professional-grade protection for every ride.
-        </p>
-        <div class="grid grid-cols-2 gap-4">
-            <img src="/api/placeholder/400/300" alt="Chest Guard" class="w-full rounded-lg shadow-lg">
-            <img src="/api/placeholder/400/300" alt="Knee Guards" class="w-full rounded-lg shadow-lg">
+        <div class="w-full h-64 overflow-hidden mb-8">
+            <img src="/about3.jpg" alt="Racing Collection" class="w-full h-full object-cover rounded-xl shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
         </div>
     </div>
 
-    <!-- Racing Gloves Section -->
-    <div class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">Professional Racing Gloves</h2>
+  <!-- Helmet Section (Text Left, Image Right) -->
+<div class="mb-16 flex flex-col md:flex-row-reverse items-center md:space-x-12">
+    <div class="w-full md:w-5/12 mb-8 md:mb-0 md:pl-6">
+        <div class="w-full h-64 overflow-hidden">
+            <img src="/about4.jpg" alt="Racing Helmet" class="w-full h-full object-cover rounded-xl shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
+        </div>
+    </div>
+    <div class="w-full md:w-7/12 md:pr-6">
+        <h2 class="text-3xl font-semibold text-gray-800 mb-4">Professional Racing Gloves</h2>
+        <p class="text-lg text-gray-700 leading-relaxed">
+            Our DOT-certified racing helmets represent the pinnacle of head protection technology. Featuring a multi-density EPS liner, advanced ventilation system, and quick-release anti-scratch visor, these helmets provide superior impact protection while maintaining optimal comfort during long races. The moisture-wicking comfort padding ensures a fresh feel, even during the most intense racing conditions.
+        </p>
+    </div>
+</div>
+
+<!-- Protection Gear Section (Text Left, Image Right) -->
+<div class="mb-16 flex flex-col md:flex-row-reverse items-center md:gap-12">
+    <div class="w-7/12 md:pr-6">
+        <h2 class="text-3xl font-semibold text-gray-800 mb-4">Comprehensive Body Protection</h2>
         <p class="text-lg text-gray-700 leading-relaxed mb-8">
             Complete your racing gear with our premium leather gloves. Constructed with genuine leather and featuring carbon fiber knuckle protection, these gloves offer the perfect balance of protection and control. The pre-curved finger design reduces fatigue during long rides, while touchscreen-compatible fingertips keep you connected when needed.
         </p>
-        <img src="/api/placeholder/800/400" alt="Racing Gloves" class="w-full rounded-lg shadow-lg">
+    </div>
+    <div class="w-5/12 mb-8 md:mb-0 md:pl-6">
+        <div class="w-full h-64 overflow-hidden">
+            <img src="/Banner3.jpg" alt="Chest Guard" class="w-full h-full object-cover rounded-xl shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
+        </div>
     </div>
 </div>
+
+
+<!-- Racing Gloves Section (Text Left, Image Right) -->
+<div class="mb-16 flex flex-col md:flex-row-reverse items-center md:space-x-12">
+    <div class="w-full md:w-5/12 mb-8 md:mb-0 md:pl-6">
+        <div class="w-full h-64 overflow-hidden">
+            <img src="/about2.jpg" alt="Racing Gloves" class="w-full h-full object-cover rounded-xl shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
+        </div>
+    </div>
+    <div class="w-full md:w-7/12 md:pr-6">
+        <h2 class="text-3xl font-semibold text-gray-800 mb-4">Professional Racing Helmets</h2>
+        <p class="text-lg text-gray-700 leading-relaxed">
+            Our chest guards and knee protection systems are engineered for maximum impact resistance and mobility. The chest protector features a reinforced polycarbonate shell with strategic ventilation, while our knee guards utilize an articulated design with dual-density foam padding. Each piece is CE certified, providing professional-grade protection for every ride.
+        </p>
+    </div>
+</div>
+</div>
+
+
+
 
 
     

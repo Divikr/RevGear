@@ -25,6 +25,18 @@ const about = async (req, res) => {
     }
 };
 
+
+
+
+const contact = async (req, res) => {
+    try {
+        res.render("user/contactus");
+    } catch (error) {
+        console.error("Error rendering home page:", error);
+        res.status(500).send("Server error");
+    }
+};
+
 const loadsignup = async (req, res) => {
     try {
         res.render("user/signUp");
@@ -520,5 +532,6 @@ module.exports = {
     setPassword,
     resendotp,
     setNewPassword,
-    about
+    about,
+    contact
 };

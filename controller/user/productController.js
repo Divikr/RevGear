@@ -125,7 +125,7 @@ const addToWishlist = async (req, res) => {
   
       
       if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
+        return res.status(401).json({ message: "Please Login" });
       }
   
      
@@ -170,7 +170,7 @@ const addToCart = async (req, res) => {
     const userId = req.session.user;
 
     if (!userId) {
-      return res.status(401).json({ message: "User not authenticated", redirect: "/login" });
+      return res.status(401).json({ message: "Please Login", redirect: "/login" });
     }
 
     if (!productId) {
@@ -241,7 +241,7 @@ const updateCart = async (req, res) => {
     const userId = req.session.user;
 
     if (!userId) {
-      return res.status(401).json({ message: "User not authenticated", redirect: "/login" });
+      return res.status(401).json({ message: "Please Login", redirect: "/login" });
     }
 
     const validQuantity = parseInt(quantity, 10);
@@ -358,7 +358,7 @@ const removeFromCart = async (req, res) => {
     const { itemId } = req.params;
 
     if (!req.session.user ) {
-      return res.status(401).json({ message: 'User not authenticated', redirect: "/login" });
+      return res.status(401).json({ message: 'Please Login', redirect: "/login" });
     }
 
 

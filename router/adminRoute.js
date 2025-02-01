@@ -36,7 +36,7 @@ router.get("/adminlogout", adminController.adminlogout)
 //dashboard
 
 router.get("/dashboard", auth.isAdminAuth, adminController.dashboard)
-router.get('/lineGraphData', adminController.fetchLineGraphData);
+
 
 
 
@@ -81,14 +81,10 @@ router.get("/coupon",couponController.getCoupon)
 router.post('/coupon',couponController.addCoupon)
 router.delete('/coupon/:code',couponController.deleteCoupon)
 
-//report manegment
+//dashboard
 
-router.get('/salesreport',salesController.loadSalesReport)
-router.get("/salesDaily",salesController.dailySalesReport)
-router.get('/salesWeekly',salesController.generateWeeklyReport)
-router.get('/salesMonthly',salesController.generateMonthlyReport)
-router.get('/salesYearly',salesController.generateYearlyReport)
-router.get('/customDateReport',salesController.generateCustomDateReport)
+router.get('/sales-report', salesController.getSalesReport);
+router.get('/top-sellers', salesController.topSellers)
 
 
 //offer manegment

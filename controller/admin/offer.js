@@ -62,18 +62,18 @@ const addOffer = async (req, res) => {
     try {
         const { offerName, discount, startDate, endDate, offerType, productId, categoryId } = req.body;
 
-        // Validate required fields
+     
         if (!offerName || !discount || !startDate || !endDate || !offerType) {
             return res.status(400).json({ success: false, errorMessage: 'All fields are required' });
         }
 
-        // Convert discount to number and validate
+   
         const numericDiscount = Number(discount);
         if (isNaN(numericDiscount) || numericDiscount <= 0) {
             return res.status(400).json({ success: false, errorMessage: 'Invalid discount value' });
         }
 
-        // Parse dates and validate
+      
         const parseDateToLocalMidnight = (dateString) => {
             const date = new Date(dateString);
             date.setHours(0, 0, 0, 0);
@@ -92,12 +92,12 @@ const addOffer = async (req, res) => {
             return res.status(400).json({ success: false, errorMessage: 'End date must be after start date' });
         }
 
-        // Validate offer type
+     
         if (!['Product', 'Category'].includes(offerType)) {
             return res.status(400).json({ success: false, errorMessage: 'Invalid offer type' });
         }
 
-        // Create a new offer instance
+      
         const newOffer = new Offer({
             offerName,
             discount: numericDiscount,
@@ -106,7 +106,7 @@ const addOffer = async (req, res) => {
             offerType,
         });
 
-        // Handle Product Offer
+   
         if (offerType === 'Product') {
             console.log('Processing product offer');
 
@@ -124,11 +124,11 @@ const addOffer = async (req, res) => {
                 return res.status(400).json({ success: false, errorMessage: 'Invalid product price' });
             }
 
-            // Find existing category offer for the product
+          
             const categoryOffer = await Offer.findById(product.categoryOfferId);
             const categoryDiscount = categoryOffer ? Number(categoryOffer.discount) || 0 : 0;
 
-            // Compare discounts and apply the highest one
+        
             const finalDiscount = Math.max(numericDiscount, categoryDiscount);
             const discountedPrice = originalPrice - finalDiscount;
 
@@ -144,7 +144,7 @@ const addOffer = async (req, res) => {
                 finalPrice: discountedPrice
             });
 
-            // Update product with the highest discount
+         
             await Product.findByIdAndUpdate(
                 productId,
                 {
@@ -161,7 +161,7 @@ const addOffer = async (req, res) => {
             newOffer.productId = productId;
         }
 
-        // Handle Category Offer
+
         else if (offerType === 'Category') {
             console.log('Processing category offer');
 
@@ -179,16 +179,15 @@ const addOffer = async (req, res) => {
                 return res.status(404).json({ success: false, errorMessage: 'No products found for the category' });
             }
 
-            // Apply discount to each product in the category
+          
             for (const product of categoryProducts) {
                 const originalPrice = Number(product.originalPrice || product.salePrice);
                 if (isNaN(originalPrice)) continue;
 
-                // Check existing product offer
                 const productOffer = await Offer.findById(product.productOfferId);
                 const productDiscount = productOffer ? Number(productOffer.discount) || 0 : 0;
 
-                // Compare and apply only the highest discount
+          
                 const finalDiscount = Math.max(numericDiscount, productDiscount);
                 const discountedPrice = originalPrice - finalDiscount;
 
@@ -203,7 +202,6 @@ const addOffer = async (req, res) => {
                     finalPrice: discountedPrice
                 });
 
-                // Update product with highest discount
                 await Product.findByIdAndUpdate(
                     product._id,
                     {
@@ -221,11 +219,11 @@ const addOffer = async (req, res) => {
             newOffer.categoryId = categoryId;
         }
 
-        // Save the new offer
+     
         await newOffer.save();
         console.log('Offer saved successfully:', newOffer);
 
-        // Redirect to the offers page
+      
         res.redirect('/admin/offer');
     } catch (error) {
         console.error('Error adding offer:', error);
@@ -234,14 +232,12 @@ const addOffer = async (req, res) => {
 };
 
 
-
-
 const deleteOffer = async (req, res) => {
     try {
-        console.log('Entered deleting');
+        console.log('Entered deleting offer');
         const { offerId } = req.body;
 
-        // Find the offer
+    
         const offer = await Offer.findById(offerId);
         if (!offer) {
             return res.status(404).json({ success: false, message: "Offer not found" });
@@ -249,15 +245,16 @@ const deleteOffer = async (req, res) => {
 
         console.log(`Deleting offer: ${offer.offerName} (ID: ${offer._id})`);
 
+       
         if (offer.offerType === 'Product') {
-            // Handle product offer deletion
+           
             await handleProductOfferDeletion(offer);
         } else if (offer.offerType === 'Category') {
-            // Handle category offer deletion
+           
             await handleCategoryOfferDeletion(offer);
         }
 
-        // Delete the offer
+       
         await Offer.deleteOne({ _id: offerId });
         console.log(`Offer ${offerId} deleted successfully`);
 
@@ -268,7 +265,6 @@ const deleteOffer = async (req, res) => {
     }
 };
 
-// Helper function to handle product offer deletion
 const handleProductOfferDeletion = async (offer) => {
     const product = await Product.findById(offer.productId);
     if (!product) {
@@ -277,11 +273,11 @@ const handleProductOfferDeletion = async (offer) => {
     }
 
     console.log(`Found product: ${product._id}`);
-    
-    // Calculate the new sale price based on any remaining category offer
+
+   
     const newSalePrice = await calculateNewSalePrice(product);
+
     
-    // Update the product
     await Product.findByIdAndUpdate(
         product._id,
         {
@@ -290,18 +286,18 @@ const handleProductOfferDeletion = async (offer) => {
                 productDiscount: 1
             },
             $set: { 
-                salePrice: newSalePrice
+                salePrice: newSalePrice 
             }
         },
         { new: true }
     );
-    
+
     console.log(`Updated product ${product._id} salePrice to ${newSalePrice}`);
 };
 
-// Helper function to handle category offer deletion
+
 const handleCategoryOfferDeletion = async (offer) => {
-    // Find all products in the category
+   
     const category = await Category.findById(offer.categoryId);
     if (!category) {
         console.warn(`Category with ID ${offer.categoryId} not found`);
@@ -313,11 +309,10 @@ const handleCategoryOfferDeletion = async (offer) => {
 
     for (const product of catProducts) {
         console.log(`Processing product: ${product._id}`);
-        
-        // Calculate the new sale price based on any remaining product offer
+
         const newSalePrice = await calculateNewSalePrice(product);
 
-        // Update the product
+       
         await Product.findByIdAndUpdate(
             product._id,
             {
@@ -326,42 +321,40 @@ const handleCategoryOfferDeletion = async (offer) => {
                     categoryDiscount: 1
                 },
                 $set: { 
-                    salePrice: newSalePrice
+                    salePrice: newSalePrice 
                 }
             },
             { new: true }
         );
-        
+
         console.log(`Updated product ${product._id} salePrice to ${newSalePrice}`);
     }
 };
 
-// Helper function to calculate new sale price considering remaining offers
+
 const calculateNewSalePrice = async (product) => {
     let newSalePrice = product.regularPrice;
 
-    // Check for remaining product offer
     if (product.productOfferId) {
         const productOffer = await Offer.findById(product.productOfferId);
         if (productOffer) {
             newSalePrice = product.regularPrice - productOffer.discount;
         }
     }
-    
-    // Check for remaining category offer
+
+  
     if (product.categoryOfferId) {
         const categoryOffer = await Offer.findById(product.categoryOfferId);
         if (categoryOffer) {
             const categoryDiscountedPrice = product.regularPrice - categoryOffer.discount;
-            // Use the better discount between product and category offers
+          
             newSalePrice = Math.min(newSalePrice, categoryDiscountedPrice);
         }
     }
 
-    // If no offers remain, use regular price
-    return Math.max(newSalePrice, 0); // Ensure price doesn't go below 0
+   
+    return Math.max(newSalePrice, 0);
 };
-
 
 module.exports={
     offerPage,

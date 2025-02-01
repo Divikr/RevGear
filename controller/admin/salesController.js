@@ -1,803 +1,245 @@
-const Orders=require("../../model/Order")
-const User=require("../../model/users")
+const Category = require('../../model/category');
+const User = require('../../model/users');
+const Order = require('../../model/Order');
 const moment = require('moment')
 const PDFDocument = require('pdfkit');
 
-const loadSalesReport = async (req, res) => {
+
+
+
+
+const getSalesReport = async (req, res, next) => {
     try {
-        const page = parseInt(req.query.page) || 1; 
-        const limit = 10; 
-        const skip = (page - 1) * limit; 
+        const { startDate, endDate, timeFrame = 'daily' } = req.query;
 
-        const totalOrders = await Orders.countDocuments();
-        const totalPages = Math.ceil(totalOrders / limit);
+        // Validate and parse date range
+        let matchCondition = { orderStatus: { $ne: 'Cancelled' } };
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (start > end) return res.status(400).json({ success: false, message: "End date must be after start date" });
+            if (!isNaN(start) && !isNaN(end)) matchCondition.orderDate = { $gte: start, $lte: end };
+            else return res.status(400).json({ success: false, message: "Invalid date format" });
+        }
 
-        const orders = await Orders.find({})
-            .populate('userId')
-            .populate('deliveryAddress')
-            .populate({ path: 'items.productId', model: 'Product' }) 
-            .sort({ _id: -1 })
-            .skip(skip)
-            .limit(limit);
+        // Determine date format for grouping
+        const dateFormats = {
+            daily: "%Y-%m-%d",
+            weekly: "%Y-W%V",
+            monthly: "%Y-%m",
+            yearly: "%Y"
+        };
+        const dateFormat = { $dateToString: { format: dateFormats[timeFrame] || dateFormats.daily, date: "$orderDate" } };
 
-        const formattedOrders = orders.map(order => {
-            const date = new Date(order.createdAt);
-            const formattedDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
-            return {
-                ...order.toObject(),
-                formattedCreatedAt: formattedDate,
-            };
-        });
-
-        res.render('saleReport', {
-            orderDetails: formattedOrders,
-            currentPage: page,
-            totalPages,
-        });
-    } catch (error) {
-        console.error('Error loading sales report page:', error);
-        res.status(500).send('Error loading sales report page');
-    }
-};
-
-const dailySalesReport = async (req, res) => {
-    try {
-     
-        const startDate = moment().startOf('day').toDate();
-        const endDate = moment().endOf('day').toDate();
-
-        const dailyReport = await Orders.aggregate([
-            {
-                $match: {
-                    orderDate: { 
-                        $gte: startDate, 
-                        $lte: endDate 
-                    },
-                    orderStatus: {
-                        $nin: ['Cancelled', 'Return Success']
-                    }
-                }
-            },
-            {
-                $lookup: {
-                    from: 'coupons',
-                    localField: 'couponApplied',
-                    foreignField: '_id',
-                    as: 'couponDetails'
-                }
-            },
-            {
-                $addFields: {
-                    
-                    finalAmount: {
-                        $subtract: [
-                            "$totalAmount",
-                            {
-                                $add: [
-                                    "$offerApplied",
-                                    {
-                                        $cond: {
-                                            if: { $gt: [{ $size: "$couponDetails" }, 0] },
-                                            then: {
-                                                $cond: [
-                                                    { $eq: [{ $arrayElemAt: ["$couponDetails.offerType", 0] }, "percentage"] },
-                                                    {
-                                                        $multiply: [
-                                                            "$totalAmount",
-                                                            { $divide: [{ $arrayElemAt: ["$couponDetails.offerValue", 0] }, 100] }
-                                                        ]
-                                                    },
-                                                    { $arrayElemAt: ["$couponDetails.offerValue", 0] }
-                                                ]
-                                            },
-                                            else: 0
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            },
+        const salesData = await Order.aggregate([
+            { $match: matchCondition },
             {
                 $group: {
-                    _id: {
-                        hour: { $hour: "$orderDate" }
-                    },
-                    totalOrders: { $sum: 1 },
-                    grossAmount: { $sum: "$totalAmount" },
-                    totalCouponDiscount: { 
+                    _id: dateFormat,
+                    sales: { $sum: { $subtract: ["$totalAmount", "$offerApplied"] } },
+                    orders: { $sum: 1 },
+                    avgOrderValue: { $avg: { $subtract: ["$totalAmount", "$offerApplied"] } },
+                    totalItems: {
                         $sum: {
-                            $cond: {
-                                if: { $gt: [{ $size: "$couponDetails" }, 0] },
-                                then: {
-                                    $cond: [
-                                        { $eq: [{ $arrayElemAt: ["$couponDetails.offerType", 0] }, "percentage"] },
-                                        {
-                                            $multiply: [
-                                                "$totalAmount",
-                                                { $divide: [{ $arrayElemAt: ["$couponDetails.offerValue", 0] }, 100] }
-                                            ]
-                                        },
-                                        { $arrayElemAt: ["$couponDetails.offerValue", 0] }
-                                    ]
-                                },
-                                else: 0
+                            $reduce: {
+                                input: "$items",
+                                initialValue: 0,
+                                in: { $add: ["$$value", "$$this.quantity"] }
                             }
                         }
                     },
-                    totalOfferDiscount: { $sum: "$offerApplied" },
-                    netAmount: { $sum: "$finalAmount" }
+                    totalCouponsUsed: {
+                        $sum: {
+                            $cond: [
+                                { $ne: ["$couponApplied", null] },
+                                1,
+                                0
+                            ]
+                        }
+                    },
+                    couponDeductions: { $sum: "$offerApplied" },
+                    totalDiscounts: {
+                        $sum: "$offerApplied"
+                    },
+                    grossRevenue: { $sum: "$totalAmount" },
+                    netRevenue: {
+                        $sum: {
+                            $subtract: [
+                                "$totalAmount",
+                                "$offerApplied"
+                            ]
+                        }
+                    }
                 }
             },
+            { $sort: { "_id": 1 } },
             {
-                $sort: { "_id.hour": 1 }
+                $project: {
+                    date: "$_id",
+                    sales: 1,
+                    orders: 1,
+                    avgOrderValue: { $round: ["$avgOrderValue", 2] },
+                    totalItems: 1,
+                    totalCouponsUsed: 1,
+                    couponDeductions: { $round: ["$couponDeductions", 2] },
+                    totalDiscounts: { $round: ["$totalDiscounts", 2] },
+                    grossRevenue: { $round: ["$grossRevenue", 2] },
+                    netRevenue: { $round: ["$netRevenue", 2] },
+                    _id: 0
+                }
             }
         ]);
 
-        
-        const formattedReport = Array.from({ length: 24 }, (_, hour) => {
-            const hourData = dailyReport.find(report => report._id.hour === hour) || {
-                totalOrders: 0,
-                grossAmount: 0,
-                totalCouponDiscount: 0,
-                totalOfferDiscount: 0,
-                netAmount: 0
-            };
+        const summary = generateSummary(salesData);
 
-            return {
-                _id: `${hour.toString().padStart(2, '0')}:00`,
-                ...hourData
-            };
-        });
+        const paymentMethodStats = await Order.aggregate([
+            { $match: matchCondition },
+            {
+                $group: {
+                    _id: "$paymentMethod",
+                    count: { $sum: 1 },
+                    total: { $sum: "$totalAmount" }
+                }
+            }
+        ]);
 
-        const totals = formattedReport.reduce((acc, curr) => ({
-            totalOrders: acc.totalOrders + curr.totalOrders,
-            grossAmount: acc.grossAmount + curr.grossAmount,
-            totalCouponDiscount: acc.totalCouponDiscount + curr.totalCouponDiscount,
-            totalOfferDiscount: acc.totalOfferDiscount + curr.totalOfferDiscount,
-            netAmount: acc.netAmount + curr.netAmount
-        }), {
-            totalOrders: 0,
-            grossAmount: 0,
-            totalCouponDiscount: 0,
-            totalOfferDiscount: 0,
-            netAmount: 0
-        });
-
-        res.render('reports', {
-            report: formattedReport,
-            totals: totals,
-            reportType: 'daily'
+        res.json({
+            success: true,
+            data: { salesData, summary, paymentMethodStats }
         });
 
     } catch (error) {
-        console.error('Error generating daily report:', error);
+        console.error('Sales Report Error:', error);
         res.status(500).json({
             success: false,
-            message: 'Error generating daily report',
+            message: 'Error generating sales report',
             error: error.message
         });
+        next(error);
     }
 };
 
-const generateWeeklyReport = async (req, res) => {
-    try {
-        
-        const startDate = moment().startOf('isoWeek').toDate();
-        const endDate = moment().endOf('isoWeek').toDate();
+const generateSummary = (salesData) => {
+    if (!salesData.length) return {
+        totalSales: 0,
+        totalOrders: 0,
+        avgOrderValue: 0,
+        totalItems: 0,
+        totalCouponsUsed: 0,
+        couponDeductions: 0,
+        totalDiscounts: 0,
+        grossRevenue: 0,
+        netRevenue: 0
+    };
 
-        const weeklyReport = await Orders.aggregate([
+    return {
+        totalSales: salesData.reduce((sum, item) => sum + item.sales, 0),
+        totalOrders: salesData.reduce((sum, item) => sum + item.orders, 0),
+        avgOrderValue: (salesData.reduce((sum, item) => sum + item.avgOrderValue, 0) / salesData.length).toFixed(2),
+        totalItems: salesData.reduce((sum, item) => sum + item.totalItems, 0),
+        totalCouponsUsed: salesData.reduce((sum, item) => sum + item.totalCouponsUsed, 0),
+        couponDeductions: salesData.reduce((sum, item) => sum + item.couponDeductions, 0).toFixed(2),
+        totalDiscounts: salesData.reduce((sum, item) => sum + item.totalDiscounts, 0).toFixed(2),
+        grossRevenue: salesData.reduce((sum, item) => sum + item.grossRevenue, 0).toFixed(2),
+        netRevenue: salesData.reduce((sum, item) => sum + item.netRevenue, 0).toFixed(2)
+    };
+};
+
+const topSellers = async (req, res, next) => {
+    try {
+        // Top Products
+        const topProducts = await Order.aggregate([
+            { $unwind: "$items" },
+            { 
+                $group: { 
+                    _id: "$items.productId", 
+                    value: { $sum: "$items.quantity" } 
+                } 
+            },
             {
-                $match: {
-                    orderDate: { 
-                        $gte: startDate, 
-                        $lte: endDate 
-                    },
-                    orderStatus: {
-                        $nin: ['Cancelled', 'Return Success']
-                    }
+                $lookup: {
+                    from: "products",  // MongoDB collection name is lowercase
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "productInfo"
+                }
+            },
+            { $unwind: "$productInfo" },
+            {
+                $project: {
+                    name: "$productInfo.productName",  // Get the product name
+                    value: 1,
+                    _id: 0
+                }
+            },
+            { $sort: { value: -1 } },
+            { $limit: 5 }
+        ]);
+
+        const topCategories = await Order.aggregate([
+            { $unwind: "$items" },
+            {
+                $lookup: {
+                    from: "products",  // Changed from "Product" to "products" (MongoDB collection names are lowercase)
+                    localField: "items.productId",
+                    foreignField: "_id",
+                    as: "productInfo"
+                }
+            },
+            { $unwind: "$productInfo" },
+            {
+                $group: {
+                    _id: "$productInfo.category",  // This is now grouping by category name (string)
+                    value: { $sum: "$items.quantity" }
                 }
             },
             {
                 $lookup: {
-                    from: 'coupons',
-                    localField: 'couponApplied',
-                    foreignField: '_id',
-                    as: 'couponDetails'
-                }
-            },
-            {
-                $addFields: {
-                    
-                    finalAmount: {
-                        $subtract: [
-                            "$totalAmount",
-                            {
-                                $add: [
-                                    "$offerApplied",
-                                    {
-                                        $cond: {
-                                            if: { $gt: [{ $size: "$couponDetails" }, 0] },
-                                            then: {
-                                                $cond: [
-                                                    { $eq: [{ $arrayElemAt: ["$couponDetails.offerType", 0] }, "percentage"] },
-                                                    {
-                                                        $multiply: [
-                                                            "$totalAmount",
-                                                            { $divide: [{ $arrayElemAt: ["$couponDetails.offerValue", 0] }, 100] }
-                                                        ]
-                                                    },
-                                                    { $arrayElemAt: ["$couponDetails.offerValue", 0] }
-                                                ]
-                                            },
-                                            else: 0
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                        dayOfWeek: { $dayOfWeek: "$orderDate" }
-                    },
-                    totalOrders: { $sum: 1 },
-                    grossAmount: { $sum: "$totalAmount" },
-                    totalCouponDiscount: { 
-                        $sum: {
-                            $cond: {
-                                if: { $gt: [{ $size: "$couponDetails" }, 0] },
-                                then: {
-                                    $cond: [
-                                        { $eq: [{ $arrayElemAt: ["$couponDetails.offerType", 0] }, "percentage"] },
-                                        {
-                                            $multiply: [
-                                                "$totalAmount",
-                                                { $divide: [{ $arrayElemAt: ["$couponDetails.offerValue", 0] }, 100] }
-                                            ]
-                                        },
-                                        { $arrayElemAt: ["$couponDetails.offerValue", 0] }
-                                    ]
-                                },
-                                else: 0
+                    from: "categories",  // Changed from "category" to "categories"
+                    let: { categoryName: "$_id" },  // Use let to define variables for $expr
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$name", "$$categoryName"]  // Match on category name instead of _id
+                                }
                             }
                         }
-                    },
-                    totalOfferDiscount: { $sum: "$offerApplied" },
-                    netAmount: { $sum: "$finalAmount" }
+                    ],
+                    as: "categoryInfo"
                 }
             },
-            {
-                $sort: { "_id.dayOfWeek": 1 }
-            }
+            { $unwind: "$categoryInfo" },
+            { 
+                $project: {
+                    name: "$categoryInfo.name",
+                    value: 1,
+                    _id: 0  // Exclude _id from results
+                }
+            },
+            { $sort: { value: -1 } },
+            { $limit: 5 }
         ]);
 
-        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const formattedReport = daysOfWeek.map((day, index) => {
-            const dayData = weeklyReport.find(report => report._id.dayOfWeek === index + 1) || {
-                totalOrders: 0,
-                grossAmount: 0,
-                totalCouponDiscount: 0,
-                totalOfferDiscount: 0,
-                netAmount: 0
-            };
+        console.log(topCategories)
 
-            return {
-                _id: day,
-                ...dayData
-            };
-        });
-
-
-        const totals = formattedReport.reduce((acc, curr) => ({
-            totalOrders: acc.totalOrders + curr.totalOrders,
-            grossAmount: acc.grossAmount + curr.grossAmount,
-            totalCouponDiscount: acc.totalCouponDiscount + curr.totalCouponDiscount,
-            totalOfferDiscount: acc.totalOfferDiscount + curr.totalOfferDiscount,
-            netAmount: acc.netAmount + curr.netAmount
-        }), {
-            totalOrders: 0,
-            grossAmount: 0,
-            totalCouponDiscount: 0,
-            totalOfferDiscount: 0,
-            netAmount: 0
-        });
-
-        res.render('reports', {
-            report: formattedReport,
-            totals: totals,
-            reportType: 'weekly'
-        });
-
-    } catch (error) {
-        console.error('Error generating weekly report:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error generating weekly report',
-            error: error.message
-        });
-    }
-};
-
-const generateMonthlyReport = async (req, res) => {
-    try {
-
-        const currentYear = new Date().getFullYear();
-        const startDate = new Date(currentYear, 0, 1);
-        const endDate = new Date(currentYear, 11, 31);
-
-        const monthlyReport = await Orders.aggregate([
-            {
-                $match: {
-                    orderDate: { 
-                        $gte: startDate, 
-                        $lte: endDate 
-                    },
-                    orderStatus: {
-                        $nin: ['Cancelled', 'Return Success'] 
-                    }
-                }
-            },
-            {
-                $lookup: {
-                    from: 'coupons',
-                    localField: 'couponApplied',
-                    foreignField: '_id',
-                    as: 'couponDetails'
-                }
-            },
-            {
-                $addFields: {
-             
-                    finalAmount: {
-                        $subtract: [
-                            "$totalAmount",
-                            {
-                                $add: [
-                                    "$offerApplied",
-                                    {
-                                        $cond: {
-                                            if: { $gt: [{ $size: "$couponDetails" }, 0] },
-                                            then: {
-                                                $cond: [
-                                                    { $eq: [{ $arrayElemAt: ["$couponDetails.offerType", 0] }, "percentage"] },
-                                                    {
-                                                        $multiply: [
-                                                            "$totalAmount",
-                                                            { $divide: [{ $arrayElemAt: ["$couponDetails.offerValue", 0] }, 100] }
-                                                        ]
-                                                    },
-                                                    { $arrayElemAt: ["$couponDetails.offerValue", 0] }
-                                                ]
-                                            },
-                                            else: 0
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: { 
-                        year: { $year: "$orderDate" },
-                        month: { $month: "$orderDate" }
-                    },
-                    totalOrders: { $sum: 1 },
-                    grossAmount: { $sum: "$totalAmount" },
-                    totalCouponDiscount: { 
-                        $sum: {
-                            $cond: {
-                                if: { $gt: [{ $size: "$couponDetails" }, 0] },
-                                then: {
-                                    $cond: [
-                                        { $eq: [{ $arrayElemAt: ["$couponDetails.offerType", 0] }, "percentage"] },
-                                        {
-                                            $multiply: [
-                                                "$totalAmount",
-                                                { $divide: [{ $arrayElemAt: ["$couponDetails.offerValue", 0] }, 100] }
-                                            ]
-                                        },
-                                        { $arrayElemAt: ["$couponDetails.offerValue", 0] }
-                                    ]
-                                },
-                                else: 0
-                            }
-                        }
-                    },
-                    totalOfferDiscount: { $sum: "$offerApplied" },
-                    netAmount: { $sum: "$finalAmount" }
-                }
-            },
-            {
-                $sort: { 
-                    "_id.year": 1,
-                    "_id.month": 1
-                }
-            }
-        ]);
-
-    
-        const formattedReport = monthlyReport.map(report => ({
-            _id: moment().month(report._id.month - 1).format('MMMM'),
-            totalOrders: report.totalOrders,
-            grossAmount: report.grossAmount,
-            totalCouponDiscount: report.totalCouponDiscount,
-            totalOfferDiscount: report.totalOfferDiscount,
-            netAmount: report.netAmount
-        }));
-
+        // Top Brands
        
-        const totals = formattedReport.reduce((acc, curr) => ({
-            totalOrders: acc.totalOrders + curr.totalOrders,
-            grossAmount: acc.grossAmount + curr.grossAmount,
-            totalCouponDiscount: acc.totalCouponDiscount + curr.totalCouponDiscount,
-            totalOfferDiscount: acc.totalOfferDiscount + curr.totalOfferDiscount,
-            netAmount: acc.netAmount + curr.netAmount
-        }), {
-            totalOrders: 0,
-            grossAmount: 0,
-            totalCouponDiscount: 0,
-            totalOfferDiscount: 0,
-            netAmount: 0
-        });
 
-      
-        const allMonths = moment.months();
-        const completeReport = allMonths.map(month => {
-            const existingReport = formattedReport.find(report => report._id === month);
-            return existingReport || {
-                _id: month,
-                totalOrders: 0,
-                grossAmount: 0,
-                totalCouponDiscount: 0,
-                totalOfferDiscount: 0,
-                netAmount: 0
-            };
+        res.json({
+            success: true,
+            products: topProducts,
+            categories: topCategories,
+           
         });
-
-        res.render('reports', {
-            report: completeReport,
-            totals: totals
-        });
-
     } catch (error) {
-        console.error('Error generating monthly report:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error generating monthly report',
-            error: error.message
-        });
+        console.error('Error fetching top sellers:', error);
+        res.status(500).json({ success: false, error: 'Error fetching top sellers' });
+        next(error);
     }
 };
 
-const generateYearlyReport = async (req, res) => {
-    try {
-     
-        const oldestOrder = await Orders.findOne().sort({ orderDate: 1 });
-        const startYear = oldestOrder ? moment(oldestOrder.orderDate).year() : moment().year();
-        const currentYear = moment().year();
-        
-        const yearlyReport = await Orders.aggregate([
-            {
-                $match: {
-                    orderStatus: {
-                        $nin: ['Cancelled', 'Return Success']
-                    }
-                }
-            },
-            {
-                $lookup: {
-                    from: 'coupons',
-                    localField: 'couponApplied',
-                    foreignField: '_id',
-                    as: 'couponDetails'
-                }
-            },
-            {
-                $addFields: {
-                   
-                    finalAmount: {
-                        $subtract: [
-                            "$totalAmount",
-                            {
-                                $add: [
-                                    "$offerApplied",
-                                    {
-                                        $cond: {
-                                            if: { $gt: [{ $size: "$couponDetails" }, 0] },
-                                            then: {
-                                                $cond: [
-                                                    { $eq: [{ $arrayElemAt: ["$couponDetails.offerType", 0] }, "percentage"] },
-                                                    {
-                                                        $multiply: [
-                                                            "$totalAmount",
-                                                            { $divide: [{ $arrayElemAt: ["$couponDetails.offerValue", 0] }, 100] }
-                                                        ]
-                                                    },
-                                                    { $arrayElemAt: ["$couponDetails.offerValue", 0] }
-                                                ]
-                                            },
-                                            else: 0
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: { year: { $year: "$orderDate" } },
-                    totalOrders: { $sum: 1 },
-                    grossAmount: { $sum: "$totalAmount" },
-                    totalCouponDiscount: { 
-                        $sum: {
-                            $cond: {
-                                if: { $gt: [{ $size: "$couponDetails" }, 0] },
-                                then: {
-                                    $cond: [
-                                        { $eq: [{ $arrayElemAt: ["$couponDetails.offerType", 0] }, "percentage"] },
-                                        {
-                                            $multiply: [
-                                                "$totalAmount",
-                                                { $divide: [{ $arrayElemAt: ["$couponDetails.offerValue", 0] }, 100] }
-                                            ]
-                                        },
-                                        { $arrayElemAt: ["$couponDetails.offerValue", 0] }
-                                    ]
-                                },
-                                else: 0
-                            }
-                        }
-                    },
-                    totalOfferDiscount: { $sum: "$offerApplied" },
-                    netAmount: { $sum: "$finalAmount" }
-                }
-            },
-            {
-                $sort: { "_id.year": 1 }
-            }
-        ]);
-
-  
-        const formattedReport = Array.from(
-            { length: currentYear - startYear + 1 },
-            (_, index) => {
-                const year = startYear + index;
-                const yearData = yearlyReport.find(report => report._id.year === year) || {
-                    totalOrders: 0,
-                    grossAmount: 0,
-                    totalCouponDiscount: 0,
-                    totalOfferDiscount: 0,
-                    netAmount: 0
-                };
-
-                return {
-                    _id: year.toString(),
-                    ...yearData
-                };
-            }
-        );
-
-      
-        const totals = formattedReport.reduce((acc, curr) => ({
-            totalOrders: acc.totalOrders + curr.totalOrders,
-            grossAmount: acc.grossAmount + curr.grossAmount,
-            totalCouponDiscount: acc.totalCouponDiscount + curr.totalCouponDiscount,
-            totalOfferDiscount: acc.totalOfferDiscount + curr.totalOfferDiscount,
-            netAmount: acc.netAmount + curr.netAmount
-        }), {
-            totalOrders: 0,
-            grossAmount: 0,
-            totalCouponDiscount: 0,
-            totalOfferDiscount: 0,
-            netAmount: 0
-        });
-
-        res.render('reports', {
-            report: formattedReport,
-            totals: totals,
-            reportType: 'yearly'
-        });
-
-    } catch (error) {
-        console.error('Error generating yearly report:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error generating yearly report',
-            error: error.message
-        });
-    }
+module.exports = {
+    getSalesReport,
+    topSellers
 };
-
-const generateCustomDateReport = async (req, res) => {
-    try {
-        const currentdate = moment().endOf('day'); 
-        const startDate = moment(req.query.startDate, 'YYYY-MM-DD').startOf('day');
-        const endDate = moment(req.query.endDate, 'YYYY-MM-DD').endOf('day');
-
-     
-        if (!startDate.isValid() || !endDate.isValid()) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid date format. Please use YYYY-MM-DD.'
-            });
-        }
-
-     
-        if (startDate.isAfter(currentdate) || endDate.isAfter(currentdate)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Dates cannot exceed the current date.'
-            });
-        }
-
-      
-        if (startDate.isAfter(endDate)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Start date cannot be after end date.'
-            });
-        }
-
-        const customDateReport = await Orders.aggregate([
-            {
-                $match: {
-                    orderDate: { 
-                        $gte: startDate.toDate(), 
-                        $lte: endDate.toDate() 
-                    },
-                    orderStatus: {
-                        $nin: ['Cancelled', 'Return Success']
-                    }
-                }
-            },
-            {
-                $lookup: {
-                    from: 'coupons',
-                    localField: 'couponApplied',
-                    foreignField: '_id',
-                    as: 'couponDetails'
-                }
-            },
-            {
-                $addFields: {
-                   
-                    finalAmount: {
-                        $subtract: [
-                            "$totalAmount",
-                            {
-                                $add: [
-                                    "$offerApplied",
-                                    {
-                                        $cond: {
-                                            if: { $gt: [{ $size: "$couponDetails" }, 0] },
-                                            then: {
-                                                $cond: [
-                                                    { $eq: [{ $arrayElemAt: ["$couponDetails.offerType", 0] }, "percentage"] },
-                                                    {
-                                                        $multiply: [
-                                                            "$totalAmount",
-                                                            { $divide: [{ $arrayElemAt: ["$couponDetails.offerValue", 0] }, 100] }
-                                                        ]
-                                                    },
-                                                    { $arrayElemAt: ["$couponDetails.offerValue", 0] }
-                                                ]
-                                            },
-                                            else: 0
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                        date: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } }
-                    },
-                    totalOrders: { $sum: 1 },
-                    grossAmount: { $sum: "$totalAmount" },
-                    totalCouponDiscount: { 
-                        $sum: {
-                            $cond: {
-                                if: { $gt: [{ $size: "$couponDetails" }, 0] },
-                                then: {
-                                    $cond: [
-                                        { $eq: [{ $arrayElemAt: ["$couponDetails.offerType", 0] }, "percentage"] },
-                                        {
-                                            $multiply: [
-                                                "$totalAmount",
-                                                { $divide: [{ $arrayElemAt: ["$couponDetails.offerValue", 0] }, 100] }
-                                            ]
-                                        },
-                                        { $arrayElemAt: ["$couponDetails.offerValue", 0] }
-                                    ]
-                                },
-                                else: 0
-                            }
-                        }
-                    },
-                    totalOfferDiscount: { $sum: "$offerApplied" },
-                    netAmount: { $sum: "$finalAmount" }
-                }
-            },
-            {
-                $sort: { "_id.date": 1 }
-            }
-        ]);
-
-        const allDates = [];
-        const currentDate = startDate.clone();
-        while (currentDate.isSameOrBefore(endDate)) {
-            allDates.push(currentDate.format('YYYY-MM-DD'));
-            currentDate.add(1, 'day');
-        }
-
-        const formattedReport = allDates.map(date => {
-            const dateData = customDateReport.find(report => report._id.date === date) || {
-                totalOrders: 0,
-                grossAmount: 0,
-                totalCouponDiscount: 0,
-                totalOfferDiscount: 0,
-                netAmount: 0
-            };
-
-            return {
-                _id: date,
-                ...dateData
-            };
-        });
-
-
-        const totals = formattedReport.reduce((acc, curr) => ({
-            totalOrders: acc.totalOrders + curr.totalOrders,
-            grossAmount: acc.grossAmount + curr.grossAmount,
-            totalCouponDiscount: acc.totalCouponDiscount + curr.totalCouponDiscount,
-            totalOfferDiscount: acc.totalOfferDiscount + curr.totalOfferDiscount,
-            netAmount: acc.netAmount + curr.netAmount
-        }), {
-            totalOrders: 0,
-            grossAmount: 0,
-            totalCouponDiscount: 0,
-            totalOfferDiscount: 0,
-            netAmount: 0
-        });
-
-        res.render('reports', {
-            report: formattedReport,
-            totals: totals,
-            startDate: startDate.format('YYYY-MM-DD'),
-            endDate: endDate.format('YYYY-MM-DD'),
-            reportType: 'custom'
-        });
-
-    } catch (error) {
-        console.error('Error generating custom date report:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error generating custom date report',
-            error: error.message
-        });
-    }
-};
-
-module.exports={
-    loadSalesReport,
-    dailySalesReport,
-    generateWeeklyReport,
-    generateMonthlyReport,
-    generateYearlyReport,
-    generateCustomDateReport,
-
-}

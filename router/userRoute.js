@@ -13,7 +13,7 @@ route.get("/", auth.islogin, userController.homePage)
 
 
 route.get("/about", userController.about)
-
+route.get("/contact", userController.contact)
 
 
 route.get("/signup", userController.loadsignup)
