@@ -33,7 +33,7 @@ const adminlogin = async (req, res) => {
         }
 
         if(!password){
-            return res.status(400).render("adminlogin", { error: "All fields are required." }); 
+            return res.status(400).render("adminlogin", { error: "All fields are required." })
         }
 
 
@@ -67,7 +67,7 @@ const adminlogin = async (req, res) => {
         res.status(500).render("login", { error: "Internal Server Error." });
     }
 };
-
+}
 const dashboard = async (req, res) => {
     try {
        res.render('dashboard')
