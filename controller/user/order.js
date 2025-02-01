@@ -136,7 +136,7 @@ const orderconfirm = async (req, res) => {
   
    
         wallet.transactions.push({
-          amount: order.totalAmount,
+          amount: order.totalAmount-100,
           type: 'credit',
           date: new Date(),
         });
@@ -171,6 +171,7 @@ const orderconfirm = async (req, res) => {
     try {
         const { savedaddress, paymentMethod, cart, couponCode } = req.body;
         const userId = req.session.user;
+        const shippingCharge = 100; 
 
         console.log("payment", paymentMethod);
         console.log("Received order details:", { savedaddress, paymentMethod, cart, couponCode });
@@ -184,10 +185,9 @@ const orderconfirm = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Address not found.' });
         }
 
-        let totalAmount = 0;
+        let subtotal = 0;
         const items = [];
 
-       
         for (const item of cart) {
             if (!item.productId || !item.productId.salePrice || !item.quantity) {
                 return res.status(400).json({ success: false, message: 'Invalid item in cart.' });
@@ -206,7 +206,7 @@ const orderconfirm = async (req, res) => {
             }
 
             const itemTotal = product.salePrice * item.quantity;
-            totalAmount += itemTotal;
+            subtotal += itemTotal;
 
             items.push({
                 productId: product._id,
@@ -228,11 +228,10 @@ const orderconfirm = async (req, res) => {
             }
 
             if (coupon.offerType === 'Percentage') {
-                discount = (coupon.offerValue / 100) * totalAmount;
+                discount = (coupon.offerValue / 100) * subtotal;
             } else if (coupon.offerType === 'flat') {
                 discount = coupon.offerValue;
             }
-            totalAmount = Math.max(totalAmount - discount, 0);
 
             coupon.couponUsed += 1;
             await coupon.save();
@@ -240,6 +239,9 @@ const orderconfirm = async (req, res) => {
             user.couponUsed.push(coupon._id);
             await user.save();
         }
+
+       
+        const totalAmount = Math.max(subtotal - discount, 0) + shippingCharge;
 
         const validPaymentMethods = ['Wallet', 'Razorpay', 'COD'];
         if (!validPaymentMethods.includes(paymentMethod)) {
@@ -265,12 +267,15 @@ const orderconfirm = async (req, res) => {
             await wallet.save();
         }
 
-        console.log("Total amount after discount:", totalAmount);
+        console.log("Total amount after discount and shipping:", totalAmount);
 
         const newOrder = new Order({
             userId,
             deliveryAddress: address,
             items,
+            subtotal,
+            shippingCharge,
+            discount,
             totalAmount,
             paymentMethod,
             couponApplied: couponCode ? Coupon._id : null,
@@ -283,7 +288,6 @@ const orderconfirm = async (req, res) => {
 
         console.log("Order saved:", savedOrder);
 
-        
         for (const item of items) {
             const updatedProduct = await Product.findOneAndUpdate(
                 { _id: item.productId },
@@ -304,7 +308,6 @@ const orderconfirm = async (req, res) => {
         res.status(500).json({ success: false, message: 'An error occurred while placing the order.' });
     }
 };
-
 
 
 

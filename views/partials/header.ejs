@@ -94,13 +94,12 @@ https://cdn.jsdelivr.net/npm/razorpay@2.9.5/dist/razorpay.min.js
          
           <div class="relative">
             <button id="dropdownButton" class="flex items-center space-x-2 text-xl cursor-pointer hover:text-red-500 transition-colors focus:outline-none">
-              <i class="fas fa-user"></i>
+                <i class="fas fa-user"></i>
             </button>
             <div id="dropdownMenu" class="absolute right-0 mt-2 bg-white text-black rounded-lg shadow-lg hidden">
-              <a href="/profile" class="block px-4 py-2">Profile</a>
-              <a href="/logout" class="block px-4 py-2">Logout</a>
+               
             </div>
-          </div>
+        </div>
         </div>
       </nav>
     </div>
@@ -347,5 +346,35 @@ https://cdn.jsdelivr.net/npm/razorpay@2.9.5/dist/razorpay.min.js
         });
       }
     }
+
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const dropdownMenu = document.getElementById("dropdownMenu");
+
+
+        const response = await fetch('/api/check-session');
+        const data = await response.json();
+
+        
+        dropdownMenu.innerHTML = '';
+
+        if (data.isAuthenticated) {
+          
+            dropdownMenu.innerHTML = `
+                <a href="/profile" class="block px-4 py-2">Profile</a>
+                <a href="/logout" class="block px-4 py-2">Logout</a>
+            `;
+        } else {
+           
+            dropdownMenu.innerHTML = `
+                <a href="/login" class="block px-4 py-2">Login</a>
+               
+            `;
+        }
+
+        document.getElementById("dropdownButton").addEventListener("click", () => {
+            dropdownMenu.classList.toggle("hidden");
+        });
+    });
 
   </script>

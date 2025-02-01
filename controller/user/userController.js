@@ -7,7 +7,18 @@ const { name } = require("ejs");
 
 const homePage = async (req, res) => {
     try {
-        res.render("user/homeWithoutUser");
+        res.render("user/home");
+    } catch (error) {
+        console.error("Error rendering home page:", error);
+        res.status(500).send("Server error");
+    }
+};
+
+
+
+const about = async (req, res) => {
+    try {
+        res.render("user/about");
     } catch (error) {
         console.error("Error rendering home page:", error);
         res.status(500).send("Server error");
@@ -508,5 +519,6 @@ module.exports = {
     verifyPasswordOtp,
     setPassword,
     resendotp,
-    setNewPassword
+    setNewPassword,
+    about
 };

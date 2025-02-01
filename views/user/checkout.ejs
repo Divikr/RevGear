@@ -14,7 +14,7 @@
   <h2 class="text-2xl sm:text-3xl font-light mb-6 uppercase tracking-wider">Checkout</h2>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-  
+ 
     <div class="bg-white shadow-sm rounded-lg p-6">
       <h3 class="text-lg font-medium mb-4">Shipping Address</h3>
 
@@ -64,7 +64,7 @@
       </div>
     </div>
 
-
+  
     <div class="bg-white shadow-sm rounded-lg p-6">
       <h3 class="text-lg font-medium mb-4">Order Summary</h3>
       
@@ -80,7 +80,7 @@
       </div>
       <% }) %>
 
-
+      
       <div class="space-y-2">
         <div class="flex justify-between items-center text-lg">
           <span>Subtotal:</span>
@@ -92,14 +92,18 @@
           <span id="discount-amount" class="text-green-600">-₹0.00</span>
         </div>
 
+        <div class="flex justify-between items-center text-lg">
+          <span>Shipping Charge:</span>
+          <span>₹100.00</span>
+        </div>
+
         <div class="flex justify-between items-center text-lg font-bold border-t pt-2 mt-2">
           <span>Final Total:</span>
-          <span id="final-total">₹<%= total.toFixed(2) %></span>
+          <span id="final-total">₹<%= (total + 100).toFixed(2) %></span>
         </div>
       </div>
 
-   
-    
+      
       <div class="mt-6 mb-6">
         <label for="voucher-code" class="block text-sm font-medium text-gray-700">Have a Voucher?</label>
         <div class="flex items-center space-x-2 mt-2">
@@ -149,6 +153,7 @@
 <script>
 let currentDiscount = 0;
 let originalTotal = <%= total %>;
+let shippingCharge = 100;
 let appliedCouponCode = '';
 
 
@@ -163,7 +168,8 @@ document.getElementById('view-coupons').addEventListener('change', (event) => {
   if (selectedCoupon) {
     document.getElementById('voucher-code').value = selectedCoupon;
   }
-})
+});
+
 
 document.getElementById('submit-new-address-checkout').addEventListener('click', () => {
   const newAddress = {
@@ -177,6 +183,7 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     postalCode: document.getElementById('new-address-postalCode').value.trim()
   };
 
+  
   if (!newAddress.name || !newAddress.phone || !newAddress.street || !newAddress.city || !newAddress.postalCode) {
     Swal.fire({
       icon: 'error',
@@ -188,7 +195,6 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     return;
   }
 
-  
   if (/^\s/.test(document.getElementById('new-address-name').value)) {
     Swal.fire({
       icon: 'error',
@@ -200,7 +206,6 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     return;
   }
 
-  
   if (/^\s/.test(document.getElementById('new-address-phone').value)) {
     Swal.fire({
       icon: 'error',
@@ -212,19 +217,17 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     return;
   }
 
- 
   if (!/^[A-Za-z\s]+$/.test(newAddress.name)) {
     Swal.fire({
       icon: 'error',
       title: 'Invalid Name',
-      text: 'Name must contain only letters and spaces, and it cannot be empty.',
+      text: 'Name must contain only letters and spaces.',
       confirmButtonColor: '#d33',
       confirmButtonText: 'Okay'
     });
     return;
   }
 
- 
   const phoneRegex = /^\d{10}$/;
   if (!phoneRegex.test(newAddress.phone)) {
     Swal.fire({
@@ -249,7 +252,7 @@ document.getElementById('submit-new-address-checkout').addEventListener('click',
     return;
   }
 
-
+ 
   fetch('/add-address-checkout', {
     method: 'POST',
     headers: {
@@ -338,7 +341,8 @@ document.getElementById('apply-button').addEventListener('click', async () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({voucherCode,
+      body: JSON.stringify({
+        voucherCode,
         currentTotal: originalTotal
       }),
     });
@@ -349,14 +353,11 @@ document.getElementById('apply-button').addEventListener('click', async () => {
       currentDiscount = data.discount;
       appliedCouponCode = voucherCode;
       
-     
       document.getElementById('discount-section').style.display = 'flex';
       document.getElementById('discount-amount').textContent = `-₹${currentDiscount.toFixed(2)}`;
       
-     
-      const finalTotal = originalTotal - currentDiscount;
+      const finalTotal = originalTotal - currentDiscount + shippingCharge;
       document.getElementById('final-total').textContent = `₹${finalTotal.toFixed(2)}`;
-      
       
       document.getElementById('coupon-message').textContent = 'Coupon applied successfully!';
       document.getElementById('coupon-message').style.display = 'block';
@@ -386,12 +387,13 @@ document.getElementById('apply-button').addEventListener('click', async () => {
   }
 });
 
+
 document.getElementById('remove-coupon').addEventListener('click', () => {
   currentDiscount = 0;
   appliedCouponCode = '';
   
   document.getElementById('discount-section').style.display = 'none';
-  document.getElementById('final-total').textContent = `₹${originalTotal.toFixed(2)}`;
+  document.getElementById('final-total').textContent = `₹${(originalTotal + shippingCharge).toFixed(2)}`;
   
   document.getElementById('voucher-code').value = '';
   document.getElementById('coupon-message').style.display = 'none';
@@ -452,8 +454,9 @@ document.getElementById('place-order-btn').addEventListener('click', () => {
     paymentMethod,
     cart: <%- JSON.stringify(cart || []) %>,
     couponCode: appliedCouponCode,
+    shippingCharge: shippingCharge,
     discount: currentDiscount,
-    finalTotal: originalTotal - currentDiscount
+    finalTotal: originalTotal - currentDiscount + shippingCharge
   };
 
   if (paymentMethod === 'Razorpay') {
@@ -522,48 +525,49 @@ document.getElementById('place-order-btn').addEventListener('click', () => {
 
         const razorpay = new Razorpay(options);
         razorpay.on("payment.failed", function(response) {
-  console.log("Payment failed response:", response);
-  
-  const failedPaymentDetails = {
-    savedaddress: orderDetails.savedaddress,
-    cart: orderDetails.cart,
-    couponCode: orderDetails.couponCode,
-    discount: orderDetails.discount,
-    finalTotal: orderDetails.finalTotal,
-    paymentFailureDetails: {
-      orderId: response.error.metadata.order_id,
-      paymentId: response.error.metadata.payment_id,
-      errorCode: response.error.code,
-      errorDescription: response.error.description
-    }
-  };
+          console.log("Payment failed response:", response);
+          
+          const failedPaymentDetails = {
+            savedaddress: orderDetails.savedaddress,
+            cart: orderDetails.cart,
+            couponCode: orderDetails.couponCode,
+            discount: orderDetails.discount,
+            shippingCharge: orderDetails.shippingCharge,
+            finalTotal: orderDetails.finalTotal,
+            paymentFailureDetails: {
+              orderId: response.error.metadata.order_id,
+              paymentId: response.error.metadata.payment_id,
+              errorCode: response.error.code,
+              errorDescription: response.error.description
+            }
+          };
 
-  console.log("..........failed........",failedPaymentDetails)
+          console.log("Failed payment details:", failedPaymentDetails);
 
-  fetch('/handle-payment-failure', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(failedPaymentDetails),
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      window.location.href = '/payment-failed';
-    } else {
-      throw new Error(data.message);
-    }
-  })
-  .catch(error => {
-    console.error('Payment failure handling error:', error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Order Processing Failed',
-      text: error.message || 'Failed to process order',
-    });
-  });
-});
+          fetch('/handle-payment-failure', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(failedPaymentDetails),
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              window.location.href = '/payment-failed';
+            } else {
+              throw new Error(data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Payment failure handling error:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Order Processing Failed',
+              text: error.message || 'Failed to process order',
+            });
+          });
+        });
         
         razorpay.open();
       } else {
@@ -612,6 +616,7 @@ document.getElementById('place-order-btn').addEventListener('click', () => {
     });
   }
 });
+
 
 document.addEventListener('DOMContentLoaded', fetchCoupons);
 </script>

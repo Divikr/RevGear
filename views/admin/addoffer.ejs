@@ -184,123 +184,109 @@
                 }
             }
             
+            const today = new Date();
+today.setHours(0, 0, 0, 0); // Set time to midnight for accurate date comparison
 
+// Format date to YYYY-MM-DD
+const formatDate = (date) => {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+};
 
+const todayDate = formatDate(today);
 
-            addOfferForm.addEventListener('submit', function (e) {
-            const offerName = document.getElementById('offerName').value.trim();
-            const discount = parseFloat(document.getElementById('discount').value);
-            const startDate = new Date(document.getElementById('startDate').value);
-            const endDate = new Date(document.getElementById('endDate').value);
-            const now = new Date();
+const validFromInput = document.getElementById('startDate');
+const validUntilInput = document.getElementById('endDate');
 
-            if (offerName.length < 3) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Offer Name',
-                    text: 'Offer name must be at least 3 characters long.',
-                });
-                e.preventDefault();
-                return;
-            }
+// Set minimum dates
+validFromInput.min = todayDate;
+validFromInput.value = todayDate;
 
-            if (isNaN(discount) || discount <= 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Discount',
-                    text: 'Discount must be a positive number.',
-                });
-                e.preventDefault();
-                return;
-            }
+// Set tomorrow as default end date
+const tomorrow = new Date(today);
+tomorrow.setDate(today.getDate() + 1);
+const tomorrowDate = formatDate(tomorrow);
+validUntilInput.min = tomorrowDate;
+validUntilInput.value = tomorrowDate;
 
-            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Dates',
-                    text: 'Please provide valid start and end dates.',
-                });
-                e.preventDefault();
-                return;
-            }
-
-            if (startDate < now) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Start Date',
-                    text: 'Start date cannot be in the past.',
-                });
-                e.preventDefault();
-                return;
-            }
-
-            if (startDate >= endDate) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Date Range',
-                    text: 'Start date must be before end date.',
-                });
-                e.preventDefault();
-                return;
-            }
-
-            if (offerTypeSelect.value === 'Product' && !document.getElementById('productId').value) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Selection',
-                    text: 'Please select a product for Product offers.',
-                });
-                e.preventDefault();
-                return;
-            }
-
-            if (offerTypeSelect.value === 'Category' && !document.getElementById('categoryId').value) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Selection',
-                    text: 'Please select a category for Category offers.',
-                });
-                e.preventDefault();
-                return;
-            }
-        });
-
-
-        const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); 
-    const dd = String(today.getDate()).padStart(2, '0');
-    const todayDate = `${yyyy}-${mm}-${dd}`;
-
-  
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const nextDay = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
-
-   
-    const validFromInput = document.getElementById('startDate');
-    const validUntilInput = document.getElementById('endDate');
-
-    validFromInput.min = todayDate;
-    validUntilInput.min = nextDay;
-
+// Update end date min value when start date changes
+validFromInput.addEventListener('change', function(e) {
+    const selectedStart = new Date(e.target.value);
+    const nextDay = new Date(selectedStart);
+    nextDay.setDate(selectedStart.getDate() + 1);
     
-    validFromInput.value = todayDate;
-    validUntilInput.value = nextDay;
+    const nextDayFormatted = formatDate(nextDay);
+    validUntilInput.min = nextDayFormatted;
+    
+    if (new Date(validUntilInput.value) <= selectedStart) {
+        validUntilInput.value = nextDayFormatted;
+    }
+});
 
-  
-    validFromInput.addEventListener('change', (event) => {
-        const selectedDate = new Date(event.target.value);
-        const newExpireDate = new Date(selectedDate);
-        newExpireDate.setDate(selectedDate.getDate() + 1);
+// Form validation
+addOfferForm.addEventListener('submit', function (e) {
+    const offerName = document.getElementById('offerName').value.trim();
+    const discount = parseFloat(document.getElementById('discount').value);
+    const startDate = new Date(document.getElementById('startDate').value);
+    const endDate = new Date(document.getElementById('endDate').value);
+    
+    // Set times to midnight for accurate comparison
+ 
+    
+    if (offerName.length < 3) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Offer Name',
+            text: 'Offer name must be at least 3 characters long.',
+        });
+        e.preventDefault();
+        return;
+    }
+    
+    
+    if (isNaN(discount) || discount <= 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Discount',
+            text: 'Discount must be a positive number.',
+        });
+        e.preventDefault();
+        return;
+    }
 
-        const updatedExpireDate = `${newExpireDate.getFullYear()}-${String(newExpireDate.getMonth() + 1).padStart(2, '0')}-${String(newExpireDate.getDate()).padStart(2, '0')}`;
-        validUntilInput.min = updatedExpireDate;
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Dates',
+            text: 'Please provide valid start and end dates.',
+        });
+        e.preventDefault();
+        return;
+    }
 
-        if (new Date(validUntilInput.value) < newExpireDate) {
-            validUntilInput.value = updatedExpireDate;
-        }
-    });
+    if (startDate < today) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Start Date',
+            text: 'Start date cannot be in the past.',
+        });
+        e.preventDefault();
+        return;
+    }
+
+    if (startDate >= endDate) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Date Range',
+            text: 'Start date must be before end date.',
+        });
+        e.preventDefault();
+        return;
+    }
+});
+ 
    
 
 </script>

@@ -11,6 +11,11 @@ const auth = require("../middleware/userAuth")
 
 route.get("/", auth.islogin, userController.homePage)
 
+
+route.get("/about", userController.about)
+
+
+
 route.get("/signup", userController.loadsignup)
 route.post("/signup", userController.signup)
 
@@ -27,6 +32,7 @@ route.get('/auth/google', passport.authenticate('google', { scope: ['profile', '
 route.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 route.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }),
   (req, res) => {
+    req.session.user = req.user;
     res.redirect("/home");
   }
 );
@@ -137,6 +143,14 @@ route.post('/payment-success', paymentController.paymentSuccess);
 
 route.post('/apply', couponController.applyCoupon);
 route.get('/coupons',couponController.getCoupon)
+
+route.get('/api/check-session', (req, res) => {
+  if (req.session.user) {
+      res.json({ isAuthenticated: true });
+  } else {
+      res.json({ isAuthenticated: false });
+  }
+});
 
 
 module.exports = route

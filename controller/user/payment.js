@@ -16,63 +16,68 @@ const razorpay = new Razorpay({
 });
 
 const createRazorpayOrder = async (req, res) => {
-    try {
-        const { finalTotal,savedaddress, paymentMethod, cart } = req.body;
-console.log(req.body)
-      
-        console.log("Received order details:", { savedaddress, paymentMethod, cart });
+  try {
+      const { finalTotal, savedaddress, paymentMethod, cart } = req.body;
+      console.log(req.body);
 
-        if (!savedaddress || !paymentMethod || !Array.isArray(cart) || cart.length === 0) {
-            console.error('Invalid order details.');
-            return res.status(400).json({ success: false, message: 'Invalid order details.' });
-        }
+      console.log("Received order details:", { savedaddress, paymentMethod, cart });
 
-       
-        const totalAmount = cart.reduce((sum, item) => {
-            if (!item.productId || !item.productId.salePrice || !item.quantity) {
-                throw new Error('Invalid cart item structure.');
-            }
-            return sum + item.productId.salePrice * item.quantity;
-        }, 0);
+      if (!savedaddress || !paymentMethod || !Array.isArray(cart) || cart.length === 0) {
+          console.error('Invalid order details.');
+          return res.status(400).json({ success: false, message: 'Invalid order details.' });
+      }
 
-        console.log("Calculated total amount:", totalAmount);
+      const totalAmount = cart.reduce((sum, item) => {
+          if (!item.productId || !item.productId.salePrice || !item.quantity) {
+              throw new Error('Invalid cart item structure.');
+          }
+          return sum + item.productId.salePrice * item.quantity;
+      }, 0);
 
-        if (totalAmount <= 0) {
-            console.error('Total amount is invalid.');
-            return res.status(400).json({ success: false, message: 'Total amount must be greater than 0.' });
-        }
+      console.log("Calculated total amount:", totalAmount);
 
-       
-        const options = {
-            amount: (finalTotal.toFixed(2)) * 100, 
-            currency: 'INR',
-            receipt: `order_rcptid_${Math.floor(Math.random() * 1000000)}`,
-        };
+      if (totalAmount <= 0) {
+          console.error('Total amount is invalid.');
+          return res.status(400).json({ success: false, message: 'Total amount must be greater than 0.' });
+      }
 
-        console.log("Creating Razorpay order with options:", options);
+     
+      const amountInPaise = Math.round(finalTotal * 100);
 
-        const order = await razorpay.orders.create(options);
-        console.log('.......fgsegg....',order)
+     
+      if (amountInPaise > 2500000) {
+          return res.status(400).json({ success: false, message: 'Transaction amount exceeds ₹25,000 limit.' });
+      }
 
-        console.log("Razorpay order created successfully:", order);
+      const options = {
+          amount: amountInPaise,
+          currency: 'INR',
+          receipt: `order_rcptid_${Math.floor(Math.random() * 1000000)}`,
+      };
 
-        res.status(200).json({
-            success: true,
-            key: process.env.RAZORPAY_KEY_ID,
-            orderId: order.id,
-            amount: order.amount,
-            currency: order.currency,
-        });
-    } catch (error) {
-        console.error('Error creating Razorpay order:', error);
+      console.log("Creating Razorpay order with options:", options);
 
-        if (error.isAxiosError) {
-            console.error('Razorpay API error:', error.response.data);
-        }
+      const order = await razorpay.orders.create(options);
+      console.log("Razorpay order created successfully:", order);
 
-        res.status(500).json({ success: false, message: 'Failed to create Razorpay order.' });
-    }
+      res.status(200).json({
+          success: true,
+          key: process.env.RAZORPAY_KEY_ID,
+          orderId: order.id,
+          amount: order.amount,
+          currency: order.currency,
+      });
+  } catch (error) {
+      console.error('Error creating Razorpay order:', error);
+
+      if (error.isAxiosError) {
+          console.error('Razorpay API error:', error.response.data);
+      }
+
+      res.status(500).json({ success: false, message: 'Failed to create Razorpay order.' });
+  }
 };
+
 
   
 const getWallet = async (req, res) => {
@@ -201,52 +206,61 @@ console.log("items......",items)
 
   const retryPayment = async (req, res) => {
     try {
-      const { orderId } = req.params;
-      console.log("order", orderId);
-  
-   
-      const order = await Order.findById(orderId);
-  
-      if (!order) {
-        return res.status(404).json({ success: false, message: 'Order not found' });
-      }
-  
-      if (order.orderStatus !== 'Payment Pending') {
-        return res.status(400).json({
-          success: false,
-          message: 'Payment can only be retried for orders with status "Payment Pending"',
-        });
-      }
+        const { orderId } = req.params;
+        console.log("Retrying payment for order:", orderId);
 
-     
-  
-  
-      const razorpayOrder = await razorpay.orders.create({
-        amount: order.totalAmount * 100, 
-        currency: 'INR',
-        receipt: `order_${order._id}`,
-        notes: {
-          userId: order.userId.toString(),
-          orderId: order._id.toString(),
-        },
-      });
-  
-    
-      res.status(200).json({
-        success: true,
-        key: process.env.RAZORPAY_KEY_ID,
-        razorpayOrderId: razorpayOrder.id,
-        amount: order.totalAmount * 100,
-        currency: 'INR',
-      });
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        if (order.orderStatus !== 'Payment Pending') {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment can only be retried for orders with status "Payment Pending"',
+            });
+        }
+
+       
+        const amountInPaise = Math.round(order.totalAmount * 100);
+
+       
+        if (amountInPaise > 2500000) {
+            return res.status(400).json({
+                success: false,
+                message: 'Transaction amount exceeds ₹25,000 limit.',
+            });
+        }
+
+        const razorpayOrder = await razorpay.orders.create({
+            amount: amountInPaise,
+            currency: 'INR',
+            receipt: `order_${order._id}`,
+            notes: {
+                userId: order.userId.toString(),
+                orderId: order._id.toString(),
+            },
+        });
+
+        console.log("New Razorpay order created successfully:", razorpayOrder);
+
+        res.status(200).json({
+            success: true,
+            key: process.env.RAZORPAY_KEY_ID,
+            razorpayOrderId: razorpayOrder.id,
+            amount: amountInPaise,
+            currency: 'INR',
+        });
     } catch (error) {
-      console.error('Error in retrying payment:', error);
-      res.status(500).json({
-        success: false,
-        message: error.message || 'An error occurred while retrying payment',
-      });
+        console.error('Error in retrying payment:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'An error occurred while retrying payment',
+        });
     }
-  };
+};
+
   
 
   const paymentSuccess = async (req, res) => {

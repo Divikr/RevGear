@@ -1,13 +1,13 @@
 const islogin = (req, res, next) => {
     if (req.session.user) {
-        return res.redirect('/home');
+        next;
     }
-    return next();
+    return res.redirect('/home');
 }
 
 const islogout = (req, res, next) => {
     if (req.session.user) {
-        return res.redirect('/home');
+        return res.redirect('/login');
     }
     return next();
 }
