@@ -22,92 +22,215 @@ https://cdn.jsdelivr.net/npm/razorpay@2.9.5/dist/razorpay.min.js
 "></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
+<style>
+  #dropdownMenu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: #1a202c;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    overflow: hidden;
+  }
 
-  <style>
-   
-    #dropdownMenu {
-      display: none;
+  #dropdownMenu a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: white;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  #dropdownMenu a:hover {
+    background: #2d3748;
+  }
+
+  /* Mobile menu styles */
+  #mobileMenu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 40;
+  }
+
+  #mobileMenu.active {
+    display: block;
+  }
+
+  .search-transition {
+    transition: all 0.3s ease;
+  }
+
+  @media (max-width: 768px) {
+    .search-container.active {
       position: absolute;
-      right: 0;
       top: 100%;
-      background: #1a202c;
-      border-radius: 0.5rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      z-index: 50;
-      overflow: hidden;
+      left: 0;
+      right: 0;
+      padding: 1rem;
+      background: black;
+      z-index: 30;
     }
-
-    #dropdownMenu a {
-      display: block;
-      padding: 0.75rem 1rem;
-      color: white;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-
-    #dropdownMenu a:hover {
-      background: #2d3748;
-    }
-  </style>
+  }
+</style>
 </head>
 
 <body class="bg-gray-50">
+<header class="bg-black text-white py-6 shadow-lg relative">
+  <div class="container mx-auto px-4">
+    <nav class="flex justify-between items-center">
+      <!-- Logo -->
+      <div class="text-2xl font-bold cursor-pointer">REVGEAR</div>
 
-  <header class="bg-black text-white py-6 shadow-lg relative">
-    <div class="container mx-auto px-4">
-      <nav class="flex justify-between items-center">
-        
-     
-        <div class="text-2xl font-bold cursor-pointer">REVGEAR</div>
-  
-    
-        <div class="hidden md:flex items-center space-x-6">
-          <a href="/home" class="hover:text-red-500 transition-colors">Home</a>
-          <a href="/products" class="hover:text-red-500 transition-colors">Products</a>
-          <a href="/categories" class="hover:text-red-500 transition-colors">Categories</a>
+      <!-- Mobile Menu Button -->
+      <button id="mobileMenuBtn" class="md:hidden text-white focus:outline-none">
+        <i class="fas fa-bars text-2xl"></i>
+      </button>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/home" class="hover:text-red-500 transition-colors">Home</a>
+        <a href="/products" class="hover:text-red-500 transition-colors">Products</a>
+        <a href="/categories" class="hover:text-red-500 transition-colors">Categories</a>
+      </div>
+
+      <!-- Search and Icons -->
+      <div class="hidden md:flex items-center space-x-6 z-10">
+        <!-- Desktop Search -->
+        <div class="relative flex-1 mx-8">
+          <input type="text" id="searchInput" placeholder="Search for products..." 
+            class="w-full max-w-2xl bg-gray-800 text-white px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300 search-transition" 
+            autocomplete="off" />
+          <button onclick="performSearch()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-400 transition-colors">
+            <i class="fas fa-search text-lg"></i>
+          </button>
+          <div id="searchSuggestions" class="absolute w-full mt-2 bg-white rounded-lg shadow-xl max-h-96 overflow-y-auto hidden z-50"></div>
         </div>
-  
-        
-        <div class="flex items-center space-x-6 z-10 relative">
-         
-          <div class="hidden md:block relative flex-1 mx-8">
-            <input type="text" id="searchInput" placeholder="Search for products..." class="w-full max-w-2xl bg-gray-800 text-white px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300 search-transition" autocomplete="off" />
-            
-            <button onclick="performSearch()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-400 transition-colors">
-              <i class="fas fa-search text-lg"></i>
-            </button>
-          
-            <div id="searchSuggestions" class="absolute w-full mt-2 bg-white rounded-lg shadow-xl max-h-96 overflow-y-auto hidden z-50">
-         
-            </div>
-          </div>
-  
-          <a href="/wishlist" class="text-xl cursor-pointer hover:text-red-500 transition-colors">
+
+        <!-- Icons -->
+        <div class="flex items-center space-x-6">
+          <a href="/wishlist" class="text-xl hover:text-red-500 transition-colors">
             <i class="fas fa-heart"></i>
           </a>
-  
-          
-          <a href="/cart" class="text-xl cursor-pointer hover:text-red-500 transition-colors">
+          <a href="/cart" class="text-xl hover:text-red-500 transition-colors">
             <i class="fas fa-shopping-cart"></i>
           </a>
-  
-         
           <div class="relative">
-            <button id="dropdownButton" class="flex items-center space-x-2 text-xl cursor-pointer hover:text-red-500 transition-colors focus:outline-none">
-                <i class="fas fa-user"></i>
+            <button id="dropdownButton" class="flex items-center space-x-2 text-xl hover:text-red-500 transition-colors focus:outline-none">
+              <i class="fas fa-user"></i>
             </button>
-            <div id="dropdownMenu" class="absolute right-0 mt-2 bg-white text-black rounded-lg shadow-lg hidden">
-               
-            </div>
+            <div id="dropdownMenu"></div>
+          </div>
         </div>
-        </div>
-      </nav>
+      </div>
+
+      <!-- Mobile Search Button -->
+      <button id="mobileSearchBtn" class="md:hidden text-xl text-white ml-4">
+        <i class="fas fa-search"></i>
+      </button>
+    </nav>
+
+    <!-- Mobile Search Container -->
+    <div id="mobileSearchContainer" class="md:hidden mt-4 hidden px-4">
+      <div class="relative">
+        <input type="text" id="mobileSearchInput" placeholder="Search for products..." 
+          class="w-full bg-gray-800 text-white px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500" />
+        <button onclick="performMobileSearch()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500">
+          <i class="fas fa-search text-lg"></i>
+        </button>
+      </div>
     </div>
-  </header>
+  </div>
+</header>
+
+<!-- Mobile Menu Overlay -->
+<div id="mobileMenu" class="md:hidden">
+  <div class="flex flex-col h-full">
+    <div class="flex justify-between items-center p-6 border-b border-gray-800">
+      <div class="text-2xl font-bold text-white">REVGEAR</div>
+      <button id="mobileMenuCloseBtn" class="text-white focus:outline-none">
+        <i class="fas fa-times text-2xl"></i>
+      </button>
+    </div>
+    <div class="flex-1 p-6">
+      <div class="flex flex-col space-y-6">
+        <a href="/home" class="text-white text-lg hover:text-red-500 transition-colors">Home</a>
+        <a href="/products" class="text-white text-lg hover:text-red-500 transition-colors">Products</a>
+        <a href="/categories" class="text-white text-lg hover:text-red-500 transition-colors">Categories</a>
+        <a href="/wishlist" class="text-white text-lg hover:text-red-500 transition-colors">
+          <i class="fas fa-heart mr-2"></i> Wishlist
+        </a>
+        <a href="/cart" class="text-white text-lg hover:text-red-500 transition-colors">
+          <i class="fas fa-shopping-cart mr-2"></i> Cart
+        </a>
+        <a href="/profile" class="text-white text-lg hover:text-red-500 transition-colors">
+          <i class="fas fa-user mr-2"></i> Profile
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
   
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
    <script>
+
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenuCloseBtn = document.getElementById('mobileMenuCloseBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+    const mobileSearchContainer = document.getElementById('mobileSearchContainer');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    mobileMenuCloseBtn.addEventListener('click', () => {
+      mobileMenu.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+
+    mobileSearchBtn.addEventListener('click', () => {
+      mobileSearchContainer.classList.toggle('hidden');
+      if (!mobileSearchContainer.classList.contains('hidden')) {
+        document.getElementById('mobileSearchInput').focus();
+      }
+    });
+
+    // Close mobile menu when clicking outside
+    mobileMenu.addEventListener('click', (e) => {
+      if (e.target === mobileMenu) {
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    // Mobile search functionality
+    function performMobileSearch() {
+      const query = document.getElementById('mobileSearchInput').value.trim();
+      if (query) {
+        window.location.href = `/search?query=${encodeURIComponent(query)}`;
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Empty Search',
+          text: 'Please enter a search term',
+          confirmButtonColor: '#EF4444'
+        });
+      }
+    }
+
+
+
+
+
 
 
 
