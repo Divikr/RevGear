@@ -62,54 +62,115 @@ const addOffer = async (req, res) => {
     try {
         const { offerName, discount, startDate, endDate, offerType, productId, categoryId } = req.body;
 
-     
+        // Basic validation
         if (!offerName || !discount || !startDate || !endDate || !offerType) {
             return res.status(400).json({ success: false, errorMessage: 'All fields are required' });
         }
 
-   
+        // Validate discount
         const numericDiscount = Number(discount);
         if (isNaN(numericDiscount) || numericDiscount <= 0) {
             return res.status(400).json({ success: false, errorMessage: 'Invalid discount value' });
         }
 
-      
-        const parseDateToLocalMidnight = (dateString) => {
+        const parseDate = (dateString) => {
             const date = new Date(dateString);
-            date.setHours(0, 0, 0, 0);
             return date;
         };
 
-        const startLocal = parseDateToLocalMidnight(startDate);
-        const endLocal = parseDateToLocalMidnight(endDate);
-        const todayLocal = parseDateToLocalMidnight(new Date().toISOString());
+        const startDateTime = parseDate(startDate);
+        const endDateTime = parseDate(endDate);
+        const now = new Date();
+        const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-        if (startLocal < todayLocal) {
+        // Date validations
+        if (startDateTime < currentDate) {
             return res.status(400).json({ success: false, errorMessage: 'Start date cannot be in the past' });
         }
 
-        if (startLocal >= endLocal) {
+        if (startDateTime >= endDateTime) {
             return res.status(400).json({ success: false, errorMessage: 'End date must be after start date' });
         }
 
-     
+        // Validate offer type
         if (!['Product', 'Category'].includes(offerType)) {
             return res.status(400).json({ success: false, errorMessage: 'Invalid offer type' });
         }
 
-      
+        // Create new offer
         const newOffer = new Offer({
             offerName,
             discount: numericDiscount,
-            startDate: startLocal,
-            endDate: endLocal,
+            startDate: startDateTime,
+            endDate: endDateTime,
             offerType,
         });
 
-   
-        if (offerType === 'Product') {
-            console.log('Processing product offer');
+        // Helper function to get all applicable offers for a product
+        const getApplicableOffers = async (product) => {
+            const offers = [];
+            
+            // Check product-specific offers
+            if (product.productOfferId) {
+                const productOffer = await Offer.findById(product.productOfferId);
+                if (productOffer && productOffer.startDate <= now && productOffer.endDate >= now) {
+                    offers.push({
+                        type: 'Product',
+                        discount: productOffer.discount,
+                        offerId: productOffer._id
+                    });
+                }
+            }
 
+            // Check category offers
+            if (product.categoryOfferId) {
+                const categoryOffer = await Offer.findById(product.categoryOfferId);
+                if (categoryOffer && categoryOffer.startDate <= now && categoryOffer.endDate >= now) {
+                    offers.push({
+                        type: 'Category',
+                        discount: categoryOffer.discount,
+                        offerId: categoryOffer._id
+                    });
+                }
+            }
+
+            return offers;
+        };
+
+        // Helper function to apply the best offer
+        const applyBestOffer = async (product, newOfferDetails) => {
+            const originalPrice = Number(product.originalPrice || product.salePrice);
+            if (isNaN(originalPrice)) return null;
+
+            const applicableOffers = await getApplicableOffers(product);
+            applicableOffers.push(newOfferDetails);
+
+            // Find the offer with the highest discount
+            const bestOffer = applicableOffers.reduce((best, current) => {
+                return (current.discount > best.discount) ? current : best;
+            }, applicableOffers[0]);
+
+            // Only update if the best offer is different from what's currently applied
+            const currentDiscount = product.appliedDiscount || 0;
+            if (bestOffer.discount !== currentDiscount) {
+                const updateFields = {
+                    salePrice: originalPrice - bestOffer.discount,
+                    appliedDiscount: bestOffer.discount,
+                    productOfferId: null,
+                    categoryOfferId: null,
+                    [`${bestOffer.type.toLowerCase()}OfferId`]: bestOffer.offerId
+                };
+
+                return Product.findByIdAndUpdate(
+                    product._id,
+                    { $set: updateFields },
+                    { new: true }
+                );
+            }
+            return null;
+        };
+
+        if (offerType === 'Product') {
             if (!productId) {
                 return res.status(400).json({ success: false, errorMessage: 'Product ID is required for Product offers' });
             }
@@ -119,52 +180,35 @@ const addOffer = async (req, res) => {
                 return res.status(404).json({ success: false, errorMessage: 'Product not found' });
             }
 
-            const originalPrice = Number(product.originalPrice || product.salePrice);
-            if (isNaN(originalPrice)) {
-                return res.status(400).json({ success: false, errorMessage: 'Invalid product price' });
-            }
-
-          
-            const categoryOffer = await Offer.findById(product.categoryOfferId);
-            const categoryDiscount = categoryOffer ? Number(categoryOffer.discount) || 0 : 0;
-
-        
-            const finalDiscount = Math.max(numericDiscount, categoryDiscount);
-            const discountedPrice = originalPrice - finalDiscount;
-
-            if (discountedPrice < 0) {
-                return res.status(400).json({ success: false, errorMessage: 'Discount exceeds product price' });
-            }
-
-            console.log('Applying highest discount:', {
-                originalPrice,
-                productOffer: numericDiscount,
-                categoryOffer: categoryDiscount,
-                appliedDiscount: finalDiscount,
-                finalPrice: discountedPrice
+            // Check for overlapping product offers
+            const existingOffer = await Offer.findOne({
+                productId: productId,
+                startDate: { $lte: endDateTime },
+                endDate: { $gte: startDateTime }
             });
 
-         
-            await Product.findByIdAndUpdate(
-                productId,
-                {
-                    $set: {
-                        salePrice: discountedPrice,
-                        productOfferId: numericDiscount >= categoryDiscount ? newOffer._id : product.productOfferId,
-                        categoryOfferId: categoryDiscount > numericDiscount ? product.categoryOfferId : newOffer._id,
-                        appliedDiscount: finalDiscount,
-                    },
-                },
-                { new: true }
-            );
+            if (existingOffer) {
+                return res.status(400).json({ 
+                    success: false, 
+                    errorMessage: 'An offer already exists for this product during the selected date range' 
+                });
+            }
+
+            // Only update product if the offer starts today
+            const startDateLocal = new Date(startDateTime.setHours(0,0,0,0));
+            const currentDateLocal = new Date(currentDate.setHours(0,0,0,0));
+
+            if (startDateLocal.getTime() === currentDateLocal.getTime()) {
+                await applyBestOffer(product, {
+                    type: 'Product',
+                    discount: numericDiscount,
+                    offerId: newOffer._id
+                });
+            }
 
             newOffer.productId = productId;
-        }
 
-
-        else if (offerType === 'Category') {
-            console.log('Processing category offer');
-
+        } else if (offerType === 'Category') {
             if (!categoryId) {
                 return res.status(400).json({ success: false, errorMessage: 'Category ID is required for Category offers' });
             }
@@ -174,62 +218,54 @@ const addOffer = async (req, res) => {
                 return res.status(404).json({ success: false, errorMessage: 'Category not found' });
             }
 
+            // Check for overlapping category offers
+            const existingOffer = await Offer.findOne({
+                categoryId: categoryId,
+                startDate: { $lte: endDateTime },
+                endDate: { $gte: startDateTime }
+            });
+
+            if (existingOffer) {
+                return res.status(400).json({ 
+                    success: false, 
+                    errorMessage: 'An offer already exists for this category during the selected date range' 
+                });
+            }
+
             const categoryProducts = await Product.find({ category: category.name });
             if (!categoryProducts.length) {
                 return res.status(404).json({ success: false, errorMessage: 'No products found for the category' });
             }
 
-          
-            for (const product of categoryProducts) {
-                const originalPrice = Number(product.originalPrice || product.salePrice);
-                if (isNaN(originalPrice)) continue;
+            // Only update products if the offer starts today
+            const startDateLocal = new Date(startDateTime.setHours(0,0,0,0));
+            const currentDateLocal = new Date(currentDate.setHours(0,0,0,0));
 
-                const productOffer = await Offer.findById(product.productOfferId);
-                const productDiscount = productOffer ? Number(productOffer.discount) || 0 : 0;
-
-          
-                const finalDiscount = Math.max(numericDiscount, productDiscount);
-                const discountedPrice = originalPrice - finalDiscount;
-
-                if (discountedPrice < 0) continue;
-
-                console.log('Applying highest discount for category product:', {
-                    productId: product._id,
-                    originalPrice,
-                    productOffer: productDiscount,
-                    categoryOffer: numericDiscount,
-                    appliedDiscount: finalDiscount,
-                    finalPrice: discountedPrice
-                });
-
-                await Product.findByIdAndUpdate(
-                    product._id,
-                    {
-                        $set: {
-                            salePrice: discountedPrice,
-                            productOfferId: productDiscount >= numericDiscount ? product.productOfferId : newOffer._id,
-                            categoryOfferId: numericDiscount > productDiscount ? newOffer._id : product.categoryOfferId,
-                            appliedDiscount: finalDiscount,
-                        },
-                    },
-                    { new: true }
-                );
+            if (startDateLocal.getTime() === currentDateLocal.getTime()) {
+                for (const product of categoryProducts) {
+                    await applyBestOffer(product, {
+                        type: 'Category',
+                        discount: numericDiscount,
+                        offerId: newOffer._id
+                    });
+                }
             }
 
             newOffer.categoryId = categoryId;
         }
 
-     
+        // Save the offer
         await newOffer.save();
         console.log('Offer saved successfully:', newOffer);
 
-      
         res.redirect('/admin/offer');
     } catch (error) {
         console.error('Error adding offer:', error);
         res.status(500).json({ success: false, errorMessage: 'Error adding offer: ' + error.message });
     }
 };
+
+
 
 
 const deleteOffer = async (req, res) => {

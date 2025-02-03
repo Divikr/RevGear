@@ -143,14 +143,23 @@
     const form = document.getElementById('signupForm');
     const fields = {
         name: {
-            element: document.getElementById('name'),
-            errorElement: document.getElementById('firstNameError'),
-            validate: value => {
-                if (!value) return 'First name is required';
-                if (value.length < 2) return 'First name must be at least 2 characters';
-                return '';
-            }
-        },
+    element: document.getElementById('name'),
+    errorElement: document.getElementById('firstNameError'),
+    validate: value => {
+        if (!value) return 'First name is required';
+        
+        // Check for leading spaces
+        if (value[0] === ' ') return 'Name should not have leading spaces';
+        
+        // Check for trailing spaces or spaces in between that make the name invalid
+        if (value.trim() !== value) return 'Name should not have leading or trailing spaces';
+        
+        // Check for minimum length
+        if (value.length < 4) return 'Name must be at least 4 characters';
+        
+        return '';
+    }
+},
         email: {
             element: document.getElementById('email'),
             errorElement: document.getElementById('emailError'),
