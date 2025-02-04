@@ -323,7 +323,7 @@
 
                 case 'category-description':
                     const descValue = field.value.trim();
-                    if (descValue.length < 10 || descValue.length > 500) {
+                    if (descValue.length < 5 || descValue.length > 100) {
                         field.classList.add('error');
                         errorElement.style.display = 'block';
                         isValid = false;
