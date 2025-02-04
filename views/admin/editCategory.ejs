@@ -3,11 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RevGear </title>
+    <title>RevGear - Edit Category</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/admin/addCategory.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <link rel="stylesheet" href="/admin/category.css">
+    <style>
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c6cfd8;
+            font-weight: 500;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error {
+            border-color: #e74c3c !important;
+        }
+
+        .image-upload-container {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        #add-image-button {
+            cursor: pointer;
+            color: #3498db;
+        }
+
+        #add-image-button i {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            height: 50%;
+            width: 50%;
+        }
+
+        .image-wrapper {
+            position: relative;
+            width: 150px;
+        }
+
+        .cropped-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .delete-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .save-category {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .save-category:hover {
+            background-color: #27ae60;
+        }
+
+        .cropper-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            opacity: 0.9;
+        }
+
+        .cropper-container {
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            transform: translate(-50%, -50%);
+            max-width: 70%;
+            max-height: 50%;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .cropper-buttons {
+            position: fixed;
+            bottom: 90px;
+            left: 37%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            display: flex;
+            gap: 10px;
+        }
+
+        .cropper-buttons button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .crop-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .crop-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background-color: #c0392b;
+        }
+
+        #crop-image-preview {
+            max-width: 50%;
+            max-height: 40vh;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard">
@@ -24,7 +208,7 @@
                     <i class="fas fa-box"></i>
                     <span>Products</span>
                 </a>
-                <a href="/admin/customer" class="nav-item ">
+                <a href="/admin/customer" class="nav-item">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>
@@ -40,7 +224,6 @@
                     <i class="fas fa-tags"></i>
                     <span>Coupons</span>
                 </a>
-                
                 <a href="/admin/offer" class="nav-item">
                     <i class="fas fa-gift"></i>
                     <span>Offer</span>
@@ -59,14 +242,13 @@
                     <div class="form-group image-upload">
                         <label for="product-images">Category Image</label>
                         <div class="image-upload-container">
-                          
                             <input type="file" id="image-input" name="Image" accept="image/*" style="display: none;">
                             <div id="add-image-button">
                                 <i class="fas fa-plus"></i>
                                 <span>Add Image</span>
                             </div>
-                            
                         </div>
+                        <div id="image-error" class="error-message">Please add at least one image</div>
                         <div id="image-preview-container" class="image-preview-container">
                             <% cat.Image.forEach((image) => { %>
                                 <div class="image-wrapper">
@@ -83,132 +265,324 @@
                             type="text" 
                             id="category-name" 
                             placeholder="Type category name here..." 
-                            value="<%= cat.name %>" 
+                            value="<%= cat.name %>"
+                            onkeyup="validateField('category-name')"
                         >
+                        <div id="category-name-error" class="error-message">Category name must be 3-50 characters long and contain only letters, numbers, and spaces</div>
                     </div>
 
                     <div class="form-group">
                         <label for="category-description">Description</label>
-                        <textarea id="category-description" placeholder="Type category description here..."><%= cat.description %></textarea>
+                        <textarea 
+                            id="category-description" 
+                            placeholder="Type category description here..."
+                            onkeyup="validateField('category-description')"
+                        ><%= cat.description %></textarea>
+                        <div id="category-description-error" class="error-message">Description must be between 10 and 500 characters</div>
                     </div>
-
-                   
                 </div>
                 <button class="save-category" id="update" onclick="updateCategory()">Update Category</button>
             </div>
+        </div>
+    </div>
 
-        
+    <!-- Cropper Modal -->
+    <div id="cropperModal" class="cropper-modal">
+        <div class="cropper-container">
+            <img id="crop-image-preview">
+        </div>
+        <div class="cropper-buttons">
+            <button class="crop-btn" onclick="cropImage()">Crop</button>
+            <button class="cancel-btn" onclick="cancelCrop()">Cancel</button>
         </div>
     </div>
 
     <script>
         let uploadedImage = null;
+        let cropper = null;
 
+        // Validation functions
+        function validateField(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(`${fieldId}-error`);
+            let isValid = true;
+
+            switch(fieldId) {
+                case 'category-name':
+                    const nameValue = field.value.trim();
+                    const namePattern = /^[a-zA-Z0-9\s]{3,50}$/;
+                    if (!namePattern.test(nameValue)) {
+                        field.classList.add('error');
+                        errorElement.style.display = 'block';
+                        isValid = false;
+                    } else {
+                        field.classList.remove('error');
+                        errorElement.style.display = 'none';
+                    }
+                    break;
+
+                case 'category-description':
+                    const descValue = field.value.trim();
+                    if (descValue.length < 10 || descValue.length > 500) {
+                        field.classList.add('error');
+                        errorElement.style.display = 'block';
+                        isValid = false;
+                    } else {
+                        field.classList.remove('error');
+                        errorElement.style.display = 'none';
+                    }
+                    break;
+            }
+
+            return isValid;
+        }
+
+        function validateForm() {
+            let isValid = true;
+            const imageContainer = document.getElementById('image-preview-container');
+            const imageError = document.getElementById('image-error');
+
+            // Validate images
+            if (imageContainer.children.length === 0 && !uploadedImage) {
+                imageError.style.display = 'block';
+                isValid = false;
+            } else {
+                imageError.style.display = 'none';
+            }
+
+            // Validate other fields
+            isValid = validateField('category-name') && isValid;
+            isValid = validateField('category-description') && isValid;
+
+            return isValid;
+        }
+
+        // Image handling functions
         document.getElementById('add-image-button').addEventListener('click', () => {
             document.getElementById('image-input').click();
         });
 
         document.getElementById('image-input').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    const imagePreviewContainer = document.getElementById('image-preview-container');
-    const allowedFileTypes = ['image/jpeg', 'image/png' ,'image/webp'];
-    imagePreviewContainer.innerHTML = '';
+            const file = event.target.files[0];
+            const allowedFileTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
 
-    if (file) {
-      
-        if (!allowedFileTypes.includes(file.type)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid File Type',
-                text: 'Please upload a valid image (JPEG, PNG , Webp).',
+            if (file) {
+                if (!allowedFileTypes.includes(file.type)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid File Type',
+                        text: 'Please upload a valid image (JPEG, PNG, WebP).',
+                    });
+                    event.target.value = '';
+                    return;
+                }
+
+                if (file.size > maxSize) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File Too Large',
+                        text: 'Image size should not exceed 5MB.',
+                    });
+                    event.target.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const cropImagePreview = document.getElementById('crop-image-preview');
+                    cropImagePreview.src = e.target.result;
+                    
+                    document.getElementById('cropperModal').style.display = 'block';
+                    
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    cropper = new Cropper(cropImagePreview, {
+                        aspectRatio: 1,
+                        viewMode: 2,
+                        dragMode: 'move',
+                        autoCropArea: 1,
+                        restore: false,
+                        guides: true,
+                        center: true,
+                        highlight: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function cropImage() {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                width: 800,
+                height: 800,
             });
-            event.target.value = ''; 
-            return;
-        }
 
-        
-      
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const imageWrapper = document.createElement('div');
-            imageWrapper.classList.add('image-wrapper');
-
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.classList.add('cropped-image');
-
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Remove';
-            deleteButton.classList.add('delete-button');
-            deleteButton.addEventListener('click', () => {
+            canvas.toBlob((blob) => {
+                const imagePreviewContainer = document.getElementById('image-preview-container');
                 imagePreviewContainer.innerHTML = '';
-                uploadedImage = null;
-                document.getElementById('image-input').value = ''; 
-            });
 
-            imageWrapper.appendChild(img);
-            imageWrapper.appendChild(deleteButton);
-            imagePreviewContainer.appendChild(imageWrapper);
+                const imageWrapper = document.createElement('div');
+                imageWrapper.classList.add('image-wrapper');
 
-            uploadedImage = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-});
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL();
+                img.classList.add('cropped-image');
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Remove';
+                deleteButton.classList.add('delete-button');
+                deleteButton.addEventListener('click', () => {
+                    imagePreviewContainer.innerHTML = '';
+                    uploadedImage = null;
+                    document.getElementById('image-input').value = '';
+                    validateForm();
+                });
+
+                imageWrapper.appendChild(img);
+                imageWrapper.appendChild(deleteButton);
+                imagePreviewContainer.appendChild(imageWrapper);
+
+                uploadedImage = blob;
+                closeCropperModal();
+                validateForm();
+            }, 'image/jpeg', 0.9);
+            };
+        
 
         function deleteExistingImage(imageUrl) {
-          
             const imagePreviewContainer = document.getElementById('image-preview-container');
             imagePreviewContainer.innerHTML = '';
+            validateForm();
+        }
+
+        function cancelCrop() {
+            document.getElementById('image-input').value = '';
+            closeCropperModal();
+        }
+
+        function closeCropperModal() {
+            document.getElementById('cropperModal').style.display = 'none';
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
         }
 
         function updateCategory() {
-            const categoryName = document.getElementById('category-name').value;
-            const categoryDescription = document.getElementById('category-description').value;
-           
+            if (!validateForm()) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please check all fields and try again.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            const categoryName = document.getElementById('category-name').value.trim();
+            const categoryDescription = document.getElementById('category-description').value.trim();
             const categoryId = '<%= cat._id %>';
+
+            // Additional validation before submission
+            if (categoryName.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Category name cannot be empty',
+                });
+                return;
+            }
 
             const formData = new FormData();
             formData.append('name', categoryName);
             formData.append('description', categoryDescription);
-            
 
-            const imageInput = document.getElementById('image-input');
-if (imageInput.files.length > 0) {
-    formData.append('Image', imageInput.files[0]); 
-}
+            if (uploadedImage) {
+                formData.append('Image', uploadedImage, 'cropped-image.jpg');
+            }
+
+            // Show loading state
+            Swal.fire({
+                title: 'Updating Category...',
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false
+            });
 
             fetch(`/admin/editcategory/${categoryId}`, {
                 method: 'POST',
                 body: formData,
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success)  if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success!',
-                            text: 'Category Updated Successfully!',
-                            confirmButtonText: 'OK',
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: `Error updating category: ${data.message}`,
-                        });
-                    }
-                })
-                .catch(error => console.error('Error:', error));
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Category Updated Successfully!',
+                        confirmButtonText: 'OK',
+                    }).then(() => {
+                        window.location.href = '/admin/category';
+                    });
+                } else {
+                    throw new Error(data.message || 'Error updating category');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'An unexpected error occurred. Please try again.',
+                });
+            });
         }
 
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-            window.location.reload();
-        }
+        // Event Listeners for modal handling
+        window.onclick = function(event) {
+            const modal = document.getElementById('cropperModal');
+            if (event.target === modal) {
+                cancelCrop();
+            }
+        };
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('cropperModal');
+                if (modal.style.display === 'block') {
+                    cancelCrop();
+                }
+            }
+        });
+
+        // Prevent form submission on enter key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
+                event.preventDefault();
+            }
+        });
+
+        // Initial validation on page load
+        window.addEventListener('load', function() {
+            validateField('category-name');
+            validateField('category-description');
+            validateForm();
+        });
     </script>
 </body>
 </html>

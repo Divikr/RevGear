@@ -27,7 +27,6 @@ body {
     display: flex;
     min-height: 100vh;
 }
-
 /* Sidebar Styles */
 .sidebar {
   width: 250px;
@@ -164,7 +163,6 @@ body {
 .nav-item:hover::before {
   left: 100%;
 }
-
 /* Main Content Styles */
 .main-content {
   width: 100%;

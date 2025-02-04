@@ -31,6 +31,21 @@
                
             </form>
         </div>
-   
+   <script>
+     document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorMessage = urlParams.get("error");
+
+        if (errorMessage) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: errorMessage,
+                confirmButtonColor: "#d33",
+                confirmButtonText: "Try Again"
+            });
+        }
+    });
+   </script>
 </body>
 </html>

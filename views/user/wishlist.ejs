@@ -25,7 +25,7 @@
             <div class="wishlist-card">
             <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-[480px] product-card" data-item-id="<%= product._id %>">
                 <div class="relative h-[250px] overflow-hidden">
-                    <a href="/productDetails?id=<%= product._id %>">
+                    <a href="/product/<%= product._id %>">
                         <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
                     </a>
                     <% if (product.discount > 0) { %>
