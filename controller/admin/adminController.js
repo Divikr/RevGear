@@ -262,7 +262,6 @@ module.exports={
     adminloadlogin,
     adminlogin,
     dashboard,
-
     adminlogout,
     orderlists,
     viewOrder,

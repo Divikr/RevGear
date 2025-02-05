@@ -142,7 +142,7 @@ const orderconfirm = async (req, res) => {
         });
   
        
-        wallet.balance += order.totalAmount;
+        wallet.balance += order.totalAmount-100;
   
       
         await wallet.save();
