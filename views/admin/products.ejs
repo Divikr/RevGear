@@ -207,7 +207,7 @@
                 <td><%= product.description %></td>
                 <td>₹<%= product.regularPrice %></td>
                 <td><%= product.productOffer %>%</td>
-                <td>₹<%= product.salePrice %></td>
+                <td>₹<%= product.salePrice.toFixed(2)%></td>
                 <td>
                   <span class="status-badge <%= product.isBlocked ? 'inactive' : 'active' %>">
                     <%= product.isBlocked ? 'Blocked' : 'Active' %>

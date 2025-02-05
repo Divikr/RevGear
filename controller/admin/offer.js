@@ -267,13 +267,11 @@ const addOffer = async (req, res) => {
 
 
 
-
 const deleteOffer = async (req, res) => {
     try {
         console.log('Entered deleting offer');
         const { offerId } = req.body;
 
-    
         const offer = await Offer.findById(offerId);
         if (!offer) {
             return res.status(404).json({ success: false, message: "Offer not found" });
@@ -281,16 +279,12 @@ const deleteOffer = async (req, res) => {
 
         console.log(`Deleting offer: ${offer.offerName} (ID: ${offer._id})`);
 
-       
         if (offer.offerType === 'Product') {
-           
             await handleProductOfferDeletion(offer);
         } else if (offer.offerType === 'Category') {
-           
             await handleCategoryOfferDeletion(offer);
         }
 
-       
         await Offer.deleteOne({ _id: offerId });
         console.log(`Offer ${offerId} deleted successfully`);
 
@@ -310,10 +304,9 @@ const handleProductOfferDeletion = async (offer) => {
 
     console.log(`Found product: ${product._id}`);
 
-   
+    // Calculate the new sale price considering other active offers
     const newSalePrice = await calculateNewSalePrice(product);
 
-    
     await Product.findByIdAndUpdate(
         product._id,
         {
@@ -322,7 +315,8 @@ const handleProductOfferDeletion = async (offer) => {
                 productDiscount: 1
             },
             $set: { 
-                salePrice: newSalePrice 
+                salePrice: newSalePrice,
+                productOffer: 0 // Reset product offer
             }
         },
         { new: true }
@@ -331,9 +325,7 @@ const handleProductOfferDeletion = async (offer) => {
     console.log(`Updated product ${product._id} salePrice to ${newSalePrice}`);
 };
 
-
 const handleCategoryOfferDeletion = async (offer) => {
-   
     const category = await Category.findById(offer.categoryId);
     if (!category) {
         console.warn(`Category with ID ${offer.categoryId} not found`);
@@ -348,7 +340,6 @@ const handleCategoryOfferDeletion = async (offer) => {
 
         const newSalePrice = await calculateNewSalePrice(product);
 
-       
         await Product.findByIdAndUpdate(
             product._id,
             {
@@ -357,7 +348,7 @@ const handleCategoryOfferDeletion = async (offer) => {
                     categoryDiscount: 1
                 },
                 $set: { 
-                    salePrice: newSalePrice 
+                    salePrice: newSalePrice
                 }
             },
             { new: true }
@@ -367,29 +358,33 @@ const handleCategoryOfferDeletion = async (offer) => {
     }
 };
 
-
 const calculateNewSalePrice = async (product) => {
-    let newSalePrice = product.regularPrice;
+    let finalPrice = product.regularPrice;
+    let maxDiscount = 0;
 
+    // Check for active product offer
     if (product.productOfferId) {
         const productOffer = await Offer.findById(product.productOfferId);
         if (productOffer) {
-            newSalePrice = product.regularPrice - productOffer.discount;
+            const productDiscount = (product.regularPrice * productOffer.discount) / 100;
+            maxDiscount = Math.max(maxDiscount, productDiscount);
         }
     }
 
-  
+    // Check for active category offer
     if (product.categoryOfferId) {
         const categoryOffer = await Offer.findById(product.categoryOfferId);
         if (categoryOffer) {
-            const categoryDiscountedPrice = product.regularPrice - categoryOffer.discount;
-          
-            newSalePrice = Math.min(newSalePrice, categoryDiscountedPrice);
+            const categoryDiscount = (product.regularPrice * categoryOffer.discount) / 100;
+            maxDiscount = Math.max(maxDiscount, categoryDiscount);
         }
     }
 
-   
-    return Math.max(newSalePrice, 0);
+    // Apply the highest discount
+    finalPrice = product.regularPrice - maxDiscount;
+
+    // Ensure price doesn't go below 0
+    return Math.max(finalPrice, 0);
 };
 
 module.exports={

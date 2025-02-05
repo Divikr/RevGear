@@ -597,11 +597,6 @@ const downloadInvoice = async (req, res) => {
       .font('Helvetica')
       .text('Subtotal:', summaryLeftX, summaryStartY)
       .text(`₹${subtotal.toFixed(2)}`, summaryRightX - 80, summaryStartY, { width: 80, align: 'right' })
-      .text('Discount:', summaryLeftX, summaryStartY + 25)
-      .text(`₹${discountAmount.toFixed(2)}`, summaryRightX - 80, summaryStartY + 25, { width: 80, align: 'right' })
-      .fontSize(9)
-      .text(discountText, summaryLeftX, summaryStartY + 45, { width: 210 })
-      .fontSize(11)
       .text('Shipping:', summaryLeftX, summaryStartY + 70)
       .text(`₹${shippingAmount.toFixed(2)}`, summaryRightX - 80, summaryStartY + 70, { width: 80, align: 'right' });
 
