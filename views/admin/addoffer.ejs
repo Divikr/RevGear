@@ -182,9 +182,9 @@
             }
             
             const today = new Date();
-today.setHours(0, 0, 0, 0); // Set time to midnight for accurate date comparison
+today.setHours(0, 0, 0, 0); 
 
-// Format date to YYYY-MM-DD
+
 const formatDate = (date) => {
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -197,18 +197,17 @@ const todayDate = formatDate(today);
 const validFromInput = document.getElementById('startDate');
 const validUntilInput = document.getElementById('endDate');
 
-// Set minimum dates
 validFromInput.min = todayDate;
 validFromInput.value = todayDate;
 
-// Set tomorrow as default end date
+
 const tomorrow = new Date(today);
 tomorrow.setDate(today.getDate() + 1);
 const tomorrowDate = formatDate(tomorrow);
 validUntilInput.min = tomorrowDate;
 validUntilInput.value = tomorrowDate;
 
-// Update end date min value when start date changes
+
 validFromInput.addEventListener('change', function(e) {
     const selectedStart = new Date(e.target.value);
     const nextDay = new Date(selectedStart);
@@ -222,14 +221,12 @@ validFromInput.addEventListener('change', function(e) {
     }
 });
 
-// Form validation
 addOfferForm.addEventListener('submit', function (e) {
     const offerName = document.getElementById('offerName').value.trim();
     const discount = parseFloat(document.getElementById('discount').value);
     const startDate = new Date(document.getElementById('startDate').value);
     const endDate = new Date(document.getElementById('endDate').value);
     
-    // Set times to midnight for accurate comparison
  
     
     if (offerName.length < 3) {

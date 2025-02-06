@@ -148,13 +148,13 @@
     validate: value => {
         if (!value) return 'First name is required';
         
-        // Check for leading spaces
+    
         if (value[0] === ' ') return 'Name should not have leading spaces';
         
-        // Check for trailing spaces or spaces in between that make the name invalid
+        
         if (value.trim() !== value) return 'Name should not have leading or trailing spaces';
         
-        // Check for minimum length
+      
         if (value.length < 4) return 'Name must be at least 4 characters';
         
         return '';

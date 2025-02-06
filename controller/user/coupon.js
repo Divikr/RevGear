@@ -30,7 +30,7 @@ const applyCoupon = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid or expired coupon code.' });
         }
 
-        // Double check date validation for more precise control
+    
         const expiryDate = new Date(coupon.expiredOn);
         const startDate = new Date(coupon.createdOn);
 
@@ -88,11 +88,11 @@ const applyCoupon = async (req, res, next) => {
 
         const discountedTotal = Math.max(cartTotal - discount, 0);
         
-        // Update coupon usage
+  
         coupon.couponUsed += 1;
         await coupon.save();
 
-        // Update user's coupon usage history
+   
         if (!user.couponUsed) {
             user.couponUsed = [];
         }

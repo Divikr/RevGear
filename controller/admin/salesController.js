@@ -12,7 +12,6 @@ const getSalesReport = async (req, res, next) => {
     try {
         const { startDate, endDate, timeFrame = 'daily' } = req.query;
 
-        // Validate and parse date range
         let matchCondition = { orderStatus: { $ne: 'Cancelled' } };
         if (startDate && endDate) {
             const start = new Date(startDate);
@@ -22,7 +21,7 @@ const getSalesReport = async (req, res, next) => {
             else return res.status(400).json({ success: false, message: "Invalid date format" });
         }
 
-        // Determine date format for grouping
+       
         const dateFormats = {
             daily: "%Y-%m-%d",
             weekly: "%Y-W%V",
@@ -147,7 +146,7 @@ const generateSummary = (salesData) => {
 
 const topSellers = async (req, res, next) => {
     try {
-        // Top Products
+       
         const topProducts = await Order.aggregate([
             { $unwind: "$items" },
             { 
@@ -158,7 +157,7 @@ const topSellers = async (req, res, next) => {
             },
             {
                 $lookup: {
-                    from: "products",  // MongoDB collection name is lowercase
+                    from: "products",  
                     localField: "_id",
                     foreignField: "_id",
                     as: "productInfo"
@@ -167,7 +166,7 @@ const topSellers = async (req, res, next) => {
             { $unwind: "$productInfo" },
             {
                 $project: {
-                    name: "$productInfo.productName",  // Get the product name
+                    name: "$productInfo.productName", 
                     value: 1,
                     _id: 0
                 }
@@ -180,7 +179,7 @@ const topSellers = async (req, res, next) => {
             { $unwind: "$items" },
             {
                 $lookup: {
-                    from: "products",  // Changed from "Product" to "products" (MongoDB collection names are lowercase)
+                    from: "products", 
                     localField: "items.productId",
                     foreignField: "_id",
                     as: "productInfo"
@@ -189,19 +188,19 @@ const topSellers = async (req, res, next) => {
             { $unwind: "$productInfo" },
             {
                 $group: {
-                    _id: "$productInfo.category",  // This is now grouping by category name (string)
+                    _id: "$productInfo.category", 
                     value: { $sum: "$items.quantity" }
                 }
             },
             {
                 $lookup: {
-                    from: "categories",  // Changed from "category" to "categories"
-                    let: { categoryName: "$_id" },  // Use let to define variables for $expr
+                    from: "categories", 
+                    let: { categoryName: "$_id" },
                     pipeline: [
                         {
                             $match: {
                                 $expr: {
-                                    $eq: ["$name", "$$categoryName"]  // Match on category name instead of _id
+                                    $eq: ["$name", "$$categoryName"]  
                                 }
                             }
                         }
@@ -214,7 +213,7 @@ const topSellers = async (req, res, next) => {
                 $project: {
                     name: "$categoryInfo.name",
                     value: 1,
-                    _id: 0  // Exclude _id from results
+                    _id: 0 
                 }
             },
             { $sort: { value: -1 } },
@@ -223,7 +222,7 @@ const topSellers = async (req, res, next) => {
 
         console.log(topCategories)
 
-        // Top Brands
+      
        
 
         res.json({

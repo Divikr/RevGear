@@ -58,16 +58,17 @@ const loadAddOffer = async (req, res) => {
     }
 }
 
+
 const addOffer = async (req, res) => {
     try {
         const { offerName, discount, startDate, endDate, offerType, productId, categoryId } = req.body;
 
-        // Basic validation
+      
         if (!offerName || !discount || !startDate || !endDate || !offerType) {
             return res.status(400).json({ success: false, errorMessage: 'All fields are required' });
         }
 
-        // Validate discount
+      
         const numericDiscount = Number(discount);
         if (isNaN(numericDiscount) || numericDiscount <= 0) {
             return res.status(400).json({ success: false, errorMessage: 'Invalid discount value' });
@@ -83,7 +84,7 @@ const addOffer = async (req, res) => {
         const now = new Date();
         const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-        // Date validations
+      
         if (startDateTime < currentDate) {
             return res.status(400).json({ success: false, errorMessage: 'Start date cannot be in the past' });
         }
@@ -92,12 +93,12 @@ const addOffer = async (req, res) => {
             return res.status(400).json({ success: false, errorMessage: 'End date must be after start date' });
         }
 
-        // Validate offer type
+       
         if (!['Product', 'Category'].includes(offerType)) {
             return res.status(400).json({ success: false, errorMessage: 'Invalid offer type' });
         }
 
-        // Create new offer
+        
         const newOffer = new Offer({
             offerName,
             discount: numericDiscount,
@@ -106,13 +107,15 @@ const addOffer = async (req, res) => {
             offerType,
         });
 
-        // Helper function to get all applicable offers for a product
+      
         const getApplicableOffers = async (product) => {
             const offers = [];
+          
             
-            // Check product-specific offers
-            if (product.productOfferId) {
-                const productOffer = await Offer.findById(product.productOfferId);
+           
+            if (product) {
+                const productOffer = await Offer.findById(productId);
+                console.log(productOffer,"offer vannu")
                 if (productOffer && productOffer.startDate <= now && productOffer.endDate >= now) {
                     offers.push({
                         type: 'Product',
@@ -122,36 +125,42 @@ const addOffer = async (req, res) => {
                 }
             }
 
-            // Check category offers
+           
             if (product.categoryOfferId) {
                 const categoryOffer = await Offer.findById(product.categoryOfferId);
                 if (categoryOffer && categoryOffer.startDate <= now && categoryOffer.endDate >= now) {
+                    
                     offers.push({
                         type: 'Category',
                         discount: categoryOffer.discount,
                         offerId: categoryOffer._id
                     });
                 }
+            
             }
 
             return offers;
         };
 
-        // Helper function to apply the best offer
-        const applyBestOffer = async (product, newOfferDetails) => {
-            const originalPrice = Number(product.originalPrice || product.salePrice);
+    
+        const applyBestOffer = async (product, newOffer) => {
+            const originalPrice = Number(product.regularPrice || product.salePrice);
+            console.log("ogiginalPrice kitty",originalPrice)
             if (isNaN(originalPrice)) return null;
 
             const applicableOffers = await getApplicableOffers(product);
-            applicableOffers.push(newOfferDetails);
+            console.log(applicableOffers,"hyyyy")
+            applicableOffers.push(newOffer);
 
-            // Find the offer with the highest discount
+          
             const bestOffer = applicableOffers.reduce((best, current) => {
                 return (current.discount > best.discount) ? current : best;
             }, applicableOffers[0]);
 
-            // Only update if the best offer is different from what's currently applied
-            const currentDiscount = product.appliedDiscount || 0;
+
+          
+            const currentDiscount = applicableOffers || 0;
+           
             if (bestOffer.discount !== currentDiscount) {
                 const updateFields = {
                     salePrice: originalPrice - bestOffer.discount,
@@ -180,7 +189,6 @@ const addOffer = async (req, res) => {
                 return res.status(404).json({ success: false, errorMessage: 'Product not found' });
             }
 
-            // Check for overlapping product offers
             const existingOffer = await Offer.findOne({
                 productId: productId,
                 startDate: { $lte: endDateTime },
@@ -194,7 +202,7 @@ const addOffer = async (req, res) => {
                 });
             }
 
-            // Only update product if the offer starts today
+          
             const startDateLocal = new Date(startDateTime.setHours(0,0,0,0));
             const currentDateLocal = new Date(currentDate.setHours(0,0,0,0));
 
@@ -218,7 +226,7 @@ const addOffer = async (req, res) => {
                 return res.status(404).json({ success: false, errorMessage: 'Category not found' });
             }
 
-            // Check for overlapping category offers
+          
             const existingOffer = await Offer.findOne({
                 categoryId: categoryId,
                 startDate: { $lte: endDateTime },
@@ -237,7 +245,7 @@ const addOffer = async (req, res) => {
                 return res.status(404).json({ success: false, errorMessage: 'No products found for the category' });
             }
 
-            // Only update products if the offer starts today
+           
             const startDateLocal = new Date(startDateTime.setHours(0,0,0,0));
             const currentDateLocal = new Date(currentDate.setHours(0,0,0,0));
 
@@ -254,7 +262,7 @@ const addOffer = async (req, res) => {
             newOffer.categoryId = categoryId;
         }
 
-        // Save the offer
+       
         await newOffer.save();
         console.log('Offer saved successfully:', newOffer);
 
@@ -304,7 +312,7 @@ const handleProductOfferDeletion = async (offer) => {
 
     console.log(`Found product: ${product._id}`);
 
-    // Calculate the new sale price considering other active offers
+  
     const newSalePrice = await calculateNewSalePrice(product);
 
     await Product.findByIdAndUpdate(
@@ -316,7 +324,7 @@ const handleProductOfferDeletion = async (offer) => {
             },
             $set: { 
                 salePrice: newSalePrice,
-                productOffer: 0 // Reset product offer
+                productOffer: 0
             }
         },
         { new: true }
@@ -362,16 +370,16 @@ const calculateNewSalePrice = async (product) => {
     let finalPrice = product.regularPrice;
     let maxDiscount = 0;
 
-    // Check for active product offer
+
     if (product.productOfferId) {
         const productOffer = await Offer.findById(product.productOfferId);
         if (productOffer) {
             const productDiscount = (product.regularPrice * productOffer.discount) / 100;
-            maxDiscount = Math.max(maxDiscount, productDiscount);
+            maxDiscount= Math.max(maxDiscount, productDiscount);
         }
     }
 
-    // Check for active category offer
+   
     if (product.categoryOfferId) {
         const categoryOffer = await Offer.findById(product.categoryOfferId);
         if (categoryOffer) {
@@ -380,10 +388,10 @@ const calculateNewSalePrice = async (product) => {
         }
     }
 
-    // Apply the highest discount
+    
+    
     finalPrice = product.regularPrice - maxDiscount;
 
-    // Ensure price doesn't go below 0
     return Math.max(finalPrice, 0);
 };
 

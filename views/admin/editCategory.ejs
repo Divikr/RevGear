@@ -286,7 +286,7 @@
         </div>
     </div>
 
-    <!-- Cropper Modal -->
+   
     <div id="cropperModal" class="cropper-modal">
         <div class="cropper-container">
             <img id="crop-image-preview">
@@ -301,7 +301,7 @@
         let uploadedImage = null;
         let cropper = null;
 
-        // Validation functions
+        
         function validateField(fieldId) {
             const field = document.getElementById(fieldId);
             const errorElement = document.getElementById(`${fieldId}-error`);
@@ -342,7 +342,7 @@
             const imageContainer = document.getElementById('image-preview-container');
             const imageError = document.getElementById('image-error');
 
-            // Validate images
+       
             if (imageContainer.children.length === 0 && !uploadedImage) {
                 imageError.style.display = 'block';
                 isValid = false;
@@ -350,14 +350,13 @@
                 imageError.style.display = 'none';
             }
 
-            // Validate other fields
             isValid = validateField('category-name') && isValid;
             isValid = validateField('category-description') && isValid;
 
             return isValid;
         }
 
-        // Image handling functions
+     
         document.getElementById('add-image-button').addEventListener('click', () => {
             document.getElementById('image-input').click();
         });
@@ -490,7 +489,7 @@
             const categoryDescription = document.getElementById('category-description').value.trim();
             const categoryId = '<%= cat._id %>';
 
-            // Additional validation before submission
+         
             if (categoryName.length === 0) {
                 Swal.fire({
                     icon: 'error',
@@ -508,7 +507,7 @@
                 formData.append('Image', uploadedImage, 'cropped-image.jpg');
             }
 
-            // Show loading state
+         
             Swal.fire({
                 title: 'Updating Category...',
                 didOpen: () => {
@@ -553,7 +552,7 @@
             });
         }
 
-        // Event Listeners for modal handling
+       
         window.onclick = function(event) {
             const modal = document.getElementById('cropperModal');
             if (event.target === modal) {
@@ -570,14 +569,13 @@
             }
         });
 
-        // Prevent form submission on enter key
+       
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
                 event.preventDefault();
             }
         });
 
-        // Initial validation on page load
         window.addEventListener('load', function() {
             validateField('category-name');
             validateField('category-description');
