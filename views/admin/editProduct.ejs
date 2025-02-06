@@ -211,10 +211,9 @@ const cancelCropButton = document.getElementById('cancel-crop-button');
 
 let cropper;
 
+
 addImageButton.addEventListener('click', () => {
- 
   const imageCount = imagePreviewContainer.querySelectorAll('img').length;
-  
   if (imageCount < maxImages) {
     imageInput.click();
   } else {
@@ -256,14 +255,11 @@ function closeCropperModal() {
 
 cropButton.addEventListener('click', (event) => {
   event.preventDefault();
-
   const croppedCanvas = cropper.getCroppedCanvas();
 
   croppedCanvas.toBlob((blob) => {
     const dataTransfer = new DataTransfer();
-    const file = new File([blob], 'cropped-image.png', {
-      type: 'image/png',
-    });
+    const file = new File([blob], 'cropped-image.png', { type: 'image/png' });
     dataTransfer.items.add(file);
     imageInput.files = dataTransfer.files;
 
@@ -277,7 +273,6 @@ cropButton.addEventListener('click', (event) => {
     deleteButton.classList.add('delete-button');
     deleteButton.addEventListener('click', () => {
       croppedImage.parentElement.remove();
-      
       updateImageCount();
     });
 
@@ -287,177 +282,175 @@ cropButton.addEventListener('click', (event) => {
     imageWrapper.appendChild(deleteButton);
 
     imagePreviewContainer.appendChild(imageWrapper);
-
     closeCropperModal();
- 
     updateImageCount();
   }, 'image/png');
 });
 
 function updateImageCount() {
- 
   const imageCount = imagePreviewContainer.querySelectorAll('img').length;
-
- 
-  if (imageCount >= maxImages) {
-    imageInput.disabled = true;
-  } else {
-    imageInput.disabled = false;
-  }
+  imageInput.disabled = imageCount >= maxImages;
 }
 
-document.querySelector('.save-product').addEventListener('click', function(event) {
 
-const requiredFields = [
-  'product-name', 'product-category',
-  'stock', 'product-price', 'product-description',
-];
-
-const isValid = requiredFields.every(fieldId => {
-  const field = document.getElementById(fieldId);
-  return field && field.value.trim() !== '';
-});
-
-if (!isValid) {
-  event.preventDefault();
-
-  Swal.fire({
-    icon: 'error',
-    title: '',
-    text: 'Please fill in all fields',
+document.querySelectorAll('.delete-button').forEach(button => {
+  button.addEventListener('click', function() {
+    this.parentElement.remove();
+    updateImageCount();
   });
-  return;
-}
-
-
-    const productName = document.getElementById('product-name');
-    const productDescription = document.getElementById('product-description');
-
-   
-    productName.value = productName.value.trim();
-    productDescription.value = productDescription.value.trim();
-
-
-  
-
-
-    if (productName.value.length < 3) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Product name must be at least 3 characters long.',
-        });
-        isValid = false;
-    }
-
-  
-    if (productDescription.value.length < 10) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Product description must be at least 10 characters long.',
-        });
-        isValid = false;
-    }
-
-    
-    if (isValid) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'Do you want to update this product?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, update it!',
-            cancelButtonText: 'Cancel',
-        }).then((result) => {
-            if (result.isConfirmed) {
-            
-                productName.value = productName.value.trim();
-                productDescription.value = productDescription.value.trim();
-                document.querySelector('form').submit();
-            }
-        });
-    }
-
-const stockValue = parseInt(document.getElementById('stock').value.trim());
-if (isNaN(stockValue) || stockValue <= 0) {
-  event.preventDefault();
-
-  Swal.fire({
-    icon: 'error',
-    title: 'Invalid Stock',
-    text: 'Stock must be a positive number greater than 0.',
-  });
-  return;
-}
-
-
 });
 
 
-const name = document.getElementById('product-name');
-const stock = document.getElementById('stock');
 const priceInput = document.getElementById('product-price');
 const offerInput = document.getElementById('product-offer');
 const salePriceInput = document.getElementById('product-sale-price');
 
 function calculateSalePrice() {
-const regularPrice = parseFloat(priceInput.value) || 0;
-const productOffer = parseFloat(offerInput.value) || 0;
+  const regularPrice = parseFloat(priceInput.value) || 0;
+  const productOffer = parseFloat(offerInput.value) || 0;
 
-if (productOffer <= 0 || productOffer >= 100) {
-  Swal.fire({
-    icon: 'error',
-    title: 'Invalid Offer Percentage',
-    text: 'Offer percentage should be between 0 and 100.',
-  });
-  return;
-}
+  if (regularPrice <= 0 || productOffer < 0 || productOffer >= 100) {
+    return;
+  }
 
-if (regularPrice <= 0) {
-  Swal.fire({
-    icon: 'error',
-    title: 'Invalid Price',
-    text: 'Price cannot be 0',
-  });
-  return;
-}
-
-if (stock <= 0) {
-  Swal.fire({
-    icon: 'error',
-    title: 'Invalid Stock',
-    text: 'Stock cannot be negative or 0 value',
-  });
-  return;
-}
-
-const salePrice = regularPrice - (regularPrice * (productOffer / 100));
-salePriceInput.value = salePrice.toFixed(2);
+  const salePrice = regularPrice - (regularPrice * (productOffer / 100));
+  salePriceInput.value = salePrice.toFixed(2);
 }
 
 priceInput.addEventListener('input', calculateSalePrice);
 offerInput.addEventListener('input', calculateSalePrice);
 
-document.querySelector('.save-product').addEventListener('click', function(event) {
-event.preventDefault();
 
-Swal.fire({
-  title: 'Are you sure?',
-  text: 'Do you want to update this product?',
-  icon: 'warning',
-  showCancelButton: true,
-  confirmButtonText: 'Yes, update it!',
-  cancelButtonText: 'Cancel',
-}).then((result) => {
-  if (result.isConfirmed) {
-    document.querySelector('form').submit();
-  } else {
-    Swal.fire('Canceled', 'Your product was not updated.', 'info');
+document.querySelector('form').addEventListener('submit', function(event) {
+  event.preventDefault();
+  
+  const validationFields = {
+    productName: {
+      value: document.getElementById('product-name').value.trim(),
+      rules: {
+        required: true,
+        minLength: 3,
+        maxLength: 100
+      }
+    },
+    description: {
+      value: document.getElementById('product-description').value.trim(),
+      rules: {
+        required: true,
+        minLength: 5,
+        maxLength: 1000
+      }
+    },
+    category: {
+      value: document.getElementById('product-category').value,
+      rules: {
+        required: true
+      }
+    },
+    stock: {
+      value: parseInt(document.getElementById('stock').value),
+      rules: {
+        required: true,
+        min: 1,
+        max: 10000
+      }
+    },
+    price: {
+      value: parseFloat(document.getElementById('product-price').value),
+      rules: {
+        required: true,
+        min: 0.01,
+        max: 1000000
+      }
+    },
+    offer: {
+      value: parseFloat(document.getElementById('product-offer').value),
+      rules: {
+        required: true,
+        min: 0,
+        max: 99.99
+      }
+    }
+  };
+
+
+  for (const [field, data] of Object.entries(validationFields)) {
+    if (data.rules.required && !data.value) {
+      showError(`${field.charAt(0).toUpperCase() + field.slice(1)} is required`);
+      return;
+    }
+    if (data.rules.minLength && data.value.length < data.rules.minLength) {
+      showError(`${field} must be at least ${data.rules.minLength} characters`);
+      return;
+    }
+    if (data.rules.maxLength && data.value.length > data.rules.maxLength) {
+      showError(`${field} cannot exceed ${data.rules.maxLength} characters`);
+      return;
+    }
+    if (data.rules.min && data.value < data.rules.min) {
+      showError(`${field} must be at least ${data.rules.min}`);
+      return;
+    }
+    if (data.rules.max && data.value > data.rules.max) {
+      showError(`${field} cannot exceed ${data.rules.max}`);
+      return;
+    }
   }
-});
+
+ 
+  const images = document.querySelectorAll('.cropped-image');
+  if (images.length === 0) {
+    showError('At least one product image is required');
+    return;
+  }
+
+
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to update this product?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, update it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.submit();
+    }
+  });
 });
 
+function showError(message) {
+  Swal.fire({
+    icon: 'error',
+    title: 'Validation Error',
+    text: message
+  });
+}
+
+
+const numericInputs = ['stock', 'product-price', 'product-offer'];
+numericInputs.forEach(id => {
+  const input = document.getElementById(id);
+  
+  input.addEventListener('input', function() {
+    const value = parseFloat(this.value);
+    if (this.value && (isNaN(value) || value < 0)) {
+      this.classList.add('invalid');
+    } else {
+      this.classList.remove('invalid');
+    }
+  });
+
+  input.addEventListener('keypress', function(e) {
+    if (!/[\d.]/.test(e.key)) {
+      e.preventDefault();
+    }
+  });
+});
+
+cancelCropButton.addEventListener('click', () => {
+  closeCropperModal();
+});
 
 </script>
 </body>

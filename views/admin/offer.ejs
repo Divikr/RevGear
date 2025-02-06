@@ -221,6 +221,152 @@ deleteButton.addEventListener('click', function (event) {
 });
 });
 });
+
+
+
+const offerForm = document.getElementById('offer-form');
+const offerName = document.getElementById('offer-name');
+const discount = document.getElementById('discount');
+const startDate = document.getElementById('start-date');
+const endDate = document.getElementById('end-date');
+const offerType = document.getElementById('offer-type');
+const productSelect = document.getElementById('product-select');
+const categorySelect = document.getElementById('category-select');
+
+
+const config = {
+    offerName: {
+        required: true,
+        minLength: 3,
+        maxLength: 50,
+        pattern: /^[a-zA-Z0-9\s-]+$/
+    },
+    discount: {
+        required: true,
+        min: 0,
+        max: 99.99,
+        pattern: /^\d+(\.\d{1,2})?$/
+    }
+};
+
+
+function showError(message) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: message
+    });
+}
+
+
+function validateDates() {
+    const start = new Date(startDate.value);
+    const end = new Date(endDate.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (start < today) {
+        showError('Start date cannot be in the past');
+        return false;
+    }
+    if (end <= start) {
+        showError('End date must be after start date');
+        return false;
+    }
+    return true;
+}
+
+
+function validateOfferType() {
+    if (offerType.value === 'Product' && !productSelect.value) {
+        showError('Please select a product');
+        return false;
+    }
+    if (offerType.value === 'Category' && !categorySelect.value) {
+        showError('Please select a category');
+        return false;
+    }
+    return true;
+}
+
+
+discount.addEventListener('input', function() {
+    const value = parseFloat(this.value);
+    if (this.value && (isNaN(value) || value < 0 || value > 99.99)) {
+        this.classList.add('invalid');
+        this.setCustomValidity('Discount must be between 0 and 99.99');
+    } else {
+        this.classList.remove('invalid');
+        this.setCustomValidity('');
+    }
+});
+
+
+discount.addEventListener('keypress', function(e) {
+    if (!/[\d.]/.test(e.key)) {
+        e.preventDefault();
+    }
+});
+
+
+offerType.addEventListener('change', function() {
+    productSelect.parentElement.style.display = this.value === 'Product' ? 'block' : 'none';
+    categorySelect.parentElement.style.display = this.value === 'Category' ? 'block' : 'none';
+});
+
+offerForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+   
+    if (!offerName.value.trim()) {
+        showError('Offer name is required');
+        return;
+    }
+
+    if (!config.offerName.pattern.test(offerName.value)) {
+        showError('Offer name can only contain letters, numbers, spaces and hyphens');
+        return;
+    }
+
+    if (offerName.value.length < config.offerName.minLength) {
+        showError(`Offer name must be at least ${config.offerName.minLength} characters`);
+        return;
+    }
+
+    if (!discount.value) {
+        showError('Discount is required');
+        return;
+    }
+
+    const discountValue = parseFloat(discount.value);
+    if (isNaN(discountValue) || discountValue < config.discount.min || discountValue > config.discount.max) {
+        showError(`Discount must be between ${config.discount.min} and ${config.discount.max}`);
+        return;
+    }
+
+    if (!startDate.value || !endDate.value) {
+        showError('Both start and end dates are required');
+        return;
+    }
+
+    if (!validateDates() || !validateOfferType()) {
+        return;
+    }
+
+
+    Swal.fire({
+        title: 'Confirm Offer Creation',
+        text: 'Are you sure you want to create this offer?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, create it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            this.submit();
+        }
+    });
+});
             
             </script>
 
