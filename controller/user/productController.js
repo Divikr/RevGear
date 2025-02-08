@@ -20,7 +20,8 @@ const singleproduct = async (req, res) => {
         res.render("user/singleProduct", { product, relatedProducts });
     } catch (error) {
         console.error("Error rendering home page:", error);
-        res.status(500).send("Server error");
+        res.redirect("/error")
+        
     }
 };
 
@@ -113,7 +114,8 @@ const getProductByCategory = async (req, res) => {
 
   } catch (error) {
     console.error('Error in getProductByCategory:', error);
-    res.status(500).send('Internal Server Error');
+    res.redirect("/404")
+  
   }
 }
 
@@ -154,6 +156,7 @@ const addToWishlist = async (req, res) => {
       }
     } catch (error) {
       console.error("Error adding to wishlist:", error);
+      res.redirect("/404")
       res.status(500).json({ message: "Error adding to wishlist", error: error.message });
     }
   };

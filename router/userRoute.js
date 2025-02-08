@@ -61,7 +61,7 @@ route.get("/logout", userController.logout)
 
 //product manegment
 
-
+route.get('/error',userController.error)
 
 route.get('/product/:id', productController.singleproduct)
 

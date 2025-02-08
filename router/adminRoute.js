@@ -77,20 +77,20 @@ router.post("/reject-return/:orderId", adminController.rejectReturn)
 
 //coupon manegment
 
-router.get("/coupon",couponController.getCoupon)
+router.get("/coupon",auth.isAdminAuth,couponController.getCoupon)
 router.post('/coupon',couponController.addCoupon)
 router.delete('/coupon/:code',couponController.deleteCoupon)
 
 //dashboard
 
-router.get('/sales-report', salesController.getSalesReport);
-router.get('/top-sellers', salesController.topSellers)
+router.get('/sales-report',auth.isAdminAuth,salesController.getSalesReport);
+router.get('/top-sellers',auth.isAdminAuth,salesController.topSellers)
 
 
 //offer manegment
 
-router.get('/offer',offerController.offerPage)
-router.get('/addoffer',offerController.loadAddOffer)
+router.get('/offer',auth.isAdminAuth,offerController.offerPage)
+router.get('/addoffer',auth.isAdminAuth,offerController.loadAddOffer)
 router.post('/addoffer',offerController.addOffer)
 router.post('/deleteoffer',offerController.deleteOffer)
 

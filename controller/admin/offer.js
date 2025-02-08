@@ -304,6 +304,7 @@ const deleteOffer = async (req, res) => {
 };
 
 const handleProductOfferDeletion = async (offer) => {
+    
     const product = await Product.findById(offer.productId);
     if (!product) {
         console.warn(`Product with ID ${offer.productId} not found`);
@@ -314,6 +315,7 @@ const handleProductOfferDeletion = async (offer) => {
 
   
     const newSalePrice = await calculateNewSalePrice(product);
+  
 
     await Product.findByIdAndUpdate(
         product._id,
@@ -347,7 +349,7 @@ const handleCategoryOfferDeletion = async (offer) => {
         console.log(`Processing product: ${product._id}`);
 
         const newSalePrice = await calculateNewSalePrice(product);
-
+        
         await Product.findByIdAndUpdate(
             product._id,
             {
@@ -367,10 +369,10 @@ const handleCategoryOfferDeletion = async (offer) => {
 };
 
 const calculateNewSalePrice = async (product) => {
-    let finalPrice = product.regularPrice;
+    let finalPrice =0;
     let maxDiscount = 0;
 
-
+    
     if (product.productOfferId) {
         const productOffer = await Offer.findById(product.productOfferId);
         if (productOffer) {

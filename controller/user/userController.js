@@ -15,6 +15,12 @@ const homePage = async (req, res) => {
 };
 
 
+const error = async (req, res) => {
+    return res.render('user/404page')
+}
+   
+
+
 
 const about = async (req, res) => {
     try {
@@ -533,5 +539,6 @@ module.exports = {
     resendotp,
     setNewPassword,
     about,
-    contact
+    contact,
+    error
 };
