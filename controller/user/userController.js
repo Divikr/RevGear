@@ -508,8 +508,8 @@ const searchProducts = async (req, res) => {
             sort
         });
     } catch (error) {
-        console.error('Error searching products:', error);
-        res.status(500).send('Internal Server Error');
+        console.error("Error rendering home page:", error);
+        res.redirect("/error")
     }
 };
 

@@ -3,92 +3,133 @@
 
 <br>
 
- <nav class="text-sm ml-6 font-medium text-gray-700 mb-6 ">
-  <ol class="list-reset flex">
+<nav class="text-sm px-4 sm:ml-6 font-medium text-gray-700 mb-4 sm:mb-6">
+  <ol class="flex items-center space-x-2">
     <li>
       <a href="/home" class="text-blue-600 hover:text-blue-700">Home</a>
     </li>
-    <li class="mx-2">/</li>
+    <li>/</li>
     <li>
       <a href="/profile" class="text-blue-600 hover:text-blue-700">Profile</a>
     </li>
-    <li class="mx-2">/</li>
+    <li>/</li>
     <li>
       <a href="/addressbook" class="text-blue-600 hover:text-blue-700">Address</a>
     </li>
-    <li class="mx-2">/</li>
+    <li>/</li>
     <li class="text-gray-400">Edit Address</li>
   </ol>
 </nav>
 
-<div class="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
-  <div class="bg-gradient-to-br from-white to-blue-50 shadow-2xl rounded-xl overflow-hidden">
-    <div class="grid grid-cols-4 gap-6 p-6">
+<div class="container mx-auto my-6 sm:my-10 px-4 sm:px-6 lg:px-8">
+  <div class="bg-gradient-to-br from-white to-blue-50 shadow-lg sm:shadow-2xl rounded-xl overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 p-4 sm:p-6">
+  
+      <div class="lg:hidden mb-6">
+        <button id="mobileMenuButton" class="w-full flex justify-between items-center p-4 bg-white border border-blue-200 rounded-lg shadow-sm hover:bg-blue-50 transition-colors">
+          <span class="font-medium text-gray-700">Menu</span>
+          <i class="fas fa-chevron-down text-blue-500 transition-transform duration-300" id="mobileMenuIcon"></i>
+        </button>
+        <div id="mobileMenuContent" class="hidden mt-2 bg-white border border-blue-100 rounded-lg shadow-md overflow-hidden">
+          <ul class="space-y-1">
+            <li class="sidebar-item">
+              <a href="/profile" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50">
+                <i class="fas fa-user text-blue-500 mr-4"></i>
+                <span class="text-gray-700">Profile</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a href="/addressbook" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50">
+                <i class="fas fa-map-marker-alt text-blue-500 mr-4"></i>
+                <span class="text-gray-700">Address</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a href="/wallet" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50">
+                <i class="fas fa-wallet text-blue-500 mr-4"></i>
+                <span class="text-gray-700">Wallet</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a href="/orderlist" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50">
+                <i class="fas fa-box text-blue-500 mr-4"></i>
+                <span class="text-gray-700">Order</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a href="#" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-red-50">
+                <i class="fas fa-sign-out-alt text-red-500 mr-4"></i>
+                <span class="text-gray-700">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
      
-      <div class="col-span-1 bg-white border border-blue-100 p-4 rounded-xl shadow-lg transition-all duration-500 hover:shadow-2xl">
-        <ul class="space-y-4">
+      <div class="hidden lg:block col-span-1 bg-white border border-blue-100 p-4 rounded-xl shadow-lg transition-all duration-500 hover:shadow-xl">
+        <ul class="space-y-3 sm:space-y-4">
           <li class="sidebar-item">
             <a href="/profile" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
-              <i class="fas fa-user text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
-              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Profile</span>
+              <i class="fas fa-user text-blue-500 text-sm sm:text-base mr-3 sm:mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-sm sm:text-base text-gray-700 group-hover:text-blue-600 group-hover:font-medium transition-all">Profile</span>
             </a>
           </li>
           <li class="sidebar-item">
             <a href="/addressbook" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
-              <i class="fas fa-map-marker-alt text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
-              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Address</span>
+              <i class="fas fa-map-marker-alt text-blue-500 text-sm sm:text-base mr-3 sm:mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-sm sm:text-base text-gray-700 group-hover:text-blue-600 group-hover:font-medium transition-all">Address</span>
             </a>
           </li>
-        
           <li class="sidebar-item">
             <a href="/wallet" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
-              <i class="fas fa-wallet text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
-              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Wallet</span>
+              <i class="fas fa-wallet text-blue-500 text-sm sm:text-base mr-3 sm:mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-sm sm:text-base text-gray-700 group-hover:text-blue-600 group-hover:font-medium transition-all">Wallet</span>
             </a>
           </li>
           <li class="sidebar-item">
             <a href="/orderlist" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
-              <i class="fas fa-box text-blue-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
-              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold transition-all">Order</span>
+              <i class="fas fa-box text-blue-500 text-sm sm:text-base mr-3 sm:mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-sm sm:text-base text-gray-700 group-hover:text-blue-600 group-hover:font-medium transition-all">Order</span>
             </a>
           </li>
-       
           <li class="sidebar-item">
             <a href="#" class="flex items-center p-3 rounded-lg group transition-all duration-300 hover:bg-red-50 hover:shadow-md">
-              <i class="fas fa-sign-out-alt text-red-500 mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
-              <span class="text-gray-700 group-hover:text-red-600 group-hover:font-semibold transition-all">Logout</span>
+              <i class="fas fa-sign-out-alt text-red-500 text-sm sm:text-base mr-3 sm:mr-4 transform transition-transform group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-sm sm:text-base text-gray-700 group-hover:text-red-600 group-hover:font-medium transition-all">Logout</span>
             </a>
           </li>
         </ul>
       </div>
 
+   
       <div class="col-span-3">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800 animate-fade-in">Edit Address</h1>
-        <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-blue-100">
-          <div class="p-6">
-            <h3 class="text-xl font-semibold mb-4 text-gray-700">Address Details</h3>
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 text-gray-800">Edit Address</h1>
+        <div class="bg-white shadow-md sm:shadow-lg rounded-xl overflow-hidden border border-blue-100">
+          <div class="p-4 sm:p-6">
+            <h3 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">Address Details</h3>
             
             <form id="addressForm" action="/editAddress/<%= address._id %>" method="POST" class="space-y-4">
             
               <div class="mb-4">
-                <div class="flex space-x-4">
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                   <label class="flex-1">
-                    <input type="radio" name="addressType" value="Home" class="sr-only peer" checked>
+                    <input type="radio" name="addressType" value="Home" class="sr-only peer" <%= address.addressType === 'Home' ? 'checked' : '' %>>
                     <div class="p-3 text-center rounded-lg border-2 cursor-pointer transition-all 
                       peer-checked:border-blue-500 peer-checked:bg-blue-50 
                       hover:border-blue-200 group">
-                      <i class="fas fa-home mb-2 text-xl text-blue-500 
+                      <i class="fas fa-home mb-2 text-lg sm:text-xl text-blue-500 
                         group-hover:text-blue-600 transition-all"></i>
                       <p class="font-medium text-gray-700 group-hover:text-blue-600 transition-all">Home</p>
                     </div>
                   </label>
                   
                   <label class="flex-1">
-                    <input type="radio" name="addressType" value="Office" class="sr-only peer">
+                    <input type="radio" name="addressType" value="Office" class="sr-only peer" <%= address.addressType === 'Office' ? 'checked' : '' %>>
                     <div class="p-3 text-center rounded-lg border-2 cursor-pointer transition-all 
                       peer-checked:border-blue-500 peer-checked:bg-blue-50 
                       hover:border-blue-200 group">
-                      <i class="fas fa-building mb-2 text-xl text-blue-500
+                      <i class="fas fa-building mb-2 text-lg sm:text-xl text-blue-500
                         group-hover:text-blue-600 transition-all"></i>
                       <p class="font-medium text-gray-700 group-hover:text-blue-600 transition-all">Office</p>
                     </div>
@@ -96,49 +137,49 @@
                 </div>
               </div>
 
-          
-              <div class="grid grid-cols-2 gap-4">
+           
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label for="name" class="block font-medium text-gray-700 mb-2">Full Name</label>
-                  <input type="text" id="name" value="<%= address.name  %>" name="name" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" >
-                  <div id="nameError" class="text-red-500 text-sm mt-1 hidden">Please enter your name.</div>
+                  <label for="name" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Full Name</label>
+                  <input type="text" id="name" value="<%= address.name %>" name="name" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-3 sm:px-4 py-2 text-sm sm:text-base transition-all duration-300">
+                  <div id="nameError" class="text-red-500 text-xs sm:text-sm mt-1 hidden">Please enter your name.</div>
                 </div>
                 <div>
-                  <label for="phone" class="block font-medium text-gray-700 mb-2">Phone Number</label>
-                  <input type="tel" id="phone" name="phone" value="<%= address.phone  %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" >
-                  <div id="phoneError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid phone number.</div>
-                </div>
-                
-                <div class="col-span-2">
-                  <label for="street" class="block font-medium text-gray-700 mb-2">Street Address</label>
-                  <input type="text" id="street" name="street" value="<%= address.street  %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" >
+                  <label for="phone" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Phone Number</label>
+                  <input type="tel" id="phone" name="phone" value="<%= address.phone %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-3 sm:px-4 py-2 text-sm sm:text-base transition-all duration-300">
+                  <div id="phoneError" class="text-red-500 text-xs sm:text-sm mt-1 hidden">Please enter a valid phone number.</div>
                 </div>
                 
-                <div>
-                  <label for="apartment" class="block font-medium text-gray-700 mb-2">Apartment/Suite</label>
-                  <input type="text" id="apartment" name="apartment" value="<%= address.apartment  %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300">
+                <div class="sm:col-span-2">
+                  <label for="street" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Street Address</label>
+                  <input type="text" id="street" name="street" value="<%= address.street %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-3 sm:px-4 py-2 text-sm sm:text-base transition-all duration-300">
                 </div>
                 
                 <div>
-                  <label for="landmark" class="block font-medium text-gray-700 mb-2">Landmark</label>
-                  <input type="text" id="landmark" name="landmark" value="<%= address.landmark  %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300">
+                  <label for="apartment" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Apartment/Suite</label>
+                  <input type="text" id="apartment" name="apartment" value="<%= address.apartment %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-3 sm:px-4 py-2 text-sm sm:text-base transition-all duration-300">
                 </div>
                 
                 <div>
-                  <label for="city" class="block font-medium text-gray-700 mb-2">City</label>
-                  <input type="text" id="city" name="city" value="<%= address.city  %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" >
+                  <label for="landmark" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Landmark</label>
+                  <input type="text" id="landmark" name="landmark" value="<%= address.landmark %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-3 sm:px-4 py-2 text-sm sm:text-base transition-all duration-300">
                 </div>
                 
                 <div>
-                  <label for="postalCode" class="block font-medium text-gray-700 mb-2">Pin Code</label>
-                  <input type="text" id="postalCode" name="postalCode" value="<%= address.postalCode %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-4 py-2 transition-all duration-300" >
+                  <label for="city" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">City</label>
+                  <input type="text" id="city" name="city" value="<%= address.city %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-3 sm:px-4 py-2 text-sm sm:text-base transition-all duration-300">
+                </div>
+                
+                <div>
+                  <label for="postalCode" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Pin Code</label>
+                  <input type="text" id="postalCode" name="postalCode" value="<%= address.postalCode %>" class="border-2 border-blue-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 w-full px-3 sm:px-4 py-2 text-sm sm:text-base transition-all duration-300">
                 </div>
               </div>
 
-        
+          
               <div class="mt-6 text-right">
-                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-6 rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-md hover:shadow-lg">
-                 Update Address
+                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 sm:px-6 rounded-lg text-sm sm:text-base transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-sm sm:shadow-md hover:shadow-lg">
+                  Update Address
                 </button>
               </div>
             </form>
@@ -149,12 +190,56 @@
   </div>
 </div>
 
+
+
 <%- include("../partials/footer.ejs") %>
 
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="/js/header.js"></script>
 <script>
+
+
+ document.getElementById('mobileMenuButton').addEventListener('click', function() {
+    const menuContent = document.getElementById('mobileMenuContent');
+    const menuIcon = document.getElementById('mobileMenuIcon');
+    
+    menuContent.classList.toggle('hidden');
+    menuIcon.classList.toggle('fa-chevron-down');
+    menuIcon.classList.toggle('fa-chevron-up');
+  });
+
+  
+  document.getElementById('addressForm').addEventListener('submit', function(e) {
+    let isValid = true;
+    
+    const nameInput = document.getElementById('name');
+    const nameError = document.getElementById('nameError');
+    if (!nameInput.value.trim()) {
+      nameError.classList.remove('hidden');
+      isValid = false;
+    } else {
+      nameError.classList.add('hidden');
+    }
+    
+   
+    const phoneInput = document.getElementById('phone');
+    const phoneError = document.getElementById('phoneError');
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(phoneInput.value.trim())) {
+      phoneError.classList.remove('hidden');
+      isValid = false;
+    } else {
+      phoneError.classList.add('hidden');
+    }
+    
+    if (!isValid) {
+      e.preventDefault();
+    }
+  });
+
+
+
   const form = document.getElementById('addressForm');
 const nameError = document.getElementById('nameError');
 const phoneError = document.getElementById('phoneError');

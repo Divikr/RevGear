@@ -192,26 +192,76 @@
   
   
 <br><br><hr><br>
-  <section class="motorcycle-collage">
-    <h2 class="text-3xl font-bold text-center mb-8 tracking-widest text-gray-800" style="font-family: 'Cinzel', serif;">
-      GEAR & APPAREL, CRAFTED FOR SPEED & STYLE
-    </h2>
-    <br>
-    <div class="collage-container">
-      <div class="collage-item item-1">
-        <img src="/Banner1.jpg" alt="Motorcycle rider back view">
-      </div>
-      <div class="collage-item item-2">
-        <img src="/Banner2.jpg" alt="Motorcycle helmet">
-      </div>
-      <div class="collage-item item-3">
-        <img src="/Banner3.jpg" alt="Motorcycle gloves">
-      </div>
-      <div class="collage-item item-4">
-        <img src="/Banner4.jpg" alt="Motorcycle protective gear">
-      </div>
+<section class="max-w-6xl mx-auto px-4 py-10">
+  <h2 class="text-3xl font-bold text-center mb-8 tracking-widest text-gray-800 font-['Cinzel']">
+    GEAR & APPAREL, CRAFTED FOR SPEED & STYLE
+  </h2>
+  
+  <!-- Desktop Layout (lg and above) -->
+  <div class="relative hidden lg:block" style="height: 600px;">
+    <!-- Large left image (item-1) -->
+    <div class="absolute left-1 top-0 w-[45%] h-[90%] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02] hover:z-10">
+      <img src="/Banner1.jpg" alt="Motorcycle rider back view" class="w-full h-full object-cover">
     </div>
-  </section>
+    
+    <!-- Large bottom right image (item-2) -->
+    <div class="absolute bottom-1 right-0 bottom-14 w-[53%] h-[50%] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02] hover:z-10">
+      <img src="/Banner2.jpg" alt="Motorcycle helmet" class="w-full h-full object-cover">
+    </div>
+    
+    <!-- Small top middle image (item-3) -->
+    <div class="absolute left-[46.5%] top-0 w-[29%] h-[38%] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02] z-[2] hover:z-20">
+      <img src="/Banner3.jpg" alt="Motorcycle gloves" class="w-full h-full object-cover">
+    </div>
+    
+    <!-- Small top right image (item-4) -->
+    <div class="absolute right-0 top-0 w-[23%] h-[38%] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02] z-[2] hover:z-20">
+      <img src="/Banner4.jpg" alt="Motorcycle protective gear" class="w-full h-full object-cover">
+    </div>
+  </div>
+  
+  <!-- Tablet Layout (md only) -->
+  <div class="relative hidden md:block lg:hidden" style="height: 500px;">
+    <!-- Top left -->
+    <div class="absolute left-0 top-0 w-[48%] h-[65%] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02]">
+      <img src="/Banner1.jpg" alt="Motorcycle rider back view" class="w-full h-full object-cover">
+    </div>
+    
+    <!-- Top right -->
+    <div class="absolute right-0 top-0 w-[48%] h-[65%] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02]">
+      <img src="/Banner2.jpg" alt="Motorcycle helmet" class="w-full h-full object-cover">
+    </div>
+    
+    <!-- Bottom left -->
+    <div class="absolute left-0 bottom-0 w-[48%] h-[30%] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02]">
+      <img src="/Banner3.jpg" alt="Motorcycle gloves" class="w-full h-full object-cover">
+    </div>
+    
+    <!-- Bottom right -->
+    <div class="absolute right-0 bottom-0 w-[48%] h-[30%] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02]">
+      <img src="/Banner4.jpg" alt="Motorcycle protective gear" class="w-full h-full object-cover">
+    </div>
+  </div>
+  
+  <!-- Mobile Layout (sm and below) -->
+  <div class="md:hidden space-y-4">
+    <div class="w-full h-64 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02]">
+      <img src="/Banner1.jpg" alt="Motorcycle rider back view" class="w-full h-full object-cover">
+    </div>
+    
+    <div class="w-full h-64 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02]">
+      <img src="/Banner2.jpg" alt="Motorcycle helmet" class="w-full h-full object-cover">
+    </div>
+    
+    <div class="w-full h-64 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02]">
+      <img src="/Banner3.jpg" alt="Motorcycle gloves" class="w-full h-full object-cover">
+    </div>
+    
+    <div class="w-full h-64 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-[1.02]">
+      <img src="/Banner4.jpg" alt="Motorcycle protective gear" class="w-full h-full object-cover">
+    </div>
+  </div>
+</section>
 
 <%- include("../partials/footer")  %>
 

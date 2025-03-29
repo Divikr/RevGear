@@ -1,104 +1,142 @@
 <%- include("../partials/header.ejs") %>
-
 <br>
 
- <nav class="text-sm ml-6 font-medium text-gray-700 mb-6 ">
-  <ol class="list-reset flex">
+<nav class="text-sm px-4 sm:ml-6 font-medium text-gray-700 mb-4 sm:mb-6">
+  <ol class="flex items-center space-x-2">
     <li>
       <a href="/home" class="text-blue-600 hover:text-blue-700">Home</a>
     </li>
-    <li class="mx-2">/</li>
+    <li>/</li>
     <li class="text-gray-400">Profile</li>
   </ol>
 </nav>
 
+<div class="container mx-auto my-6 sm:my-10 px-4 sm:px-6 lg:px-8">
+  <div class="bg-gradient-to-br from-white to-blue-50 shadow-lg sm:shadow-2xl rounded-xl overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 p-4 sm:p-6">
+     
+      <div class="lg:hidden mb-6">
+        <button id="mobileMenuButton" class="w-full flex justify-between items-center p-4 bg-white border border-blue-200 rounded-lg shadow-sm hover:bg-blue-50 transition-colors">
+          <span class="font-medium text-gray-700">Menu</span>
+          <i class="fas fa-chevron-down text-blue-500 transition-transform duration-300" id="mobileMenuIcon"></i>
+        </button>
+        <div id="mobileMenuContent" class="hidden mt-2 bg-white border border-blue-100 rounded-lg shadow-md overflow-hidden">
+          <ul class="space-y-1">
+            <li>
+              <a href="/profile" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50">
+                <i class="fas fa-user text-blue-500 mr-4"></i>
+                <span class="text-gray-700">Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="/addressbook" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50">
+                <i class="fas fa-map-marker-alt text-blue-500 mr-4"></i>
+                <span class="text-gray-700">Address</span>
+              </a>
+            </li>
+            <li>
+              <a href="/wallet" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50">
+                <i class="fas fa-wallet text-blue-500 mr-4"></i>
+                <span class="text-gray-700">Wallet</span>
+              </a>
+            </li>
+            <li>
+              <a href="/orderlist" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50">
+                <i class="fas fa-box text-blue-500 mr-4"></i>
+                <span class="text-gray-700">Order</span>
+              </a>
+            </li>
+            <li>
+              <a href="/logout" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-red-50">
+                <i class="fas fa-sign-out-alt text-red-500 mr-4"></i>
+                <span class="text-gray-700">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
 
-<div class="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
-  <div class="bg-gradient-to-br from-white to-blue-50 shadow-2xl rounded-xl overflow-hidden">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 p-6">
    
-      <div class="col-span-1 bg-white border border-blue-100 p-6 rounded-xl shadow-lg">
-        <ul class="space-y-6">
+      <div class="hidden lg:block col-span-1 bg-white border border-blue-100 p-4 sm:p-6 rounded-xl shadow-md sm:shadow-lg">
+        <ul class="space-y-3 sm:space-y-4">
           <li>
-            <a href="/profile" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
-              <i class="fas fa-user text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
-              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Profile</span>
+            <a href="/profile" class="flex items-center p-3 sm:p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-sm sm:hover:shadow-md">
+              <i class="fas fa-user text-blue-500 text-sm sm:text-base mr-3 sm:mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-sm sm:text-base text-gray-700 group-hover:text-blue-600 group-hover:font-medium">Profile</span>
             </a>
           </li>
           <li>
-            <a href="/addressbook" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
-              <i class="fas fa-map-marker-alt text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
-              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Address</span>
-            </a>
-          </li>
-          
-          <li>
-            <a href="/wallet" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
-              <i class="fas fa-wallet text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
-              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Wallet</span>
+            <a href="/addressbook" class="flex items-center p-3 sm:p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-sm sm:hover:shadow-md">
+              <i class="fas fa-map-marker-alt text-blue-500 text-sm sm:text-base mr-3 sm:mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-sm sm:text-base text-gray-700 group-hover:text-blue-600 group-hover:font-medium">Address</span>
             </a>
           </li>
           <li>
-            <a href="/orderlist" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
-              <i class="fas fa-box text-blue-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
-              <span class="text-gray-700 group-hover:text-blue-600 group-hover:font-semibold">Order</span>
+            <a href="/wallet" class="flex items-center p-3 sm:p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-sm sm:hover:shadow-md">
+              <i class="fas fa-wallet text-blue-500 text-sm sm:text-base mr-3 sm:mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-sm sm:text-base text-gray-700 group-hover:text-blue-600 group-hover:font-medium">Wallet</span>
             </a>
           </li>
-        
           <li>
-            <a href="/logout" class="flex items-center p-4 rounded-lg group transition-all duration-300 hover:bg-red-50 hover:shadow-md">
-              <i class="fas fa-sign-out-alt text-red-500 mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
-              <span class="text-gray-700 group-hover:text-red-600 group-hover:font-semibold">Logout</span>
+            <a href="/orderlist" class="flex items-center p-3 sm:p-4 rounded-lg group transition-all duration-300 hover:bg-blue-50 hover:shadow-sm sm:hover:shadow-md">
+              <i class="fas fa-box text-blue-500 text-sm sm:text-base mr-3 sm:mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-sm sm:text-base text-gray-700 group-hover:text-blue-600 group-hover:font-medium">Order</span>
+            </a>
+          </li>
+          <li>
+            <a href="/logout" class="flex items-center p-3 sm:p-4 rounded-lg group transition-all duration-300 hover:bg-red-50 hover:shadow-sm sm:hover:shadow-md">
+              <i class="fas fa-sign-out-alt text-red-500 text-sm sm:text-base mr-3 sm:mr-4 group-hover:scale-110 group-hover:rotate-6"></i>
+              <span class="text-sm sm:text-base text-gray-700 group-hover:text-red-600 group-hover:font-medium">Logout</span>
             </a>
           </li>
         </ul>
       </div>
 
-      <div class="col-span-3 bg-white shadow-lg rounded-xl border border-blue-100 p-8">
-        <h1 class="text-2xl font-bold mb-8 text-gray-800">Manage My Account</h1>
-        <form id="profileForm" class="space-y-6" action="/edit-profile" method="POST">
-       
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+      <div class="col-span-3 bg-white shadow-md sm:shadow-lg rounded-xl border border-blue-100 p-4 sm:p-6 md:p-8">
+        <h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 md:mb-8 text-gray-800">Manage My Account</h1>
+        
+        <form id="profileForm" class="space-y-4 sm:space-y-6" action="/edit-profile" method="POST">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label for="name" class="block font-medium text-gray-700 mb-2">Name</label>
-              <input type="text" id="name" name="name" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.name %>">
+              <label for="name" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Name</label>
+              <input type="text" id="name" name="name" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base" value="<%= user.name %>">
             </div>
             <div>
-              <label for="email" class="block font-medium text-gray-700 mb-2">Email</label>
-              <input type="email" id="email" name="email" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.email %>"  readonly>
+              <label for="email" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Email</label>
+              <input type="email" id="email" name="email" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-gray-100" value="<%= user.email %>" readonly>
             </div>
           </div>
-        
-  
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label for="phone" class="block font-medium text-gray-700 mb-2">Phone Number</label>
-              <input type="tel" id="phone" name="phone" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-4 py-2" value="<%= user.phone %>" >
+              <label for="phone" class="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Phone Number</label>
+              <input type="tel" id="phone" name="phone" class="border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base" value="<%= user.phone %>">
             </div>
           </div>
-        
-          
+
           <div class="flex justify-end">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg text-base transition-all transform hover:scale-105">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg text-sm sm:text-base transition-all transform hover:scale-105">
               Save Changes
             </button>
           </div>
         </form>
         
-        <br>
-        
-        <div class="bg-blue-50 p-4 rounded-xl shadow-md border border-blue-200 transition-all duration-300 hover:shadow-xl transform hover:scale-102 w-1/2">
-          <h3 class="text-lg font-semibold mb-4 text-gray-800">Account Security</h3>
-          <div class="space-y-2">
-            <p>Password</p>
-            
-           <a href="/changePassword" class="text-blue-600 hover:underline font-medium mt-2">Change Password</a> 
-          </div>
-        </div>
+        <div class="mt-6 sm:mt-8">
+          <div class="bg-blue-50 p-4 sm:p-6 rounded-xl shadow-sm sm:shadow-md border border-blue-200 transition-all duration-300 hover:shadow-md sm:hover:shadow-lg w-full md:w-1/2">
+            <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800">Account Security</h3>
+            <div class="space-y-2">
+              <p class="text-sm sm:text-base">Password</p>
+              <a href="/changePassword" class="text-blue-600 hover:underline font-medium text-sm sm:text-base">Change Password</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+
   
 
 <%- include("../partials/footer.ejs") %>
@@ -107,6 +145,17 @@
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="/js/header.js"></script>
 <script>
+
+ 
+ document.getElementById('mobileMenuButton').addEventListener('click', function() {
+    const menuContent = document.getElementById('mobileMenuContent');
+    const menuIcon = document.getElementById('mobileMenuIcon');
+    
+    menuContent.classList.toggle('hidden');
+    menuIcon.classList.toggle('fa-chevron-down');
+    menuIcon.classList.toggle('fa-chevron-up');
+  });
+
 const form = document.getElementById('profileForm');
 const nameInput = document.getElementById('name');
 const emailInput = document.getElementById('email');

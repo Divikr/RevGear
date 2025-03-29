@@ -88,11 +88,6 @@ https://cdn.jsdelivr.net/npm/razorpay@2.9.5/dist/razorpay.min.js
       <!-- Logo -->
       <div class="text-2xl font-bold cursor-pointer">REVGEAR</div>
 
-      <!-- Mobile Menu Button -->
-      <button id="mobileMenuBtn" class="md:hidden text-white focus:outline-none">
-        <i class="fas fa-bars text-2xl"></i>
-      </button>
-
       <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center space-x-6">
         <a href="/home" class="hover:text-red-500 transition-colors">Home</a>
@@ -130,20 +125,30 @@ https://cdn.jsdelivr.net/npm/razorpay@2.9.5/dist/razorpay.min.js
         </div>
       </div>
 
-      <!-- Mobile Search Button -->
-      <button id="mobileSearchBtn" class="md:hidden text-xl text-white ml-4">
-        <i class="fas fa-search"></i>
-      </button>
+      <!-- Mobile Controls - Grouped on right side -->
+      <div class="md:hidden flex items-center space-x-4">
+        <!-- Mobile Search Button -->
+        <button id="mobileSearchBtn" class="text-xl text-white">
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuBtn" class="text-white focus:outline-none">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
+      </div>
     </nav>
 
     <!-- Mobile Search Container -->
     <div id="mobileSearchContainer" class="md:hidden mt-4 hidden px-4">
       <div class="relative">
         <input type="text" id="mobileSearchInput" placeholder="Search for products..." 
-          class="w-full bg-gray-800 text-white px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500" />
-        <button onclick="performMobileSearch()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500">
+          class="w-full bg-gray-800 text-white px-6 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300" 
+          autocomplete="off" />
+        <button onclick="performSearch('mobile')" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-400 transition-colors">
           <i class="fas fa-search text-lg"></i>
         </button>
+        <div id="mobileSearchSuggestions" class="absolute w-full mt-2 bg-white rounded-lg shadow-xl max-h-96 overflow-y-auto hidden z-50"></div>
       </div>
     </div>
   </div>
@@ -176,328 +181,261 @@ https://cdn.jsdelivr.net/npm/razorpay@2.9.5/dist/razorpay.min.js
     </div>
   </div>
 </div>
-  
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
    <script>
 
+// Mobile menu functionality
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileMenuCloseBtn = document.getElementById('mobileMenuCloseBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const mobileSearchBtn = document.getElementById('mobileSearchBtn');
-    const mobileSearchContainer = document.getElementById('mobileSearchContainer');
+const mobileMenuCloseBtn = document.getElementById('mobileMenuCloseBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+const mobileSearchContainer = document.getElementById('mobileSearchContainer');
 
-    mobileMenuBtn.addEventListener('click', () => {
-      mobileMenu.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    });
+mobileMenuBtn.addEventListener('click', () => {
+  mobileMenu.classList.add('active');
+  document.body.style.overflow = 'hidden';
+});
 
-    mobileMenuCloseBtn.addEventListener('click', () => {
-      mobileMenu.classList.remove('active');
-      document.body.style.overflow = 'auto';
-    });
+mobileMenuCloseBtn.addEventListener('click', () => {
+  mobileMenu.classList.remove('active');
+  document.body.style.overflow = 'auto';
+});
 
-    mobileSearchBtn.addEventListener('click', () => {
-      mobileSearchContainer.classList.toggle('hidden');
-      if (!mobileSearchContainer.classList.contains('hidden')) {
-        document.getElementById('mobileSearchInput').focus();
-      }
-    });
+mobileSearchBtn.addEventListener('click', () => {
+  mobileSearchContainer.classList.toggle('hidden');
+  if (!mobileSearchContainer.classList.contains('hidden')) {
+    document.getElementById('mobileSearchInput').focus();
+  }
+});
 
-    // Close mobile menu when clicking outside
-    mobileMenu.addEventListener('click', (e) => {
-      if (e.target === mobileMenu) {
-        mobileMenu.classList.remove('active');
-        document.body.style.overflow = 'auto';
-      }
-    });
+mobileMenu.addEventListener('click', (e) => {
+  if (e.target === mobileMenu) {
+    mobileMenu.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+});
 
-    // Mobile search functionality
-    function performMobileSearch() {
-      const query = document.getElementById('mobileSearchInput').value.trim();
-      if (query) {
-        window.location.href = `/search?query=${encodeURIComponent(query)}`;
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Empty Search',
-          text: 'Please enter a search term',
-          confirmButtonColor: '#EF4444'
-        });
+// Dropdown menu functionality
+const dropdownButton = document.getElementById("dropdownButton");
+const dropdownMenu = document.getElementById("dropdownMenu");
+
+dropdownButton.addEventListener("click", () => {
+  if (dropdownMenu.style.display === "none" || dropdownMenu.style.display === "") {
+    dropdownMenu.style.display = "block";
+  } else {
+    dropdownMenu.style.display = "none";
+  }
+});
+
+window.addEventListener("click", (event) => {
+  if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+    dropdownMenu.style.display = "none";
+  }
+});
+
+// Search elements
+const searchInput = document.getElementById('searchInput');
+const searchSuggestions = document.getElementById('searchSuggestions');
+const mobileSearchInput = document.getElementById('mobileSearchInput');
+const mobileSearchSuggestions = document.getElementById('mobileSearchSuggestions');
+
+// Debounce function
+let searchTimeout;
+function debounce(func, wait) {
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(searchTimeout);
+      func(...args);
+    };
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(later, wait);
+  };
+}
+
+// Search functionality setup
+function setupSearch(inputElement, suggestionsElement) {
+  inputElement.addEventListener('focus', () => {
+    if (inputElement.value.trim()) {
+      suggestionsElement.classList.remove('hidden');
+    }
+  });
+
+  inputElement.addEventListener('blur', (e) => {
+    if (!e.relatedTarget?.closest(`#${suggestionsElement.id}`)) {
+      suggestionsElement.classList.add('hidden');
+    }
+  });
+
+  inputElement.addEventListener('input', (e) => {
+    debouncedSearch(e.target.value, suggestionsElement);
+  });
+
+  inputElement.addEventListener('keydown', (e) => {
+    if (!suggestionsElement.classList.contains('hidden')) {
+      const suggestions = suggestionsElement.querySelectorAll('a');
+      const currentIndex = Array.from(suggestions).findIndex(suggestion =>
+        suggestion.classList.contains('bg-gray-50'));
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          if (currentIndex < suggestions.length - 1) {
+            suggestions[currentIndex]?.classList.remove('bg-gray-50');
+            suggestions[currentIndex + 1]?.classList.add('bg-gray-50');
+            suggestions[currentIndex + 1]?.scrollIntoView({
+              block: 'nearest'
+            });
+          }
+          break;
+
+        case 'ArrowUp':
+          e.preventDefault();
+          if (currentIndex > 0) {
+            suggestions[currentIndex]?.classList.remove('bg-gray-50');
+            suggestions[currentIndex - 1]?.classList.add('bg-gray-50');
+            suggestions[currentIndex - 1]?.scrollIntoView({
+              block: 'nearest'
+            });
+          }
+          break;
+
+        case 'Enter':
+          e.preventDefault();
+          const selectedSuggestion = suggestionsElement.querySelector('a.bg-gray-50');
+          if (selectedSuggestion) {
+            window.location.href = selectedSuggestion.href;
+          } else if (inputElement.value.trim()) {
+            window.location.href = `/search?query=${encodeURIComponent(inputElement.value.trim())}`;
+          }
+          break;
+
+        case 'Escape':
+          suggestionsElement.classList.add('hidden');
+          inputElement.blur();
+          break;
       }
     }
+  });
+}
 
+// Initialize both search inputs
+setupSearch(searchInput, searchSuggestions);
+setupSearch(mobileSearchInput, mobileSearchSuggestions);
 
+// Search handler
+async function handleSearch(query, suggestionsElement) {
+  if (!query.trim()) {
+    suggestionsElement.classList.add('hidden');
+    return;
+  }
 
+  try {
+    suggestionsElement.classList.remove('hidden');
+    suggestionsElement.innerHTML = `
+      <div class="p-4 text-center text-gray-500">
+        <i class="fas fa-spinner fa-spin mr-2"></i> Searching...
+      </div>
+    `;
 
+    const response = await fetch(`/api/search/suggestions?q=${encodeURIComponent(query)}`);
+    const data = await response.json();
 
-
-
-
-    const dropdownButton = document.getElementById("dropdownButton");
-    const dropdownMenu = document.getElementById("dropdownMenu");
-
-    dropdownButton.addEventListener("click", () => {
-      if (dropdownMenu.style.display === "none" || dropdownMenu.style.display === "") {
-        dropdownMenu.style.display = "block";
-      } else {
-        dropdownMenu.style.display = "none";
-      }
-    });
-
-
-    window.addEventListener("click", (event) => {
-      if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
-        dropdownMenu.style.display = "none";
-      }
-    });
-
-   
-    function expandSearchBar() {
-      const searchInput = document.getElementById("searchInput");
-      const clearButton = document.getElementById("clearSearchButton");
-      searchInput.style.width = "300px";
-      if (searchInput.value) {
-        clearButton.style.display = "block";
-      }
+    if (!response.ok) {
+      throw new Error(data.message || 'Search failed');
     }
 
-    function handleSearch(event) {
-      const query = event.target.value.trim();
-      const clearButton = document.getElementById("clearSearchButton");
-      if (query) {
-        clearButton.style.display = "block";
-        if (event.key === 'Enter') {
-          window.location.href = `/search?query=${encodeURIComponent(query)}`;
-        }
-      } else {
-        clearButton.style.display = "none";
-      }
+    if (!data.suggestions || data.suggestions.length === 0) {
+      suggestionsElement.innerHTML = `
+        <div class="p-4 text-center text-gray-500">
+          No products found
+        </div>
+      `;
+      return;
     }
 
-   
-    function clearSearchBar() {
-      const searchInput = document.getElementById("searchInput");
-      const clearButton = document.getElementById("clearSearchButton");
-      searchInput.value = "";
-      clearButton.style.display = "none";
-    }
- function toggleClearButton() {
-      const searchInput = document.getElementById("searchInput");
-      const clearButton = document.getElementById("clearSearchButton");
-      if (searchInput.value.trim()) {
-        clearButton.style.display = "block";
-      } else {
-        clearButton.style.display = "none";
-      }
-    }
+    const suggestions = data.suggestions.map(product => `
+      <a href="/product/${product._id}" 
+        class="flex items-center p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
+        <img src="${product.productImage[0] || '/placeholder-image.png'}" 
+          alt="${product.productName}"
+          class="w-16 h-16 object-cover rounded-lg mr-4"
+          onerror="this.src='/placeholder-image.png'">
+        <div class="flex-1">
+          <div class="text-gray-900 font-medium text-lg">${product.productName}</div>
+          <div class="text-gray-500">${product.category}</div>
+        </div>
+        <div class="text-red-500 font-semibold text-lg">
+          ₹${product.salePrice.toLocaleString()}
+        </div>
+      </a>
+    `).join('');
 
+    suggestionsElement.innerHTML = suggestions;
 
+  } catch (error) {
+    console.error('Search error:', error);
+    suggestionsElement.innerHTML = `
+      <div class="p-4 text-center text-red-500">
+        <i class="fas fa-exclamation-circle mr-2"></i>
+        Failed to load search results
+      </div>
+    `;
+  }
+}
 
+const debouncedSearch = debounce((query, element) => handleSearch(query, element), 300);
 
-
-
-
-    let searchTimeout;
-
-   
-    function debounce(func, wait) {
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(searchTimeout);
-          func(...args);
-        };
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(later, wait);
-      };
-    }
-
-    
-    const searchInput = document.getElementById('searchInput');
-    const searchSuggestions = document.getElementById('searchSuggestions');
-
-   
-    searchInput.addEventListener('focus', () => {
-      searchInput.classList.add('expanded');
+// Perform search function
+function performSearch(type = 'desktop') {
+  const inputElement = type === 'mobile' ? mobileSearchInput : searchInput;
+  const query = inputElement.value.trim();
+  
+  if (query) {
+    window.location.href = `/search?query=${encodeURIComponent(query)}`;
+  } else {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Empty Search',
+      text: 'Please enter a search term',
+      confirmButtonColor: '#EF4444'
     });
+  }
+}
 
-    
-    searchInput.addEventListener('blur', (e) => {
-      if (!e.relatedTarget?.closest('#searchSuggestions')) {
-        searchInput.classList.remove('expanded');
-      }
-    });
+// Session check and dropdown menu setup
+document.addEventListener("DOMContentLoaded", async () => {
+  const dropdownMenu = document.getElementById("dropdownMenu");
 
-    
-    async function handleSearch(query) {
-      if (!query.trim()) {
-        searchSuggestions.classList.add('hidden');
-        return;
-      }
+  const response = await fetch('/api/check-session');
+  const data = await response.json();
 
-      try {
-     
-        searchSuggestions.classList.remove('hidden');
-        searchSuggestions.innerHTML = `
-            <div class="p-4 text-center text-gray-500">
-                <i class="fas fa-spinner fa-spin mr-2"></i> Searching...
-            </div>
-        `;
+  dropdownMenu.innerHTML = '';
 
-     
-        const response = await fetch(`/api/search/suggestions?q=${encodeURIComponent(query)}`);
-        const data = await response.json();
+  if (data.isAuthenticated) {
+    dropdownMenu.innerHTML = `
+      <a href="/profile" class="block px-4 py-2">Profile</a>
+      <a href="/logout" class="block px-4 py-2">Logout</a>
+    `;
+  } else {
+    dropdownMenu.innerHTML = `
+      <a href="/login" class="block px-4 py-2">Login</a>
+    `;
+  }
 
-        if (!response.ok) {
-          throw new Error(data.message || 'Search failed');
-        }
+  document.getElementById("dropdownButton").addEventListener("click", () => {
+    dropdownMenu.classList.toggle("hidden");
+  });
+});
 
-       
-        if (!data.suggestions || data.suggestions.length === 0) {
-          searchSuggestions.innerHTML = `
-                <div class="p-4 text-center text-gray-500">
-                    No products found
-                </div>
-            `;
-          return;
-        }
-
-       
-        const suggestions = data.suggestions.map(product => `
-            <a href="/product/${product._id}" 
-               class="flex items-center p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
-                <img src="${product.productImage[0] || '/placeholder-image.png'}" 
-                     alt="${product.productName}"
-                     class="w-16 h-16 object-cover rounded-lg mr-4"
-                     onerror="this.src='/placeholder-image.png'">
-                <div class="flex-1">
-                    <div class="text-gray-900 font-medium text-lg">${product.productName}</div>
-                    <div class="text-gray-500">${product.category}</div>
-                </div>
-                <div class="text-red-500 font-semibold text-lg">
-                    ₹${product.salePrice.toLocaleString()}
-                </div>
-            </a>
-        `).join('');
-
-        searchSuggestions.innerHTML = suggestions;
-
-      } catch (error) {
-        console.error('Search error:', error);
-        searchSuggestions.innerHTML = `
-            <div class="p-4 text-center text-red-500">
-                <i class="fas fa-exclamation-circle mr-2"></i>
-                Failed to load search results
-            </div>
-        `;
-      }
-    }
-
-    const debouncedSearch = debounce((query) => handleSearch(query), 300);
-
-   
-    searchInput.addEventListener('input', (e) => {
-      debouncedSearch(e.target.value);
-    });
-
-    searchInput.addEventListener('keydown', (e) => {
-      if (!searchSuggestions.classList.contains('hidden')) {
-        const suggestions = searchSuggestions.querySelectorAll('a');
-        const currentIndex = Array.from(suggestions).findIndex(suggestion =>
-          suggestion.classList.contains('bg-gray-50'));
-
-        switch (e.key) {
-          case 'ArrowDown':
-            e.preventDefault();
-            if (currentIndex < suggestions.length - 1) {
-              suggestions[currentIndex]?.classList.remove('bg-gray-50');
-              suggestions[currentIndex + 1]?.classList.add('bg-gray-50');
-              suggestions[currentIndex + 1]?.scrollIntoView({
-                block: 'nearest'
-              });
-            }
-            break;
-
-          case 'ArrowUp':
-            e.preventDefault();
-            if (currentIndex > 0) {
-              suggestions[currentIndex]?.classList.remove('bg-gray-50');
-              suggestions[currentIndex - 1]?.classList.add('bg-gray-50');
-              suggestions[currentIndex - 1]?.scrollIntoView({
-                block: 'nearest'
-              });
-            }
-            break;
-
-          case 'Enter':
-            e.preventDefault();
-            const selectedSuggestion = searchSuggestions.querySelector('a.bg-gray-50');
-            if (selectedSuggestion) {
-              window.location.href = selectedSuggestion.href;
-            } else if (searchInput.value.trim()) {
-              window.location.href = `/search?query=${encodeURIComponent(searchInput.value.trim())}`;
-            }
-            break;
-
-          case 'Escape':
-            searchSuggestions.classList.add('hidden');
-            searchInput.blur();
-            break;
-        }
-      }
-    });
-
-    
-    document.addEventListener('click', (e) => {
-      if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
-        searchSuggestions.classList.add('hidden');
-      }
-    });
-
-    
-    function performSearch() {
-      const query = searchInput.value.trim();
-      if (query) {
-        window.location.href = `/search?query=${encodeURIComponent(query)}`;
-      } else {
-      
-        Swal.fire({
-          icon: 'warning',
-          title: 'Empty Search',
-          text: 'Please enter a search term',
-          confirmButtonColor: '#EF4444'
-        });
-      }
-    }
-
-
-    document.addEventListener("DOMContentLoaded", async () => {
-        const dropdownMenu = document.getElementById("dropdownMenu");
-
-
-        const response = await fetch('/api/check-session');
-        const data = await response.json();
-
-        
-        dropdownMenu.innerHTML = '';
-
-        if (data.isAuthenticated) {
-          
-            dropdownMenu.innerHTML = `
-                <a href="/profile" class="block px-4 py-2">Profile</a>
-                <a href="/logout" class="block px-4 py-2">Logout</a>
-            `;
-        } else {
-           
-            dropdownMenu.innerHTML = `
-                <a href="/login" class="block px-4 py-2">Login</a>
-               
-            `;
-        }
-
-        document.getElementById("dropdownButton").addEventListener("click", () => {
-            dropdownMenu.classList.toggle("hidden");
-        });
-    });
+// Close suggestions when clicking outside
+document.addEventListener('click', (e) => {
+  if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+    searchSuggestions.classList.add('hidden');
+  }
+  if (!mobileSearchInput.contains(e.target) && !mobileSearchSuggestions.contains(e.target)) {
+    mobileSearchSuggestions.classList.add('hidden');
+  }
+});
 
   </script>

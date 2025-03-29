@@ -1,111 +1,104 @@
 <%- include("../partials/header.ejs")  %>
 <br>
+<nav class="text-sm ml-2 sm:ml-6 font-medium text-gray-700 mb-4 sm:mb-6">
+  <ol class="flex items-center space-x-2">
+    <li>
+      <a href="/home" class="text-blue-600 hover:text-blue-700">Home</a>
+    </li>
+    <li>/</li>
+    <li>
+      <a href="/product" class="text-blue-600 hover:text-blue-700">Shop</a>
+    </li>
+    <li>/</li>
+    <li class="text-gray-400">Wishlist</li>
+  </ol>
+</nav>
 
- <nav class="text-sm ml-6 font-medium text-gray-700 mb-6 ">
-    <ol class="list-reset flex">
-      <li>
-        <a href="/home" class="text-blue-600 hover:text-blue-700">Home</a>
-      </li>
-      <li class="mx-2">/</li>
-      <li>
-        <a href="/product" class="text-blue-600 hover:text-blue-700">Shop</a>
-      </li>
-      <li class="mx-2">/</li>
-      
-      <li class="text-gray-400">Whislist</li>
-    </ol>
-  </nav>
-<div class="text-center mb-8">
-    <h1 class="font-playfair text-3xl mb-2 text-[#1a1a1a]">Your Wishlist</h1>
+<div class="text-center mb-6 sm:mb-8 px-4">
+  <h1 class="font-playfair text-2xl sm:text-3xl mb-2 text-gray-900">Your Wishlist</h1>
 </div>
-<section class="mb-12 ml-8">
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
+
+<section class="mb-12 px-4 sm:px-8">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
     <% if (wishlistProducts && wishlistProducts.length > 0) { %>
-        <% wishlistProducts.forEach(function(product) { %>
-            <div class="wishlist-card">
-            <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-[480px] product-card" data-item-id="<%= product._id %>">
-                <div class="relative h-[250px] overflow-hidden">
-                    <a href="/product/<%= product._id %>">
-                        <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
-                    </a>
-                    <% if (product.discount > 0) { %>
-                        <div class="absolute top-3 right-3 bg-red-500 text-white py-1 px-3 rounded-full text-xs font-semibold">
-                            <%= product.discount %>% OFF
-                        </div>
-                    <% } %>
+      <% wishlistProducts.forEach(function(product) { %>
+        <div class="wishlist-card">
+          <div class="bg-white rounded-lg sm:rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col h-full min-h-[400px] sm:h-[480px] product-card" data-item-id="<%= product._id %>">
+            <div class="relative h-48 sm:h-[250px] overflow-hidden">
+              <a href="/product/<%= product._id %>">
+                <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" 
+                  class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+              </a>
+              <% if (product.discount > 0) { %>
+                <div class="absolute top-2 right-2 sm:top-3 sm:right-3 bg-red-500 text-white py-1 px-2 sm:px-3 rounded-full text-xs font-semibold">
+                  <%= product.discount %>% OFF
                 </div>
-                
-                <div class="p-4 flex-grow flex flex-col">
-                    <div class="text-gray-500 uppercase text-xs mb-1"><%= product.brand %></div>
-                    <h3 class="text-base font-bold text-[#1a1a1a] mb-2 line-clamp-2 h-12"><%= product.productName %></h3>
-                    
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="flex items-center">
-                            <span class="text-xl font-bold text-red-600">₹<%= Math.round(product.salePrice) %></span>
-                            <span class="text-sm text-gray-400 line-through ml-2">₹<%= product.regularPrice %></span>
-                        </div>
-                        <% if (product.quantity > 0) { %>
-                            <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded"><%= product.productOffer %> % OFF</span>
-                            <% } else { %>
-                            <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded out-of-stock-indicator">Out of Stock</span>
-                            <% } %>
-                    </div>
-
-                    <div class="flex items-center mb-2">
-                        <% for (let i = 0; i < 5; i++) { %>
-                            <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20" fill="<%= i < (product.rating || 0) ? 'currentColor' : '#e5e7eb' %>">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                        <% } %>
-                        <span class="text-gray-500 text-sm ml-2">(<%= product.reviewCount || 0 %>)</span>
-                    </div>
-
-                   
-
-                
-                      <br>
-
-                    <div class="flex justify-between items-center mt-auto">
-                        
-                            <button onclick="addToCart('<%= product._id %>', this)" 
-                              data-product-id="<%= product._id %>" 
-                              class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 cart-btn <%= product.quantity === 0 ? 'opacity-50 cursor-not-allowed' : '' %>" 
-                              <%= product.quantity === 0 ? 'disabled' : '' %>>
-                              <span class="cart-text flex items-center justify-center space-x-2">
-                                <i class="fas fa-shopping-cart"></i>
-                                <span>Add to Cart</span>
-                              </span>
-                            </button>
-                         
-                    
-                        <div class="product-card" data-item-id="<%= product._id %>">
-                            <button class="remove-item p-2 text-gray-400 hover:text-red-500">
-                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        
-                       
-                    </div>
-                </div>
+              <% } %>
             </div>
+            
+            <div class="p-3 sm:p-4 flex-grow flex flex-col">
+              <div class="text-gray-500 uppercase text-xs mb-1"><%= product.brand %></div>
+              <h3 class="text-sm sm:text-base font-bold text-gray-900 mb-2 line-clamp-2 h-12"><%= product.productName %></h3>
+              
+              <div class="flex justify-between items-center mb-2 sm:mb-3">
+                <div class="flex items-center">
+                  <span class="text-lg sm:text-xl font-bold text-red-600">₹<%= Math.round(product.salePrice) %></span>
+                  <span class="text-xs sm:text-sm text-gray-400 line-through ml-2">₹<%= product.regularPrice %></span>
+                </div>
+                <% if (product.quantity > 0) { %>
+                  <span class="bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded"><%= product.productOffer %> % OFF</span>
+                <% } else { %>
+                  <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-0.5 rounded">Out of Stock</span>
+                <% } %>
+              </div>
+
+              <div class="flex items-center mb-2">
+                <% for (let i = 0; i < 5; i++) { %>
+                  <svg class="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" viewBox="0 0 20 20" fill="<%= i < (product.rating || 0) ? 'currentColor' : '#e5e7eb' %>">
+                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                  </svg>
+                <% } %>
+                <span class="text-gray-500 text-xs sm:text-sm ml-1 sm:ml-2">(<%= product.reviewCount || 0 %>)</span>
+              </div>
+
+              <div class="flex justify-between items-center mt-auto pt-2">
+                <button onclick="addToCart('<%= product._id %>', this)" 
+                  data-product-id="<%= product._id %>" 
+                  class="w-full bg-red-600 hover:bg-red-700 text-white font-medium sm:font-bold py-2 sm:py-3 px-3 sm:px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 text-sm sm:text-base <%= product.quantity === 0 ? 'opacity-50 cursor-not-allowed' : '' %>" 
+                  <%= product.quantity === 0 ? 'disabled' : '' %>>
+                  <span class="flex items-center justify-center space-x-1 sm:space-x-2">
+                    <i class="fas fa-shopping-cart text-xs sm:text-sm"></i>
+                    <span>Add to Cart</span>
+                  </span>
+                </button>
+                
+                <button class="remove-item p-1 sm:p-2 text-gray-400 hover:text-red-500 ml-2">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <% }); %>
+      <% }); %>
     <% } else { %>
-        <div class="col-span-full py-16 flex flex-col items-center justify-center">
-            <svg class="w-24 h-24 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-            </svg>
-            <h2 class="font-playfair text-2xl font-bold text-gray-900 mb-2">
-                Your Wishlist is Empty
-            </h2>
-            <p class="text-gray-600 text-center max-w-md">
-                Discover our latest collections and add your favorite pieces to create your perfect wardrobe.
-            </p>
-        </div>
+      <div class="col-span-full py-8 sm:py-16 flex flex-col items-center justify-center px-4">
+        <svg class="w-16 h-16 sm:w-24 sm:h-24 text-gray-300 mb-4 sm:mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+        <h2 class="font-playfair text-xl sm:text-2xl font-bold text-gray-900 mb-2 text-center">
+          Your Wishlist is Empty
+        </h2>
+        <p class="text-gray-600 text-center text-sm sm:text-base max-w-md">
+          Discover our latest collections and add your favorite pieces to create your perfect wardrobe.
+        </p>
+        <a href="/products" class="mt-4 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-full transition duration-300">
+          Shop Now
+        </a>
+      </div>
     <% } %>
-</div>
+  </div>
 </section>
 <%- include("../partials/footer.ejs")  %>
 
