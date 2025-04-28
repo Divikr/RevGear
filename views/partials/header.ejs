@@ -390,7 +390,7 @@ const debouncedSearch = debounce((query, element) => handleSearch(query, element
 function performSearch(type = 'desktop') {
   const inputElement = type === 'mobile' ? mobileSearchInput : searchInput;
   const query = inputElement.value.trim();
-  
+  console.log(query,"query")
   if (query) {
     window.location.href = `/search?query=${encodeURIComponent(query)}`;
   } else {

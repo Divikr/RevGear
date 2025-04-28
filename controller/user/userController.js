@@ -475,21 +475,47 @@ const category = async (req, res) => {
 
 const searchProducts = async (req, res) => {
     try {
-        const { query } = req.query; 
+        const { page = 1, limit = 5, sort,query } = req.query; 
+        
         if (!query) {
             return res.status(400).send("Query parameter is required.");
         }
 
+        
+
+        let sortCriteria = {};
+        switch (sort) {
+            case 'a-z':
+                sortCriteria = { productName: 1 };
+                break;
+            case 'z-a':
+                sortCriteria = { productName: -1 };
+                break;
+            case 'low-to-high':
+                sortCriteria = { salePrice: 1 };
+                break;
+            case 'high-to-low':
+                sortCriteria = { salePrice: -1 };
+                break;
+            default:
+                sortCriteria = {};
+        }
        
         const products = await Products.find({
             isBlocked: false,
             $or: [
                 { productName: { $regex: query, $options: 'i' } },
-                { description: { $regex: query, $options: 'i' } }
+                { description: { $regex: query, $options: 'i' } },
+               
             ]
         })
-        .select('productName productImage') 
-        .lean(); 
+       
+        .lean()
+        .sort(sortCriteria)
+            .skip((page - 1) * 8)
+            .limit(8);
+
+console.log(products,"products")
 
         const categories = await Category.find({}); 
 
@@ -502,10 +528,18 @@ const searchProducts = async (req, res) => {
             });
         }
 
+        const totalProducts = await Products.countDocuments({ isBlocked: false });
+        const totalPages = Math.ceil(totalProducts / 8);
+
         res.render('user/allProducts', {
             products,
             categories, 
-            sort
+            sort,
+            currentPage: parseInt(page),
+            totalPages,
+            limit: 8,
+            query:req.query
+              
         });
     } catch (error) {
         console.error("Error rendering home page:", error);

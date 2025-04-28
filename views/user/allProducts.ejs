@@ -99,7 +99,7 @@
                   <h2 class="text-sm font-bold text-gray-400 mb-5"><%= product.description %></h2>
                   <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center">
-                      <span class="text-2xl font-bold text-red-600">₹<%= Math.round(product.salePrice) %></span>
+                      <span class="text-2xl font-bold text-red-600">₹<%= Math.round(product.salePrice)   %></span>
                       <span class="text-sm text-gray-500 line-through ml-2">₹<%= product.regularPrice %></span>
                     </div>
                     <% if (product.quantity > 0) { %>
