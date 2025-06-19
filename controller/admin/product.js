@@ -25,7 +25,7 @@ const getProduct = async (req, res) => {
     const products = await Product.find(searchQuery)
       .skip(skip)
       .limit(limit);
-
+      console.log(products)
     res.render('products', {
       products,
       currentPage: page,
