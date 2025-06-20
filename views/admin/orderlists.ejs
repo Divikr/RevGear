@@ -283,7 +283,6 @@
                             <th>ID</th>
                             <th>Status</th>
                             <th>Date</th>
-                            <th>Customer</th>
                             <th>Total Price</th>
                             <th>Action</th>
                         </tr>
@@ -305,7 +304,7 @@
                                         </span>
                                     </td>
                                     <td><%= new Date(orderItem.orderDate).toLocaleDateString() %></td>
-                                    <td><%= orderItem.userId.name %></td>
+                                    
                                     <td>₹<%= orderItem.totalAmount.toFixed(2) %></td>
                                     <td>
                                         <button class="btn btn-primary btn-sm view-btn" data-id="<%= orderItem._id %>">

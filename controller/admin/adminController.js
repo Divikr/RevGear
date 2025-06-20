@@ -110,7 +110,7 @@ const orderlists = async (req, res) => {
         const totalOrders = await Order.countDocuments(); 
         const totalPages = Math.ceil(totalOrders / limit); 
 
-        res.render('orderLists', { 
+        res.render('orderlists', { 
             orders,
             totalPages,
             currentPage: parseInt(page, 10), 
@@ -142,7 +142,7 @@ const viewOrder = async (req, res) => {
             return res.status(404).send('Order not found');
         }
 
-        res.render('viewOrderList', { orderDetails });
+        res.render('vieworderlist', { orderDetails });
     } catch (error) {
         console.error('Error loading user single order:', error.message);
         res.status(500).send('Internal Server Error');

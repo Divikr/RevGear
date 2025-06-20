@@ -63,7 +63,7 @@ const orderconfirm = async (req, res) => {
         const totalOrders = await Order.countDocuments({ userId: id });
         const totalPages = Math.ceil(totalOrders / limit);
         
-        res.render("user/orderList", { 
+        res.render("user/orderlist", { 
             orders,
             page,
             totalPages
